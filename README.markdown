@@ -43,7 +43,7 @@ Default: m
     nmap [` <Plug>MMW_PrevSpotByPos
 
 This will allow to use the default behavior of m to set marks and, if the line already contains the mark, it'll be unset.  
-Default behavior of ]', [', ]` and [` enhanced by wrapped jumps.  
+Default behavior of ]', [', ]_`_ and [_`_ enhanced by wrapped jumps.  
 To disable the default mappings and use custom mappings, set
     let g:MarkMyWords_DefaultMappings = 0
 
