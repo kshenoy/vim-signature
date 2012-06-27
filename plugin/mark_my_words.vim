@@ -1,8 +1,6 @@
 " MarkMyWords.vim is a plugin to toggle, display and navigate marks.
 " Combines the functionality of primarily vim-showmarks and mark-tools.
 "
-" Last Change:	Jun 21, 2012
-" URL: 
 " Maintainer: Kartik Shenoy
 " vim: fdm=marker:et:ts=4:sw=4:sts=4
 "
@@ -62,8 +60,12 @@
 " ToDo:
 "   * Add color support for signs
 "   * Add custom character display support for signs
-"   * Multiple characters display support for signs
 "   * Add support for non-Alphabetical marks
+"
+" Changelist:
+"   2012-06-27 : Added support to display multiple marks
+"
+"   2012-06-22 : First release
 "
 "===========================================================================
 
@@ -75,24 +77,52 @@ let g:loaded_MarkMyWords = 1    " Version Number
 let s:keepcpo            = &cpo
 set cpo&vim
 
-"===============================================================================
-" Public Interface:
-" AppFunction: is a function you expect your users to call
-" PickAMap: some sequence of characters that will run your AppFunction
-" Repeat these three lines as needed for multiple functions which will
-" be used to provide an interface for the user
 
-"===============================================================================
-" s:AppFunction: this function is available vi the <Plug>/<script> interface above
+if !exists('g:MarkMyWords_IncludeMarks')
+    let g:MarkMyWords_IncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+endif
+if !exists('g:MarkMyWords_WrapJumps')
+    let g:MarkMyWords_WrapJumps = 1
+endif
+if !exists('g:MarkMyWords_leader')
+    let g:MarkMyWords_leader = "m"
+endif
+if !exists('g:MarkMyWords_DefaultMappings')
+    let g:MarkMyWords_DefaultMappings = 1
+endif
 
-"===============================================================================
-" s:InternalAppFunction: this function cannot be called from outside the
-" script, and its name won't clash with whatever else the user has loaded
+if g:MarkMyWords_DefaultMappings
+    nmap '] <Plug>MMW_NextLineByAlpha
+    nmap '[ <Plug>MMW_PrevLineByAlpha
+    nmap `] <Plug>MMW_NextSpotByAlpha
+    nmap `[ <Plug>MMW_PrevSpotByAlpha
+    nmap ]' <Plug>MMW_NextLineByPos
+    nmap [' <Plug>MMW_PrevLineByPos
+    nmap ]` <Plug>MMW_NextSpotByPos
+    nmap [` <Plug>MMW_PrevSpotByPos
+endif
+
+for i in split(g:MarkMyWords_IncludeMarks, '\zs')
+    "echom 'nnoremap <silent> ' . g:MarkMyWords_leader . i . ' :call mark_my_words#ToggleMark("' . i . '")<CR>'
+    silent exec 'nnoremap <silent> ' . g:MarkMyWords_leader . i . ' :call mark_my_words#ToggleMark("' . i . '")<CR>'
+endfor
+
+silent exec 'nnoremap <silent> ' . g:MarkMyWords_leader . ', :call mark_my_words#ToggleMark(",")<CR>'
+silent exec 'nnoremap <silent> ' . g:MarkMyWords_leader . '<Space> :call mark_my_words#PurgeAll()<CR>'
+nnoremap <silent> <Plug>MMW_NextSpotByAlpha :call mark_my_words#JumpToMark('alpha', 'next', 'spot')<CR>
+nnoremap <silent> <Plug>MMW_PrevSpotByAlpha :call mark_my_words#JumpToMark('alpha', 'prev', 'spot')<CR>
+nnoremap <silent> <Plug>MMW_NextLineByAlpha :call mark_my_words#JumpToMark('alpha', 'next', 'line')<CR>
+nnoremap <silent> <Plug>MMW_PrevLineByAlpha :call mark_my_words#JumpToMark('alpha', 'prev', 'line')<CR>
+nnoremap <silent> <Plug>MMW_NextSpotByPos   :call mark_my_words#JumpToMark('pos', 'next', 'spot')<CR>
+nnoremap <silent> <Plug>MMW_PrevSpotByPos   :call mark_my_words#JumpToMark('pos', 'prev', 'spot')<CR>
+nnoremap <silent> <Plug>MMW_NextLineByPos   :call mark_my_words#JumpToMark('pos', 'next', 'line')<CR>
+nnoremap <silent> <Plug>MMW_PrevLineByPos   :call mark_my_words#JumpToMark('pos', 'prev', 'line')<CR>
+
 
 if has('autocmd')
     augroup MMW_autocmds
         autocmd!
-        autocmd BufEnter * call MarkMyWords#MMW_Setup() 
+        autocmd BufEnter * call mark_my_words#RefreshMarks() 
     augroup END
 endif
 
