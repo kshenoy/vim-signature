@@ -1,8 +1,12 @@
 # vim-mark_my_words
 vim-mark_my_words is a plugin to toggle, display and navigate marks.  
+
 Wait a minute...isn't this done excellently by vim-showmarks and mark-tools; why another plugin you say?  
-Well, you are right. However, I got a little impatient with the delay between setting and display of marks and I liked the navigation options which mark-tools provided and I didn't want to use two plugins where one would do and I was bored and felt like writing my own...  
-Are you convinced or do you want me to go on? Anyway, that's how vim-mark_my_words was born.    
+Well, you are right. However, I got a little impatient with the delay between setting and display of marks in vim-showmarks and  
+I liked the navigation options which mark-tools provided and I didn't want to use two plugins where one would do and  
+I was bored and felt like writing my own... Are you convinced yet or do you want me to go on?  
+
+Anyway, that's how vim-mark_my_words was born.    
 
 ## Requirements
 Requires Vim to be compiled with +signs to display marks.
@@ -52,8 +56,9 @@ To disable the default mappings and use custom mappings, set
 
 ## Thanks to...
 * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
-* Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)
-Here I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.  
+* Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
+
+Here I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.
 Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 
 ## ToDo:
