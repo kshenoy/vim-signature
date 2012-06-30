@@ -10,16 +10,16 @@ Anyway, that's how vim-signature was born and it does the following
 
 `<SignatureLeader>[a-zA-Z]`  : Place alphabetical marks (normal behavior)  
 `<SignatureLeader>[0-9]`     : Place  )!@#$%^&_*_( as signs  
-`<Plug>Sig_NextSpotByPos`    : Jump to next mark  
-`<Plug>Sig_PrevSpotByPos`    : Jump to prev mark  
-`<Plug>Sig_NextSpotByAlpha`  : Jump to next mark by Alphabetical Order  
-`<Plug>Sig_PrevSpotByAlpha`  : Jump to prev mark by Alphabetical Order  
-`<Plug>Sig_NextLineByPos`    : Jump to beginning of next line containing a mark  
-`<Plug>Sig_PrevLineByPos`    : Jump to beginning of prev line containing a mark  
-`<Plug>Sig_NextLineByAlpha`  : Jump to next line by Alphabetical Order  
-`<Plug>Sig_PrevLineByAlpha`  : Jump to next prev by Alphabetical Order  
-`<Plug>Sig_NextMarkerByType` : Jump to next line having same marker  
-`<Plug>Sig_PrevMarkerByType` : Jump to prev line having same marker  
+`<Plug>SIG_NextSpotByPos`    : Jump to next mark  
+`<Plug>SIG_PrevSpotByPos`    : Jump to prev mark  
+`<Plug>SIG_NextSpotByAlpha`  : Jump to next mark by Alphabetical Order  
+`<Plug>SIG_PrevSpotByAlpha`  : Jump to prev mark by Alphabetical Order  
+`<Plug>SIG_NextLineByPos`    : Jump to beginning of next line containing a mark  
+`<Plug>SIG_PrevLineByPos`    : Jump to beginning of prev line containing a mark  
+`<Plug>SIG_NextLineByAlpha`  : Jump to next line by Alphabetical Order  
+`<Plug>SIG_PrevLineByAlpha`  : Jump to next prev by Alphabetical Order  
+`<Plug>SIG_NextMarkerByType` : Jump to next line having same marker  
+`<Plug>SIG_PrevMarkerByType` : Jump to prev line having same marker  
 
 ## Requirements
 Requires Vim to be compiled with +signs to display marks.
