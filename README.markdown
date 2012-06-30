@@ -67,24 +67,24 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 `<leader>ma` will toggle the mark 'a'  
 `<leader>m,` will place the next available mark  
 `<leader>m<Space>` will delete all marks  
-
-<Plug>SIG_NextSpotByPos    : Jump to next mark
-<Plug>SIG_PrevSpotByPos    : Jump to prev mark
+```
+<Plug>SIG_NextSpotByPos    : Jump to next mark  
+<Plug>SIG_PrevSpotByPos    : Jump to prev mark  
 <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark  
 <Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark  
 <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark  
 <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark  
 <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
-<Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark 
-
+<Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
+```
 `g:SignatureMarkerLeader` ( Default: m )  
 Set the key used to toggle markers.  If this key is set to `<leader>m`  
 `<leader>m1` will toggle the marker '!'  
 `<leader>m!` will remove all the '!' markers  
-
+```
 <Plug>SIG_NextMarkerByType : Jump to next line having same marker  
 <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker  
-
+```
 
 ## Thanks to...
 Restecp (no, that's a reference and not a typo :P ) to  
