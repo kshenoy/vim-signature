@@ -1,96 +1,134 @@
-" Description:
-" signature.vim is a plugin to toggle, display and navigate marks.
-" Combines the functionality of primarily vim-showmarks and mark-tools.
+" README: vim-signature                 {{{1
 "
-"   <SignatureLeader>[a-zA-Z]  : Place marks (normal behavior)
-"   <SignatureLeader>[0-9]     : Place )!@#$%^&*( as signs
-"   <Plug>SIG_PlaceNextMark    : Place next available mark
-"   <Plug>SIG_PurgeMarks       : Delete all marks
-"   <Plug>SIG_NextSpotByPos    : Jump to next mark
-"   <Plug>SIG_PrevSpotByPos    : Jump to prev mark
-"   <Plug>SIG_NextSpotByAlpha  : Jump to next mark by Alphabetical Order
-"   <Plug>SIG_PrevSpotByAlpha  : Jump to prev mark by Alphabetical Order
-"   <Plug>SIG_NextLineByPos    : Jump to beginning of next line containing a mark
-"   <Plug>SIG_PrevLineByPos    : Jump to beginning of prev line containing a mark
-"   <Plug>SIG_NextLineByAlpha  : Jump to next line by Alphabetical Order
-"   <Plug>SIG_PrevLineByAlpha  : Jump to next prev by Alphabetical Order
-"   <Plug>SIG_NextMarkerByType : Jump to next line having same marker
-"   <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker
+" Description:                          {{{2
+" vim-signature is a plugin to toggle, display and navigate marks.
+" What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
 "
-" Maintainer: Kartik Shenoy
+" Wait a minute...isn't this done not only well but excellently by vim-showmarks
+" and mark-tools; why another plugin you say?
+" Well, you are right. However, I got a little impatient with the delay between
+" setting and display of marks in vim-showmarks and
+" I liked the navigation options which mark-tools provided and I didn't want to
+" use two plugins where one would do and
+" I was bored and felt like writing my own...
 "
-" Requirements:
-" Requires Vim to be compiled with +signs to display marks
+" Are you convinced yet or do you want me to go on? Anyway, that's how vim-signature was born.
 "
-" Customisation:
-"   g:SignatureDefaults : Will use the default mappings specified below.
-"   Default: 1
 "
-"   g:SignatureIncludeMarks : Specify the marks that can be controlled by this plugin
-"   Only supports Alphabetical marks at the moment
-"   Default: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+" Requirements:                         {{{2
+" Requires Vim to be compiled with +signs to display marks.
 "
-"   g:SignatureWrapJumps : Specify if jumping to marks should wrap-around
-"   Default: 1
 "
-"   g:SignatureLeader : Set the key used to Toggle Marks.
-"   Default: m
-"   If this is set to <leader>m, 
-"     <leader>ma will toggle the mark 'a' 
-"     <leader>m, will place the next available mark
-"     <leader>m<Space> will delete all marks
+" Installation:                         {{{2
+" I highly recommend using Pathogen or Vundler to do the dirty work for you. If
+" for some reason, you do not want to use any of these excellent plugins, then
+" unzip it to your ~/.vim directory. You know how it goes...
 "
-" Default Mappings:
-"   nmap m,       <Plug>SIG_PlaceNextMark
-"   nmap m<Space> <Plug>SIG_PurgeMarks
-"   nmap ']       <Plug>SIG_NextLineByAlpha
-"   nmap '[       <Plug>SIG_PrevLineByAlpha
-"   nmap `]       <Plug>SIG_NextSpotByAlpha
-"   nmap `[       <Plug>SIG_PrevSpotByAlpha
-"   nmap ]'       <Plug>SIG_NextLineByPos
-"   nmap ['       <Plug>SIG_PrevLineByPos
-"   nmap ]`       <Plug>SIG_NextSpotByPos
-"   nmap [`       <Plug>SIG_PrevSpotByPos
-"   nmap ]=       <Plug>SIG_NextMarkerByType
-"   nmap ]-       <Plug>SIG_PrevMarkerByType
-" 
-" - This will allow to use the default behavior of m to set marks and, if the
-"   line already contains the mark, it will be unset.
+" So, once that's done, out of the box, the followings mappings are defined by
+" default
 "
-" - Default behavior of ]', [', ]` and [` supported. Also now supports wrapped jumps
+" m[a-zA-Z]  : Place mark (normal behavior)
+" m<Space>   : Delete all marks
+" m,         : Place the next available mark
+" ]`         : Jump to next mark
+" [`         : Jump to prev mark
+" ]'         : Jump to start of next line containing a mark
+" ['         : Jump to start of prev line containing a mark
+" `]         : Jump by alphabetical order to next mark
+" `[         : Jump by alphabetical order to prev mark
+" ']         : Jump by alphabetical order to start of next line containing a mark
+" '[         : Jump by alphabetical order to start of prev line containing a mark
 "
-" - To disable the default mappings and use custom mappings, set
-"      let g:SignatureDefaultMappings = 0
+" m[0-9]     : Place the corresponding marker !@#$%^&*()
+" m<S-[0-9]> : Remove all markers of the same type  
+" ]=         : Jump to next line having same marker
+" ]-         : Jump to prev line having same marker
 "
-" Thanks To:
-"   * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
-"   * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)
+" This will allow the use of default behavior of m to set marks and, if the line
+" already contains the mark, it'll be unset.
+" The default behavior of `]'`, `['`, ]_`_ and [_`_ is supported and enhanced by
+" wrapping around when beginning or end of file is reached.
 "
-" ToDo:
-"   * Add custom color support for signs
-"   * Add custom character display support for signs
-"   * Add support for non-Alphabetical marks
+"
+" Customisation:                        {{{2
+" The defaults not to your liking bub? Have no fear; use the following
+" variables to set things just the way you want it
+"
+" `g:SignatureDefaultMappings` ( Default : 1 )
+" Will use the default mappings specified below.
+"
+" `g:SignatureIncludeMarks` ( Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
+" Specify the marks that can be controlled by this plugin.
+" Only supports Alphabetical marks at the moment.
+"
+" `g:SignatureWrapJumps` ( Default : 1 )
+" Specify if jumping to marks should wrap-around.
+"
+" `g:SignatureMarkLeader` ( Default: m )
+" Set the key used to toggle marks.  If this key is set to `<leader>m`
+" `<leader>ma` will toggle the mark 'a'
+" `<leader>m,` will place the next available mark
+" `<leader>m<Space>` will delete all marks
+"
+" <Plug>SIG_NextSpotByPos    : Jump to next mark
+" <Plug>SIG_PrevSpotByPos    : Jump to prev mark
+" <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark
+" <Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark
+" <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark
+" <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark
+" <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark
+" <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark
+"
+" `g:SignatureMarkerLeader` ( Default: m )
+" Set the key used to toggle markers.  If this key is set to `<leader>m`
+" `<leader>m1` will toggle the marker '!'
+" `<leader>m!` will remove all '!' markers  
+"
+" <Plug>SIG_NextMarkerByType : Jump to next line having same marker
+" <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker
+"
+"
+" Thanks To:                            {{{2
+" Restecp (no, that's a reference and not a typo :P ) to
+" * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
+" * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)
+"
+" I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.
+" Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
+"
+"
+" ToDo:                                 {{{2
+" * Add custom color support for signs
+" * Add custom character display support for signs
+" * Add support for non-Alphabetical marks
+"
+"
+" Maintainer:                           {{{2
+"   Kartik Shenoy
 "
 " Changelist:
 "   2012-06-29:
-"     - Added support to display !@#$%^&*() as signs  
+"     - Added support to remove all markers of a certain type
+"
+"   2012-06-29:
+"     - Added support to display !@#$%^&*() as signs
 "     - Added support to navigate markers
 "
 "   2012-06-27:
-"     - Added support to display multiple marks  
+"     - Added support to display multiple marks
 "
 "   2012-06-22:
-"     - First release  
+"     - First release
 "
-" vim: fdm=marker:et:ts=4:sw=4:sts=4
+" vim: fdm=marker:et:ts=4:sw=4:sts=4    }}}1
 "===========================================================================
 
-" Exit when your app has already been loaded (or "compatible" mode set)
+" Exit when app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_Signature") || &cp
     finish
 endif
 let g:loaded_Signature = 1    " Version Number
-let s:keepcpo          = &cpo
+let s:save_cpo         = &cpo
 set cpo&vim
 
 
@@ -100,8 +138,11 @@ endif
 if !exists('g:SignatureWrapJumps')
     let g:SignatureWrapJumps = 1
 endif
-if !exists('g:SignatureLeader')
-    let g:SignatureLeader = "m"
+if !exists('g:SignatureMarkLeader')
+    let g:SignatureMarkLeader = "m"
+endif
+if !exists('g:SignatureMarkerLeader')
+    let g:SignatureMarkerLeader = g:SignatureMarkLeader
 endif
 if !exists('g:SignatureDefaultMappings')
     let g:SignatureDefaultMappings = 1
@@ -123,7 +164,7 @@ if g:SignatureDefaultMappings
 endif
 
 for i in split(g:SignatureIncludeMarks, '\zs')
-    silent exec 'nnoremap <silent> ' . g:SignatureLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+    silent exec 'nnoremap <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
 endfor
 
 nnoremap <silent> <Plug>SIG_PlaceNextMark    :call signature#ToggleMark(",")<CR>
@@ -144,7 +185,8 @@ let g:SignatureMarkers = ")!@#$%^&*("
 let s:signature_markers = split(g:SignatureMarkers, '\zs')
 for i in range(0, len(s:signature_markers)-1)
     exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
-    silent exec 'nnoremap <silent> ' . g:SignatureLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
+    silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
+    silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
 endfor
 
 if has('autocmd')
@@ -155,5 +197,5 @@ if has('autocmd')
 endif
 
 "===============================================================================
-let &cpo= s:keepcpo
-unlet s:keepcpo
+let &cpo = s:save_cpo
+unlet s:save_cpo

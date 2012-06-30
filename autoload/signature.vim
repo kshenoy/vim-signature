@@ -75,6 +75,13 @@
         endif
     endfunction
 
+    function! signature#PurgeMarks()  "{{{2
+        for i in map(filter(s:MarksList(), 'v:val[1]>0'), 'v:val[0]')
+            silent exec 'delmarks ' . i
+            silent call s:ToggleSign(i, 0, 0)
+        endfor
+    endfunction     "}}}2
+
     function! signature#ToggleMarker(marker)    "{{{2
         let l:lnum = line('.')
         if has_key(b:sig_markers, l:lnum) && b:sig_markers[l:lnum] == a:marker
@@ -83,6 +90,15 @@
             call s:ToggleSign(a:marker, 1, l:lnum)
         endif
     endfunction
+
+
+    function! signature#RemoveMarker(marker)    "{{{2
+        let l:markers = keys(filter(copy(b:sig_markers), 'v:val=~#a:marker'))
+        for i in l:markers
+            call s:ToggleSign(a:marker, 0, i)
+        endfor
+        call filter(b:sig_markers, 'v:val!~#a:marker')
+    endfunction     "}}}2
 
     function! s:ToggleSign(mark, mode, lnum)    "{{{2
         if !has('signs') | return | endif
@@ -133,18 +149,10 @@
                 exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
             endif
         endif
-
-    endfunction
-
-    function! signature#PurgeMarks()  "{{{2
-        for i in map(filter(s:MarksList(), 'v:val[1]>0'), 'v:val[0]')
-            silent exec 'delmarks ' . i
-            silent call s:ToggleSign(i, 0, 0)
-        endfor
     endfunction     "}}}2
 
 
-" Navigate Marks    {{{1
+" Navigation    {{{1
     function! signature#GotoMark(mode, dir, loc)  "{{{2
         "echom a:mode . ", " . a:dir . ", " . a:loc
 
@@ -253,8 +261,6 @@
         endfor
     endfunction     "}}}2
 
-
-" Navigate Signs    {{{1
     function! signature#GotoMarker(dir)   "{{{2
         let l:lnum = line('.')
         let l:lmin = line('$') + 1
