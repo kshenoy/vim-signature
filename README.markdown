@@ -8,8 +8,8 @@ I was bored and felt like writing my own... Are you convinced yet or do you want
 
 Anyway, that's how vim-signature was born and it does the following    
 
-`<SignatureLeader>[a-zA-Z]`  : Place alphabetical marks (normal behavior)
-`<SignatureLeader>[0-9]`     : Place  )!@#$%^&_*_( as signs
+`<SignatureLeader>[a-zA-Z]`  : Place alphabetical marks (normal behavior)  
+`<SignatureLeader>[0-9]`     : Place  )!@#$%^&_*_( as signs  
 `<Plug>Sig_NextSpotByPos`    : Jump to next mark  
 `<Plug>Sig_PrevSpotByPos`    : Jump to prev mark  
 `<Plug>Sig_NextSpotByAlpha`  : Jump to next mark by Alphabetical Order  
@@ -18,8 +18,8 @@ Anyway, that's how vim-signature was born and it does the following
 `<Plug>Sig_PrevLineByPos`    : Jump to beginning of prev line containing a mark  
 `<Plug>Sig_NextLineByAlpha`  : Jump to next line by Alphabetical Order  
 `<Plug>Sig_PrevLineByAlpha`  : Jump to next prev by Alphabetical Order  
-`<Plug>Sig_NextMarkerByType` : Jump to next line having same marker
-`<Plug>Sig_PrevMarkerByType` : Jump to prev line having same marker
+`<Plug>Sig_NextMarkerByType` : Jump to next line having same marker  
+`<Plug>Sig_PrevMarkerByType` : Jump to prev line having same marker  
 
 ## Requirements
 Requires Vim to be compiled with +signs to display marks.
@@ -35,21 +35,14 @@ Only supports Alphabetical marks at the moment.
 `g:SignatureWrapJumps` : Specify if jumping to marks should wrap-around.  
 Default: 1
 
-`g:SignatureLeader` : Set the key used to Toggle Marks. If this key is set to `<leader>m`  
-  `<leader>ma` will toggle the mark 'a'  
-  `<leader>m,` will place the next available mark  
-  `<leader>m<Space>` will delete all marks  
+`g:SignatureLeader` : Set the key used to Toggle Marks.  
 Default: m  
-
-## Mappings
-`<Plug>SIG_NextSpotByPos`   : Jump to next mark  
-`<Plug>SIG_PrevSpotByPos`   : Jump to prev mark  
-`<Plug>SIG_NextSpotByAlpha` : Jump to next mark by Alphabetical Order  
-`<Plug>SIG_PrevSpotByAlpha` : Jump to prev mark by Alphabetical Order  
-`<Plug>SIG_NextLineByPos`   : Jump to beginning of next line containing a mark  
-`<Plug>SIG_PrevLineByPos`   : Jump to beginning of prev line containing a mark  
-`<Plug>SIG_NextLineByAlpha` : Jump to next line by Alphabetical Order  
-`<Plug>SIG_PrevLineByAlpha` : Jump to next prev by Alphabetical Order  
+  
+If this key is set to `<leader>m`  
+`<leader>ma` will toggle the mark 'a'  
+`<leader>m,` will place the next available mark  
+`<leader>m<Space>` will delete all marks  
+ 
 
 ## Default Mappings
 ```
@@ -65,7 +58,7 @@ nmap ]= <Plug>SIG_NextMarkerByType
 nmap ]- <Plug>SIG_PrevMarkerByType
 ```
 This will allow the use of default behavior of m to set marks and, if the line already contains the mark, it'll be unset.  
-Default behavior of ]', [', ]_`_ and [_`_ enhanced by wrapped jumps.  
+Default behavior of `]'`, `['`, ]_`_ and [_`_ enhanced by wrapped jumps.  
 To disable the default mappings and use custom mappings, set
     let g:SignatureDefaultMappings = 0
 
@@ -73,7 +66,7 @@ To disable the default mappings and use custom mappings, set
 * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
 * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
 
-Here I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.
+I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.
 Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 
 ## ToDo:
