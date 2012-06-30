@@ -145,16 +145,16 @@
 
 
 " Navigate Marks    {{{1
-    function! signature#JumpToMark(mode, dir, loc)  "{{{2
+    function! signature#GotoMark(mode, dir, loc)  "{{{2
         "echom a:mode . ", " . a:dir . ", " . a:loc
 
         let l:mark = ""
         let l:dir  = a:dir
 
         if a:mode ==? "pos"
-            let l:mark = s:JumpByPos(a:dir)
+            let l:mark = s:GotoMarkByPos(a:dir)
         elseif a:mode ==? "alpha"
-            let l:mark = s:JumpByAlpha(a:dir)
+            let l:mark = s:GotoMarkByAlpha(a:dir)
         endif
 
         "echom ">>" . l:mark . "<<"
@@ -166,7 +166,7 @@
         endif
     endfunction
 
-    function! s:JumpByPos(dir)  "{{{2
+    function! s:GotoMarkByPos(dir)  "{{{2
         "echom "Jumping by POS"
 
         let l:MarksList = s:UsedMarks()
@@ -210,7 +210,7 @@
       return l:mark
     endfunction
 
-    function! s:JumpByAlpha(dir)    "{{{2
+    function! s:GotoMarkByAlpha(dir)    "{{{2
         "echom "Jumping by ALPHA"
 
         let l:UsedMarks = s:UsedMarks()
@@ -219,38 +219,67 @@
         let l:mark_first = ""
 
         if empty(l:MarksAt)
-            if exists('g:sig_JumpByAlpha')
-                unlet g:sig_JumpByAlpha
+            if exists('g:sig_GotoMarkByAlpha')
+                unlet g:sig_GotoMarkByAlpha
             endif
-            return s:JumpByPos(a:dir)
+            return s:GotoMarkByPos(a:dir)
         endif
         
-        if len(l:MarksAt) == 1 || !exists('g:sig_JumpByAlpha')
-            let g:sig_JumpByAlpha = l:MarksAt[0]
+        if len(l:MarksAt) == 1 || !exists('g:sig_GotoMarkByAlpha')
+            let g:sig_GotoMarkByAlpha = l:MarksAt[0]
         endif
 
         for i in range(0, len(l:UsedMarks)-1)
-            if l:UsedMarks[i][0] ==# g:sig_JumpByAlpha
+            if l:UsedMarks[i][0] ==# g:sig_GotoMarkByAlpha
                 if a:dir ==? "next"
                     if i != len(l:UsedMarks)-1
                         let l:mark = l:UsedMarks[i+1][0]
-                        let g:sig_JumpByAlpha = l:mark
+                        let g:sig_GotoMarkByAlpha = l:mark
                     elseif g:Signature_WrapJumps 
                         let l:mark = l:UsedMarks[0][0]
-                        let g:sig_JumpByAlpha = l:mark
+                        let g:sig_GotoMarkByAlpha = l:mark
                     endif
                 elseif a:dir ==? "prev"
                     if i != 0
                         let l:mark = l:UsedMarks[i-1][0]
-                        let g:sig_JumpByAlpha = l:mark
+                        let g:sig_GotoMarkByAlpha = l:mark
                     elseif g:Signature_WrapJumps
                         let l:mark = l:UsedMarks[-1][0]
-                        let g:sig_JumpByAlpha = l:mark
+                        let g:sig_GotoMarkByAlpha = l:mark
                     endif
                 endif
                 return l:mark
             endif
         endfor
+    endfunction     "}}}2
+
+
+" Navigate Signs    {{{1
+    function! signature#GotoMarker(dir)   "{{{2
+        let l:lnum = line('.')
+        let l:lmax = 0
+        let l:lmin = line('$') + 1
+
+        if     a:dir ==? "next" | let l:targ = l:lmin
+        elseif a:dir ==? "prev" | let l:targ = l:lmax
+        endif
+
+        for i in keys(filter(copy(b:sig_markers), 'v:val==b:sig_markers[l:lnum]'))
+            if a:dir == "next" && i > l:lnum && i < l:targ ||
+             \ a:dir == "prev" && i < l:lnum && i > l:targ
+                let l:targ = i
+            endif
+            if i < l:lmin | let l:lmin = i | endif
+            if i > l:lmax | let l:lmax = i | endif
+        endfor
+
+        if     a:dir == "next" && l:lnum == l:lmax | let l:targ = l:lmin
+        elseif a:dir == "prev" && l:lnum == l:lmin | let l:targ = l:lmax
+        endif
+
+        if l:targ != 0 && l:targ != line('$') + 1
+            exec 'normal! ' . l:targ . 'G'
+        endif
     endfunction     "}}}2
 
 
