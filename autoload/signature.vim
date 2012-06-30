@@ -257,14 +257,20 @@
 " Navigate Signs    {{{1
     function! signature#GotoMarker(dir)   "{{{2
         let l:lnum = line('.')
-        let l:lmax = 0
         let l:lmin = line('$') + 1
+        let l:lmax = 0
 
         if     a:dir ==? "next" | let l:targ = l:lmin
         elseif a:dir ==? "prev" | let l:targ = l:lmax
         endif
 
-        for i in keys(filter(copy(b:sig_markers), 'v:val==b:sig_markers[l:lnum]'))
+        if has_key(b:sig_markers, l:lnum)
+            let l:markers = keys(filter(copy(b:sig_markers), 'v:val==b:sig_markers[l:lnum]'))
+        else
+            let l:markers = keys(b:sig_markers)
+        endif
+
+        for i in l:markers
             if a:dir == "next" && i > l:lnum && i < l:targ ||
              \ a:dir == "prev" && i < l:lnum && i > l:targ
                 let l:targ = i
@@ -273,8 +279,8 @@
             if i > l:lmax | let l:lmax = i | endif
         endfor
 
-        if     a:dir == "next" && l:lnum == l:lmax | let l:targ = l:lmin
-        elseif a:dir == "prev" && l:lnum == l:lmin | let l:targ = l:lmax
+        if     a:dir == "next" && l:lnum >= l:lmax | let l:targ = l:lmin
+        elseif a:dir == "prev" && l:lnum <= l:lmin | let l:targ = l:lmax
         endif
 
         if l:targ != 0 && l:targ != line('$') + 1
