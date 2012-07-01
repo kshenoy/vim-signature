@@ -15,7 +15,8 @@ Oh, and I also added some touches of my own such as
 * Displaying multiple marks (upto 2, limited by the signs feature)  
 * Placing custom signs !@#$%^&*() as visual markers  
   
-You can see it in action [here](http://imgur.com/a/bPp3m#0)
+###Screenshots
+[Click](http://imgur.com/a/bPp3m#0)
 
 
 ## Requirements
