@@ -1,4 +1,5 @@
-" README: vim-signature                 {{{1
+" README:                               {{{1
+" vim-signature, version 1.1
 " 
 " Description:                          {{{2
 " vim-signature is a plugin to toggle, display and navigate marks.
@@ -125,6 +126,7 @@
 " 
 " Changelist:
 "   2012-06-30:
+"     - Added support to change display style of marks
 "     - Added support to remove all markers of a certain type
 "     - Added support to display !@#$%^&*() as signs
 "     - Added support to navigate markers
@@ -140,7 +142,7 @@
 if exists("g:loaded_Signature") || &cp
     finish
 endif
-let g:loaded_Signature = 1    " Version Number
+let g:loaded_Signature = "1.1"  " Version Number
 let s:save_cpo         = &cpo
 set cpo&vim
 
