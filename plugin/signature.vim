@@ -17,6 +17,8 @@
 " Oh, and I also added some touches of my own such as  
 " * Display multiple marks (upto 2, limited by the signs feature)  
 " * Place custom signs !@#$%^&*() as visual markers  
+"    
+" You can see it in action [here](http://imgur.com/a/bPp3m#0)
 " 
 " 
 " Requirements:                         {{{2
@@ -32,7 +34,7 @@
 " default
 " 
 " ````
-" m[a-zA-Z]  : Place mark (normal behavior)
+" m[a-zA-Z]  : Toggle mark  
 " m<Space>   : Delete all marks
 " m,         : Place the next available mark
 " ]`         : Jump to next mark
@@ -44,7 +46,7 @@
 " ']         : Jump by alphabetical order to start of next line containing a mark
 " '[         : Jump by alphabetical order to start of prev line containing a mark
 " 
-" m[0-9]     : Place the corresponding marker !@#$%^&*()
+" m[0-9]     : Toggle the corresponding marker !@#$%^&*()  
 " m<S-[0-9]> : Remove all markers of the same type  
 " ]=         : Jump to next line having same marker
 " ]-         : Jump to prev line having same marker

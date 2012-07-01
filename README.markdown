@@ -14,6 +14,8 @@ Are you convinced yet or do you want me to go on? Anyway, that's how vim-signatu
 Oh, and I also added some touches of my own such as
 * Displaying multiple marks (upto 2, limited by the signs feature)  
 * Placing custom signs !@#$%^&*() as visual markers  
+  
+You can see it in action [here](http://imgur.com/a/bPp3m#0)
 
 
 ## Requirements
@@ -28,7 +30,7 @@ unzip it to your ~/.vim directory. You know how it goes...
 So, once that's done, out of the box, the followings mappings are defined by
 default
 ````
-  m[a-zA-Z]  : Place mark (normal behavior)
+  m[a-zA-Z]  : Toggle mark  
   m<Space>   : Delete all marks
   m,         : Place the next available mark
   ]`         : Jump to next mark
@@ -40,7 +42,7 @@ default
   ']         : Jump by alphabetical order to start of next line containing a mark  
   '[         : Jump by alphabetical order to start of prev line containing a mark 
 
-  m[0-9]     : Place the corresponding marker !@#$%^&*()
+  m[0-9]     : Toggle the corresponding marker !@#$%^&*()
   m<S-[0-9]> : Remove all markers of the same type  
   ]=         : Jump to next line having same marker  
   ]-         : Jump to prev line having same marker  
