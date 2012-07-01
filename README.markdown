@@ -11,9 +11,9 @@ use two plugins where one would do and
 I was bored and felt like writing my own...  
   
 Are you convinced yet or do you want me to go on? Anyway, that's how vim-signature was born.
-Oh, and I also added some touches of my own such as  
-* Display multiple marks (upto 2, limited by the signs feature)  
-* Place custom signs !@#$%^&*() as visual markers  
+Oh, and I also added some touches of my own such as
+* Displaying multiple marks (upto 2, limited by the signs feature)  
+* Placing custom signs !@#$%^&*() as visual markers  
 
 
 ## Requirements
@@ -80,16 +80,19 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
 <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
 ```
-`g:SignatureMarkStr` ( Default : "\m\p" )
-You can display upto 2 characters (vim-showmarks style people).
+  
+`g:SignatureMarkStr` ( Default : "\m\p" )  
+You can display upto 2 characters (vim-showmarks style people)  
 However, contrary to vim-showmarks, setting g:SignatureMarkStr to a single
-character will not suffix the mark. Don't be lazy people, if you want to see
-the mark, set it accordingly.  
-'\m' represents the latest mark added and '\p', the one previous to it.
-    g:SignatureMarkStr = "\m."  : Display last mark with '.' suffixed  
-    g:SignatureMarkStr = "_\m"  : Display last mark with '_' prefixed  
-    g:SignatureMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
-    g:SignatureMarkStr = "\m\p" : Display last two marks placed  
+character will not suffix the mark.  
+Don't be lazy people, if you want to see the mark, set it. 
+`\m` represents the latest mark added and `\p`, the one previous to it.
+````
+g:SignatureMarkStr = "\m."  : Display last mark with '.' suffixed  
+g:SignatureMarkStr = "_\m"  : Display last mark with '_' prefixed  
+g:SignatureMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
+g:SignatureMarkStr = "\m\p" : Display last two marks placed  
+````
 Oh, and see in all the above strings, I've used double-quotes and not
 single-quotes. That's not cause I love 'em but things go haywire if
 double-quotes aren't used.  
