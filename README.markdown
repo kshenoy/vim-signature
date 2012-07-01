@@ -27,7 +27,7 @@ unzip it to your ~/.vim directory. You know how it goes...
 
 So, once that's done, out of the box, the followings mappings are defined by
 default
-```
+````
 m[a-zA-Z]  : Place mark (normal behavior)
 m<Space>   : Delete all marks
 m,         : Place the next available mark
@@ -44,7 +44,7 @@ m[0-9]     : Place the corresponding marker !@#$%^&*()
 m<S-[0-9]> : Remove all markers of the same type  
 ]=         : Jump to next line having same marker  
 ]-         : Jump to prev line having same marker  
-```
+````
 This will allow the use of default behavior of m to set marks and, if the line
 already contains the mark, it'll be unset.  
 The default behavior of `]'`, `['`, ]_`_ and [_`_ is supported and enhanced by
@@ -81,21 +81,24 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
 ```
   
-`g:SignatureMarkStr` ( Default : "\m\p" )  
-You can display upto 2 characters (vim-showmarks style people)  
-However, contrary to vim-showmarks, setting g:SignatureMarkStr to a single
-character will not suffix the mark.  
-Don't be lazy people, if you want to see the mark, set it. 
-`\m` represents the latest mark added and `\p`, the one previous to it.
-````
-g:SignatureMarkStr = "\m."  : Display last mark with '.' suffixed  
-g:SignatureMarkStr = "_\m"  : Display last mark with '_' prefixed  
-g:SignatureMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
-g:SignatureMarkStr = "\m\p" : Display last two marks placed  
-````
+`g:SignatureLcMarkStr` ( Default : "\p\m" )  
+Set the manner in which local (lowercase) marks are displayed.
+'\m' represents the latest mark added and '\p', the one previous to it.
+    g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
+    g:SignatureLcMarkStr = "_\m"  : Display last mark with '_' prefixed  
+    g:SignatureLcMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
+    g:SignatureLcMarkStr = "\m\p" : Display last two marks placed  
+
+`g:SignatureUcMarkStr` ( Default : "\p\m" )  
+Set the manner in which global (uppercase) marks are displayed. Similar to above.  
+
+You can display upto 2 characters. That's a limitation imposed by the signs
+feature; nothing I can do about it : / .  
+Setting the MarkStr to a single character will not suffix the mark.
+Don't be lazy people, if you want to see the mark, set it accordingly.  
 Oh, and see in all the above strings, I've used double-quotes and not
 single-quotes. That's not cause I love 'em but things go haywire if
-double-quotes aren't used.  
+double-quotes aren't used. Also, `\m` and `\p` cannot be set to <Space>  
 
 `g:SignatureMarkerLeader` ( Default: m )  
 Set the key used to toggle markers.  If this key is set to `<leader>m`  

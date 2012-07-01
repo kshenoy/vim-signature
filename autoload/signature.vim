@@ -2,22 +2,38 @@
 "===============================================================================
 
 " Helper Functions {{{1
-    function! s:MarksList() "{{{2
+    function! s:LowerMarksList()    "{{{2
         let l:ref = split("abcdefghijklmnopqrstuvwxyz", '\zs')
-        let l:marks = []
+        let l:lmarks = []
         for i in l:ref
             if stridx(g:SignatureIncludeMarks, i) >= 0
-                let l:marks = add(l:marks, [i, line("'" . i)])
+                call add(l:lmarks, i)
             endif
-            if stridx(g:SignatureIncludeMarks, toupper(i)) >= 0
-                let [ l:buf, l:line, l:col, l:off ] = getpos("'" . toupper(i))
-                if l:buf == bufnr('%') || l:buf == 0
-                    let l:marks = add(l:marks, [toupper(i), l:line])
-                endif
+        endfor
+        return l:lmarks
+    endfunction
+
+    function! s:UpperMarksList()    "{{{2
+        let l:ref = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", '\zs')
+        let l:umarks = []
+        for i in l:ref
+            if stridx(g:SignatureIncludeMarks, i) >= 0
+                call add(l:umarks, i)
             endif
-            "if stridx(g:SignatureIncludeMarks, i) >= 0
-                "let l:marks = add(l:marks, i)
-            "endif
+        endfor
+        return l:umarks
+    endfunction
+
+    function! s:MarksList() "{{{2
+        let l:marks = []
+        for i in s:UpperMarksList()
+            let [ l:buf, l:line, l:col, l:off ] = getpos("'" . i)
+            if l:buf == bufnr('%') || l:buf == 0
+                let l:marks = add(l:marks, [i, l:line])
+            endif
+        endfor
+        for i in s:LowerMarksList()
+            let l:marks = add(l:marks, [i, line("'" . i)])
         endfor
 
         "echo l:marks
@@ -37,10 +53,9 @@
     endfunction
 
     function! s:UnusedMarks()   "{{{2
-        let l:ref = split("abcdefghijklmnopqrstuvwxyz", '\zs')
         let l:marks = []
-        for i in l:ref
-            if stridx(g:SignatureIncludeMarks, i) >= 0 && line("'" . i) == 0
+        for i in s:LowerMarksList()
+            if line("'" . i) == 0
                 let l:marks = add(l:marks, i)
             endif
         endfor
@@ -114,12 +129,13 @@
             else
                 call remove(b:sig_markers, l:lnum)
                 if has_key(b:sig_marks, l:lnum)
-                    let l:str = substitute(g:SignatureMarkStr, "\m", strpart(b:sig_marks[l:lnum], 0, 1), "")
-                    if len(b:sig_marks[l:lnum]) > 1
-                        let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-                    else
-                        let l:str = substitute(l:str, "\p", " ", "")
+                    let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
+                    if index(s:LowerMarksList(), l:mark) >= 0
+                        let l:str = substitute(g:SignatureLcMarkStr, "\m", l:mark, "")
+                    elseif index(s:UpperMarksList(), l:mark) >= 0
+                        let l:str = substitute(g:SignatureUcMarkStr, "\m", l:mark, "")
                     endif
+                    let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
                     exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
                     exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
                 else
@@ -131,30 +147,33 @@
             " Alphabetical mark has been set
             if a:mode
                 let l:lnum = a:lnum
+                let l:id  = ( winbufnr(0) + 1 ) * l:lnum
                 let b:sig_marks[l:lnum] = a:mark . get(b:sig_marks, l:lnum, "")
             else
                 let l:arr = keys(filter(copy(b:sig_marks), 'v:val =~# a:mark'))
                 if empty(l:arr) | return | endif
                 let l:lnum = l:arr[0]
+                let l:id  = ( winbufnr(0) + 1 ) * l:lnum
                 let l:save_ic = &ic | set noic
                 let b:sig_marks[l:lnum] = substitute(b:sig_marks[l:lnum], a:mark, "", "")
                 let &ic = l:save_ic
+                if empty(b:sig_marks[l:lnum]) 
+                    call remove(b:sig_marks, l:lnum)
+                    if !has_key(b:sig_markers, l:lnum)
+                        exec 'sign unplace ' . l:id
+                    endif
+                    return
+                endif
             endif
 
-            let l:id  = ( winbufnr(0) + 1 ) * l:lnum
-            let l:str = strpart(b:sig_marks[l:lnum], 0, 2)
-            if empty(l:str) 
-                call remove(b:sig_marks, l:lnum)
-                if !has_key(b:sig_markers, l:lnum)
-                    exec 'sign unplace ' . l:id
+            if !has_key(b:sig_markers, l:lnum)
+                let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
+                if index(s:LowerMarksList(), l:mark) >= 0
+                    let l:str = substitute(g:SignatureLcMarkStr, "\m", l:mark, "")
+                elseif index(s:UpperMarksList(), l:mark) >= 0
+                    let l:str = substitute(g:SignatureUcMarkStr, "\m", l:mark, "")
                 endif
-            elseif !has_key(b:sig_markers, l:lnum)
-                let l:str = substitute(g:SignatureMarkStr, "\m", strpart(b:sig_marks[l:lnum], 0, 1), "")
-                if len(b:sig_marks[l:lnum]) > 1
-                    let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-                else
-                    let l:str = substitute(l:str, "\p", " ", "")
-                endif
+                let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
                 exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
                 exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
             endif
@@ -325,7 +344,6 @@
                 endfor
                 if !(l:found)
                     call s:ToggleSign(i, 0, 0)
-                    echom "Whoa!!!"
                 endif
             endif
         endfor

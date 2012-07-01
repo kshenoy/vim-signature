@@ -31,6 +31,7 @@
 " So, once that's done, out of the box, the followings mappings are defined by
 " default
 " 
+" ````
 " m[a-zA-Z]  : Place mark (normal behavior)
 " m<Space>   : Delete all marks
 " m,         : Place the next available mark
@@ -47,6 +48,7 @@
 " m<S-[0-9]> : Remove all markers of the same type  
 " ]=         : Jump to next line having same marker
 " ]-         : Jump to prev line having same marker
+" ````
 " 
 " This will allow the use of default behavior of m to set marks and, if the line
 " already contains the mark, it'll be unset.
@@ -73,7 +75,8 @@
 " `<leader>ma` will toggle the mark 'a'
 " `<leader>m,` will place the next available mark
 " `<leader>m<Space>` will delete all marks
-" 
+"
+" ````
 " <Plug>SIG_NextSpotByPos    : Jump to next mark
 " <Plug>SIG_PrevSpotByPos    : Jump to prev mark
 " <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark
@@ -82,20 +85,26 @@
 " <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark
 " <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark
 " <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark
+" ````
 " 
-" `g:SignatureMarkStr` ( Default : "\m\p" )
-" You can display upto 2 characters (vim-showmarks style people).
-" However, contrary to vim-showmarks, setting g:SignatureMarkStr to a single
-" character will not suffix the mark. Don't be lazy people, if you want to see
-" the mark, set it accordingly.  
+" `g:SignatureLcMarkStr` ( Default : "\p\m" )  
+" Set the manner in which local (lowercase) marks are displayed.
 " '\m' represents the latest mark added and '\p', the one previous to it.
-"     g:SignatureMarkStr = "\m."  : Display last mark with '.' suffixed  
-"     g:SignatureMarkStr = "_\m"  : Display last mark with '_' prefixed  
-"     g:SignatureMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
-"     g:SignatureMarkStr = "\m\p" : Display last two marks placed  
+"     g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
+"     g:SignatureLcMarkStr = "_\m"  : Display last mark with '_' prefixed  
+"     g:SignatureLcMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
+"     g:SignatureLcMarkStr = "\m\p" : Display last two marks placed  
+"
+" `g:SignatureUcMarkStr` ( Default : "\p\m" )  
+" Set the manner in which global (uppercase) marks are displayed. Similar to above.  
+"
+" You can display upto 2 characters. That's a limitation imposed by the signs
+" feature; nothing I can do about it : / .  
+" Setting the MarkStr to a single character will not suffix the mark.
+" Don't be lazy people, if you want to see the mark, set it accordingly.  
 " Oh, and see in all the above strings, I've used double-quotes and not
 " single-quotes. That's not cause I love 'em but things go haywire if
-" double-quotes aren't used.  
+" double-quotes aren't used. Also, `\m` and `\p` cannot be set to <Space>  
 " 
 " `g:SignatureMarkerLeader` ( Default: m )
 " Set the key used to toggle markers.  If this key is set to `<leader>m`
@@ -162,23 +171,26 @@ endif
 if !exists('g:SignatureDefaultMappings')
     let g:SignatureDefaultMappings = 1
 endif
-if !exists('g:SignatureMarkStr')
-    let g:SignatureMarkStr = "\m\p"
+if !exists('g:SignatureLcMarkStr')
+    let g:SignatureLcMarkStr = "\p\m"
+endif
+if !exists('g:SignatureUcMarkStr')
+    let g:SignatureUcMarkStr = g:SignatureLcMarkStr
 endif
 
 if g:SignatureDefaultMappings
-    nmap m,       <Plug>SIG_PlaceNextMark
-    nmap m<Space> <Plug>SIG_PurgeMarks
-    nmap ']       <Plug>SIG_NextLineByAlpha
-    nmap '[       <Plug>SIG_PrevLineByAlpha
-    nmap `]       <Plug>SIG_NextSpotByAlpha
-    nmap `[       <Plug>SIG_PrevSpotByAlpha
-    nmap ]'       <Plug>SIG_NextLineByPos
-    nmap ['       <Plug>SIG_PrevLineByPos
-    nmap ]`       <Plug>SIG_NextSpotByPos
-    nmap [`       <Plug>SIG_PrevSpotByPos
-    nmap ]=       <Plug>SIG_NextMarkerByType
-    nmap ]-       <Plug>SIG_PrevMarkerByType
+    if !hasmapto( '<Plug>SIG_PlaceNextMark'    ) | nmap m,       <Plug>SIG_PlaceNextMark| endif
+    if !hasmapto( '<Plug>SIG_PurgeMarks'       ) | nmap m<Space> <Plug>SIG_PurgeMarks| endif
+    if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap ']       <Plug>SIG_NextLineByAlpha| endif
+    if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[       <Plug>SIG_PrevLineByAlpha| endif
+    if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `]       <Plug>SIG_NextSpotByAlpha| endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[       <Plug>SIG_PrevSpotByAlpha| endif
+    if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]'       <Plug>SIG_NextLineByPos| endif
+    if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap ['       <Plug>SIG_PrevLineByPos| endif
+    if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]`       <Plug>SIG_NextSpotByPos| endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [`       <Plug>SIG_PrevSpotByPos| endif
+    if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]=       <Plug>SIG_NextMarkerByType| endif
+    if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap ]-       <Plug>SIG_PrevMarkerByType| endif
 endif
 
 for i in split(g:SignatureIncludeMarks, '\zs')
