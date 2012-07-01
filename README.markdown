@@ -28,22 +28,22 @@ unzip it to your ~/.vim directory. You know how it goes...
 So, once that's done, out of the box, the followings mappings are defined by
 default
 ````
-m[a-zA-Z]  : Place mark (normal behavior)
-m<Space>   : Delete all marks
-m,         : Place the next available mark
-]`         : Jump to next mark
-[`         : Jump to prev mark
-]'         : Jump to start of next line containing a mark  
-['         : Jump to start of prev line containing a mark  
-`]         : Jump by alphabetical order to next mark  
-`[         : Jump by alphabetical order to prev mark  
-']         : Jump by alphabetical order to start of next line containing a mark  
-'[         : Jump by alphabetical order to start of prev line containing a mark 
+  m[a-zA-Z]  : Place mark (normal behavior)
+  m<Space>   : Delete all marks
+  m,         : Place the next available mark
+  ]`         : Jump to next mark
+  [`         : Jump to prev mark
+  ]'         : Jump to start of next line containing a mark  
+  ['         : Jump to start of prev line containing a mark  
+  `]         : Jump by alphabetical order to next mark  
+  `[         : Jump by alphabetical order to prev mark  
+  ']         : Jump by alphabetical order to start of next line containing a mark  
+  '[         : Jump by alphabetical order to start of prev line containing a mark 
 
-m[0-9]     : Place the corresponding marker !@#$%^&*()
-m<S-[0-9]> : Remove all markers of the same type  
-]=         : Jump to next line having same marker  
-]-         : Jump to prev line having same marker  
+  m[0-9]     : Place the corresponding marker !@#$%^&*()
+  m<S-[0-9]> : Remove all markers of the same type  
+  ]=         : Jump to next line having same marker  
+  ]-         : Jump to prev line having same marker  
 ````
 This will allow the use of default behavior of m to set marks and, if the line
 already contains the mark, it'll be unset.  
@@ -71,24 +71,25 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 `<leader>m,` will place the next available mark  
 `<leader>m<Space>` will delete all marks  
 ```
-<Plug>SIG_NextSpotByPos    : Jump to next mark  
-<Plug>SIG_PrevSpotByPos    : Jump to prev mark  
-<Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark  
-<Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark  
-<Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark  
-<Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark  
-<Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
-<Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
+  <Plug>SIG_NextSpotByPos    : Jump to next mark  
+  <Plug>SIG_PrevSpotByPos    : Jump to prev mark  
+  <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark  
+  <Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark  
+  <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark  
+  <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark  
+  <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
+  <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
 ```
   
 `g:SignatureLcMarkStr` ( Default : "\p\m" )  
 Set the manner in which local (lowercase) marks are displayed.
 '\m' represents the latest mark added and '\p', the one previous to it.
-    g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
-    g:SignatureLcMarkStr = "_\m"  : Display last mark with '_' prefixed  
-    g:SignatureLcMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
-    g:SignatureLcMarkStr = "\m\p" : Display last two marks placed  
-
+````
+  g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
+  g:SignatureLcMarkStr = "_\m"  : Display last mark with '_' prefixed  
+  g:SignatureLcMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
+  g:SignatureLcMarkStr = "\m\p" : Display last two marks placed  
+````
 `g:SignatureUcMarkStr` ( Default : "\p\m" )  
 Set the manner in which global (uppercase) marks are displayed. Similar to above.  
 
@@ -98,7 +99,7 @@ Setting the MarkStr to a single character will not suffix the mark.
 Don't be lazy people, if you want to see the mark, set it accordingly.  
 Oh, and see in all the above strings, I've used double-quotes and not
 single-quotes. That's not cause I love 'em but things go haywire if
-double-quotes aren't used. Also, `\m` and `\p` cannot be set to <Space>  
+double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_  
 
 `g:SignatureMarkerLeader` ( Default: m )  
 Set the key used to toggle markers.  If this key is set to `<leader>m`  
@@ -110,7 +111,7 @@ Set the key used to toggle markers.  If this key is set to `<leader>m`
 ```
 
 ## Thanks to...
-Restecp (no, that's a reference and not a typo :P ) to  
+Restecp to (no, that's a reference and not a typo :P )  
 * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
 * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
 
