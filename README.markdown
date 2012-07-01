@@ -2,7 +2,7 @@
 vim-signature is a plugin to toggle, display and navigate marks.  
 What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
   
-Wait a minute...isn't this done not only well but excellently by vim-showmarks
+Wait a minute...isn't this done not only well but excellently so by vim-showmarks
 and mark-tools; why another plugin you say?  
 Well, you are right. However, I got a little impatient with the delay between
 setting and display of marks in vim-showmarks and  
@@ -47,7 +47,7 @@ default
 ````
 This will allow the use of default behavior of m to set marks and, if the line
 already contains the mark, it'll be unset.  
-The default behavior of `]'`, `['`, ]_`_ and [_`_ is supported and enhanced by
+The default behavior of `]'`, `['`, ``]` `` and ``[` `` is supported and enhanced by
 wrapping around when beginning or end of file is reached.  
   
 
@@ -85,7 +85,7 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 Set the manner in which local (lowercase) marks are displayed.  
 `g:SignatureUcMarkStr` ( Default : "\p\m" )  
 Set the manner in which global (uppercase) marks are displayed. Similar to above.  
-'\m' represents the latest mark added and '\p', the one previous to it.
+`\m` represents the latest mark added and `\p`, the one previous to it.
 ````
   g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
   g:SignatureLcMarkStr = "_\m"  : Display last mark with '_' prefixed  
