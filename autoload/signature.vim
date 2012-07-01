@@ -26,14 +26,16 @@
 
     function! s:MarksList() "{{{2
         let l:marks = []
-        for i in s:UpperMarksList()
-            let [ l:buf, l:line, l:col, l:off ] = getpos("'" . i)
-            if l:buf == bufnr('%') || l:buf == 0
-                let l:marks = add(l:marks, [i, l:line])
+        for i in split("abcdefghijklmnopqrstuvwxyz", '\zs')
+            if stridx(g:SignatureIncludeMarks, toupper(i)) >= 0
+                let [ l:buf, l:line, l:col, l:off ] = getpos("'" . toupper(i))
+                if l:buf == bufnr('%') || l:buf == 0
+                    let l:marks = add(l:marks, [toupper(i), l:line])
+                endif
             endif
-        endfor
-        for i in s:LowerMarksList()
-            let l:marks = add(l:marks, [i, line("'" . i)])
+            if stridx(g:SignatureIncludeMarks, i) >= 0
+                let l:marks = add(l:marks, [i, line("'" . i)])
+            endif
         endfor
 
         "echo l:marks
