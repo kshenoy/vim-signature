@@ -114,7 +114,12 @@
             else
                 call remove(b:sig_markers, l:lnum)
                 if has_key(b:sig_marks, l:lnum)
-                    let l:str  = strpart(b:sig_marks[l:lnum], strlen(b:sig_marks[l:lnum])-2, 2)
+                    let l:str = substitute(g:SignatureMarkStr, "\m", strpart(b:sig_marks[l:lnum], 0, 1), "")
+                    if len(b:sig_marks[l:lnum]) > 1
+                        let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
+                    else
+                        let l:str = substitute(l:str, "\p", " ", "")
+                    endif
                     exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
                     exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
                 else
@@ -126,8 +131,7 @@
             " Alphabetical mark has been set
             if a:mode
                 let l:lnum = a:lnum
-                let b:sig_marks[l:lnum] = get(b:sig_marks, l:lnum, "") . a:mark
-
+                let b:sig_marks[l:lnum] = a:mark . get(b:sig_marks, l:lnum, "")
             else
                 let l:arr = keys(filter(copy(b:sig_marks), 'v:val =~# a:mark'))
                 if empty(l:arr) | return | endif
@@ -137,14 +141,20 @@
                 let &ic = l:save_ic
             endif
 
-            let l:id = ( winbufnr(0) + 1 ) * l:lnum
-            let l:str  = strpart(b:sig_marks[l:lnum], strlen(b:sig_marks[l:lnum])-2, 2)
+            let l:id  = ( winbufnr(0) + 1 ) * l:lnum
+            let l:str = strpart(b:sig_marks[l:lnum], 0, 2)
             if empty(l:str) 
                 call remove(b:sig_marks, l:lnum)
                 if !has_key(b:sig_markers, l:lnum)
                     exec 'sign unplace ' . l:id
                 endif
             elseif !has_key(b:sig_markers, l:lnum)
+                let l:str = substitute(g:SignatureMarkStr, "\m", strpart(b:sig_marks[l:lnum], 0, 1), "")
+                if len(b:sig_marks[l:lnum]) > 1
+                    let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
+                else
+                    let l:str = substitute(l:str, "\p", " ", "")
+                endif
                 exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
                 exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
             endif
@@ -211,7 +221,7 @@
             endfor
         endif
 
-        if empty(l:mark) && g:Signature_WrapJumps
+        if empty(l:mark) && g:SignatureWrapJumps
             let l:mark = l:mark_first
         endif
 
@@ -243,7 +253,7 @@
                     if i != len(l:UsedMarks)-1
                         let l:mark = l:UsedMarks[i+1][0]
                         let g:sig_GotoMarkByAlpha = l:mark
-                    elseif g:Signature_WrapJumps 
+                    elseif g:SignatureWrapJumps 
                         let l:mark = l:UsedMarks[0][0]
                         let g:sig_GotoMarkByAlpha = l:mark
                     endif
@@ -251,7 +261,7 @@
                     if i != 0
                         let l:mark = l:UsedMarks[i-1][0]
                         let g:sig_GotoMarkByAlpha = l:mark
-                    elseif g:Signature_WrapJumps
+                    elseif g:SignatureWrapJumps
                         let l:mark = l:UsedMarks[-1][0]
                         let g:sig_GotoMarkByAlpha = l:mark
                     endif

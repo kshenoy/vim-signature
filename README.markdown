@@ -11,6 +11,9 @@ use two plugins where one would do and
 I was bored and felt like writing my own...  
   
 Are you convinced yet or do you want me to go on? Anyway, that's how vim-signature was born.
+Oh, and I also added some touches of my own such as  
+* Display multiple marks (upto 2, limited by the signs feature)  
+* Place custom signs !@#$%^&*() as visual markers  
 
 
 ## Requirements
@@ -77,6 +80,20 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
 <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
 ```
+`g:SignatureMarkStr` ( Default : "\m\p" )
+You can display upto 2 characters (vim-showmarks style people).
+However, contrary to vim-showmarks, setting g:SignatureMarkStr to a single
+character will not suffix the mark. Don't be lazy people, if you want to see
+the mark, set it accordingly.  
+'\m' represents the latest mark added and '\p', the one previous to it.
+    g:SignatureMarkStr = "\m."  : Display last mark with '.' suffixed  
+    g:SignatureMarkStr = "_\m"  : Display last mark with '_' prefixed  
+    g:SignatureMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
+    g:SignatureMarkStr = "\m\p" : Display last two marks placed  
+Oh, and see in all the above strings, I've used double-quotes and not
+single-quotes. That's not cause I love 'em but things go haywire if
+double-quotes aren't used.  
+
 `g:SignatureMarkerLeader` ( Default: m )  
 Set the key used to toggle markers.  If this key is set to `<leader>m`  
 `<leader>m1` will toggle the marker '!'  
@@ -91,11 +108,11 @@ Restecp (no, that's a reference and not a typo :P ) to
 * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
 * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
 
-I feel obligated to mention that as some portions were coded so well by them, I could think of no way to improve them and I've just used it as is.
+I feel obligated to mention that as some portions were coded so well by
+them, I could think of no way to improve them and I've just used it as is.  
 Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 
 
 ## ToDo:
 * Add custom color support for signs
-* Add custom character display support for signs
 * Add support for non-Alphabetical marks
