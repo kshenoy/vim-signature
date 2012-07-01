@@ -82,7 +82,9 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
 ```
   
 `g:SignatureLcMarkStr` ( Default : "\p\m" )  
-Set the manner in which local (lowercase) marks are displayed.
+Set the manner in which local (lowercase) marks are displayed.  
+`g:SignatureUcMarkStr` ( Default : "\p\m" )  
+Set the manner in which global (uppercase) marks are displayed. Similar to above.  
 '\m' represents the latest mark added and '\p', the one previous to it.
 ````
   g:SignatureLcMarkStr = "\m."  : Display last mark with '.' suffixed  
@@ -90,9 +92,6 @@ Set the manner in which local (lowercase) marks are displayed.
   g:SignatureLcMarkStr = ">"    : Display ">" for a line containing a mark. The mark is not displayed  
   g:SignatureLcMarkStr = "\m\p" : Display last two marks placed  
 ````
-`g:SignatureUcMarkStr` ( Default : "\p\m" )  
-Set the manner in which global (uppercase) marks are displayed. Similar to above.  
-
 You can display upto 2 characters. That's a limitation imposed by the signs
 feature; nothing I can do about it : / .  
 Setting the MarkStr to a single character will not suffix the mark.
