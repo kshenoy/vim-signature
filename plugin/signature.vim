@@ -56,8 +56,10 @@
 " already contains the mark, it'll be unset.
 " The default behavior of `]'`, `['`, ]_`_ and [_`_ is supported and enhanced by
 " wrapping around when beginning or end of file is reached.
+"
+" The command `SignatureToggle` can be used to enable/disable vim-signature
 " 
-" 
+"
 " Customisation:                        {{{2
 " The defaults not to your liking bub? Have no fear; use the following
 " variables to set things just the way you want it
@@ -158,75 +160,127 @@ let s:save_cpo         = &cpo
 set cpo&vim
 
 
-if !exists('g:SignatureIncludeMarks')
-    let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-endif
-if !exists('g:SignatureWrapJumps')
-    let g:SignatureWrapJumps = 1
-endif
-if !exists('g:SignatureMarkLeader')
-    let g:SignatureMarkLeader = "m"
-endif
-if !exists('g:SignatureMarkerLeader')
-    let g:SignatureMarkerLeader = g:SignatureMarkLeader
-endif
-if !exists('g:SignatureDefaultMappings')
-    let g:SignatureDefaultMappings = 1
-endif
-if !exists('g:SignatureLcMarkStr')
-    let g:SignatureLcMarkStr = "\p\m"
-endif
-if !exists('g:SignatureUcMarkStr')
-    let g:SignatureUcMarkStr = g:SignatureLcMarkStr
-endif
+function! s:SignatureToggle(...)
+    let b:sig_status = ( a:0 > 0 ? a:1 : !( exists('b:sig_status') && b:sig_status ))
 
-if g:SignatureDefaultMappings
-    if !hasmapto( '<Plug>SIG_PlaceNextMark'    ) | nmap m,       <Plug>SIG_PlaceNextMark| endif
-    if !hasmapto( '<Plug>SIG_PurgeMarks'       ) | nmap m<Space> <Plug>SIG_PurgeMarks| endif
-    if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap ']       <Plug>SIG_NextLineByAlpha| endif
-    if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[       <Plug>SIG_PrevLineByAlpha| endif
-    if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `]       <Plug>SIG_NextSpotByAlpha| endif
-    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[       <Plug>SIG_PrevSpotByAlpha| endif
-    if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]'       <Plug>SIG_NextLineByPos| endif
-    if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap ['       <Plug>SIG_PrevLineByPos| endif
-    if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]`       <Plug>SIG_NextSpotByPos| endif
-    if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [`       <Plug>SIG_PrevSpotByPos| endif
-    if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]=       <Plug>SIG_NextMarkerByType| endif
-    if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap ]-       <Plug>SIG_PrevMarkerByType| endif
-endif
+    if b:sig_status "   {{{
+        if !exists('g:SignatureIncludeMarks')
+            let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        endif
+        if !exists('g:SignatureWrapJumps')
+            let g:SignatureWrapJumps = 1
+        endif
+        if !exists('g:SignatureMarkLeader')
+            let g:SignatureMarkLeader = "m"
+        endif
+        if !exists('g:SignatureMarkerLeader')
+            let g:SignatureMarkerLeader = g:SignatureMarkLeader
+        endif
+        if !exists('g:SignatureDefaultMappings')
+            let g:SignatureDefaultMappings = 1
+        endif
+        if !exists('g:SignatureLcMarkStr')
+            let g:SignatureLcMarkStr = "\p\m"
+        endif
+        if !exists('g:SignatureUcMarkStr')
+            let g:SignatureUcMarkStr = g:SignatureLcMarkStr
+        endif
 
-for i in split(g:SignatureIncludeMarks, '\zs')
-    silent exec 'nnoremap <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
-endfor
+        if g:SignatureDefaultMappings
+            if !hasmapto( '<Plug>SIG_PlaceNextMark'    ) | nmap m,       <Plug>SIG_PlaceNextMark| endif
+            if !hasmapto( '<Plug>SIG_PurgeMarks'       ) | nmap m<Space> <Plug>SIG_PurgeMarks| endif
+            if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap ']       <Plug>SIG_NextLineByAlpha| endif
+            if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[       <Plug>SIG_PrevLineByAlpha| endif
+            if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `]       <Plug>SIG_NextSpotByAlpha| endif
+            if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[       <Plug>SIG_PrevSpotByAlpha| endif
+            if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]'       <Plug>SIG_NextLineByPos| endif
+            if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap ['       <Plug>SIG_PrevLineByPos| endif
+            if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]`       <Plug>SIG_NextSpotByPos| endif
+            if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [`       <Plug>SIG_PrevSpotByPos| endif
+            if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]=       <Plug>SIG_NextMarkerByType| endif
+            if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap ]-       <Plug>SIG_PrevMarkerByType| endif
+        endif
 
-nnoremap <silent> <Plug>SIG_PlaceNextMark    :call signature#ToggleMark(",")<CR>
-nnoremap <silent> <Plug>SIG_PurgeMarks       :call signature#PurgeMarks()<CR>
-nnoremap <silent> <Plug>SIG_NextSpotByAlpha  :call signature#GotoMark("alpha", "next", "spot")<CR>
-nnoremap <silent> <Plug>SIG_PrevSpotByAlpha  :call signature#GotoMark("alpha", "prev", "spot")<CR>
-nnoremap <silent> <Plug>SIG_NextLineByAlpha  :call signature#GotoMark("alpha", "next", "line")<CR>
-nnoremap <silent> <Plug>SIG_PrevLineByAlpha  :call signature#GotoMark("alpha", "prev", "line")<CR>
-nnoremap <silent> <Plug>SIG_NextSpotByPos    :call signature#GotoMark("pos", "next", "spot")<CR>
-nnoremap <silent> <Plug>SIG_PrevSpotByPos    :call signature#GotoMark("pos", "prev", "spot")<CR>
-nnoremap <silent> <Plug>SIG_NextLineByPos    :call signature#GotoMark("pos", "next", "line")<CR>
-nnoremap <silent> <Plug>SIG_PrevLineByPos    :call signature#GotoMark("pos", "prev", "line")<CR>
-nnoremap <silent> <Plug>SIG_NextMarkerByType :call signature#GotoMarker("next")<CR>
-nnoremap <silent> <Plug>SIG_PrevMarkerByType :call signature#GotoMarker("prev")<CR>
+        for i in split(g:SignatureIncludeMarks, '\zs')
+            silent exec 'nnoremap <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+        endfor
 
+        nnoremap <silent> <Plug>SIG_PlaceNextMark    :call signature#ToggleMark(",")<CR>
+        nnoremap <silent> <Plug>SIG_PurgeMarks       :call signature#PurgeMarks()<CR>
+        nnoremap <silent> <Plug>SIG_NextSpotByAlpha  :call signature#GotoMark("alpha", "next", "spot")<CR>
+        nnoremap <silent> <Plug>SIG_PrevSpotByAlpha  :call signature#GotoMark("alpha", "prev", "spot")<CR>
+        nnoremap <silent> <Plug>SIG_NextLineByAlpha  :call signature#GotoMark("alpha", "next", "line")<CR>
+        nnoremap <silent> <Plug>SIG_PrevLineByAlpha  :call signature#GotoMark("alpha", "prev", "line")<CR>
+        nnoremap <silent> <Plug>SIG_NextSpotByPos    :call signature#GotoMark("pos", "next", "spot")<CR>
+        nnoremap <silent> <Plug>SIG_PrevSpotByPos    :call signature#GotoMark("pos", "prev", "spot")<CR>
+        nnoremap <silent> <Plug>SIG_NextLineByPos    :call signature#GotoMark("pos", "next", "line")<CR>
+        nnoremap <silent> <Plug>SIG_PrevLineByPos    :call signature#GotoMark("pos", "prev", "line")<CR>
+        nnoremap <silent> <Plug>SIG_NextMarkerByType :call signature#GotoMarker("next")<CR>
+        nnoremap <silent> <Plug>SIG_PrevMarkerByType :call signature#GotoMarker("prev")<CR>
 
-let g:SignatureMarkers = ")!@#$%^&*("
-let s:signature_markers = split(g:SignatureMarkers, '\zs')
-for i in range(0, len(s:signature_markers)-1)
-    exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
-    silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
-    silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
-endfor
+        let g:SignatureMarkers = ")!@#$%^&*("
+        let s:signature_markers = split(g:SignatureMarkers, '\zs')
+        for i in range(0, len(s:signature_markers)-1)
+            exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
+            silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
+            silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
+        endfor
 
-if has('autocmd')
-    augroup sig_autocmds
-        autocmd!
-        autocmd BufEnter * call signature#RefreshMarks() 
-    augroup END
-endif
+        if has('autocmd')
+            augroup sig_autocmds
+                autocmd!
+                autocmd BufEnter * call signature#RefreshAll(1) 
+            augroup END
+        endif
+        call signature#RefreshAll(1)
+    " }}}
+    else            "   {{{
+
+        call signature#RefreshAll(0)
+        if has('autocmd')
+            augroup sig_autocmds
+                autocmd!
+            augroup END
+        endif
+
+        for i in range(0, len(s:signature_markers)-1)
+            silent exec 'nunmap <silent> ' . g:SignatureMarkerLeader . i
+            silent exec 'nunmap <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i]
+        endfor
+        unlet s:signature_markers
+        unlet g:SignatureMarkers
+
+        nunmap <silent> <Plug>SIG_PlaceNextMark
+        nunmap <silent> <Plug>SIG_PurgeMarks
+        nunmap <silent> <Plug>SIG_NextSpotByAlpha
+        nunmap <silent> <Plug>SIG_PrevSpotByAlpha
+        nunmap <silent> <Plug>SIG_NextLineByAlpha
+        nunmap <silent> <Plug>SIG_PrevLineByAlpha
+        nunmap <silent> <Plug>SIG_NextSpotByPos
+        nunmap <silent> <Plug>SIG_PrevSpotByPos
+        nunmap <silent> <Plug>SIG_NextLineByPos
+        nunmap <silent> <Plug>SIG_PrevLineByPos
+        nunmap <silent> <Plug>SIG_NextMarkerByType
+        nunmap <silent> <Plug>SIG_PrevMarkerByType
+
+        for i in split(g:SignatureIncludeMarks, '\zs')
+            silent exec 'nunmap <silent> ' . g:SignatureMarkLeader . i
+        endfor
+
+        if exists('g:SignatureIncludeMarks')    | unlet g:SignatureIncludeMarks    | endif
+        if exists('g:SignatureWrapJumps')       | unlet g:SignatureWrapJumps       | endif
+        if exists('g:SignatureMarkLeader')      | unlet g:SignatureMarkLeader      | endif
+        if exists('g:SignatureMarkerLeader')    | unlet g:SignatureMarkerLeader    | endif
+        if exists('g:SignatureDefaultMappings') | unlet g:SignatureDefaultMappings | endif
+        if exists('g:SignatureLcMarkStr')       | unlet g:SignatureLcMarkStr       | endif
+        if exists('g:SignatureUcMarkStr')       | unlet g:SignatureUcMarkStr       | endif
+
+    endif " }}}
+endfunction
+call s:SignatureToggle(1)
+
+command! -nargs=0 SignatureToggle call s:SignatureToggle()
+
 
 "===============================================================================
 let &cpo = s:save_cpo

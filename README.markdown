@@ -53,6 +53,8 @@ already contains the mark, it'll be unset.
 The default behavior of `]'`, `['`, ``]` `` and ``[` `` is supported and enhanced by
 wrapping around when beginning or end of file is reached.  
   
+The command `SignatureToggle` can be used to enable/disable vim-signature  
+  
 
 ## Customisation
 The defaults not to your liking bub? Have no fear; use the following

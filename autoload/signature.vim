@@ -1,8 +1,8 @@
 " vim: fdm=marker:et:ts=4:sw=4:sts=4
 "===============================================================================
 
-" Helper Functions {{{1
-    function! s:LowerMarksList()    "{{{2
+" Helper Functions                                  {{{1
+    function! s:LowerMarksList() "                  {{{2
         let l:ref = split("abcdefghijklmnopqrstuvwxyz", '\zs')
         let l:lmarks = []
         for i in l:ref
@@ -13,7 +13,7 @@
         return l:lmarks
     endfunction
 
-    function! s:UpperMarksList()    "{{{2
+    function! s:UpperMarksList() "                  {{{2
         let l:ref = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", '\zs')
         let l:umarks = []
         for i in l:ref
@@ -24,7 +24,7 @@
         return l:umarks
     endfunction
 
-    function! s:MarksList() "{{{2
+    function! s:MarksList() "                       {{{2
         let l:marks = []
         for i in split("abcdefghijklmnopqrstuvwxyz", '\zs')
             if stridx(g:SignatureIncludeMarks, toupper(i)) >= 0
@@ -42,19 +42,19 @@
         return l:marks
     endfunction
 
-    function! s:MarksAt(line)   "{{{2
+    function! s:MarksAt(line) "                     {{{2
         let l:return_var = map(filter(s:MarksList(), 'v:val[1]==' . a:line), 'v:val[0]')
         "echom l:return_var
         return l:return_var
     endfunction
 
-    function! s:UsedMarks()     "{{{2
+    function! s:UsedMarks() "                       {{{2
         let l:return_var = filter(s:MarksList(), 'v:val[1]>0')
         "echo l:return_var
         return l:return_var
     endfunction
 
-    function! s:UnusedMarks()   "{{{2
+    function! s:UnusedMarks() "                     {{{2
         let l:marks = []
         for i in s:LowerMarksList()
             if line("'" . i) == 0
@@ -65,9 +65,10 @@
     endfunction     "}}}2
 
 
-" Toggle Marks/Signs    {{{1
-    function! signature#ToggleMark(mark)    "{{{2
-        let l:lnum = line('.')
+" Toggle Marks/Signs                                {{{1
+    function! signature#ToggleMark(mark, ...) "     {{{2
+        let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : -1        )
+        let l:lnum = ( a:0 >= 2 && a:2 >  0 ? a:2 : line('.') )
 
         if a:mark == ","
             " Place new mark
@@ -76,40 +77,45 @@
             call s:ToggleSign(l:mark, 1, l:lnum)
 
         else
-            " Toggle Mark
-            for i in s:MarksAt(line('.'))
-                if i ==# a:mark
-                    exec 'delmarks ' . a:mark
-                    call s:ToggleSign(a:mark, 0, l:lnum)
-                    return
-                endif
-            endfor
+            if a:mode == 0 || a:mode == -1
+                " Toggle Mark
+                for i in s:MarksAt(line('.'))
+                    if i ==# a:mark
+                        exec 'delmarks ' . a:mark
+                        call s:ToggleSign(a:mark, 0, l:lnum)
+                        return
+                    endif
+                endfor
+            endif
 
-            " Mark not present, hence place new mark
-            call s:ToggleSign(a:mark, 0, 0)
-            exec 'normal! m' . a:mark
-            call s:ToggleSign(a:mark, 1, l:lnum)
+            if a:mode == 1 || a:mode == -1
+                " Mark not present, hence place new mark
+                call s:ToggleSign(a:mark, 0, 0)
+                exec 'normal! m' . a:mark
+                call s:ToggleSign(a:mark, 1, l:lnum)
+            endif
+
         endif
     endfunction
 
-    function! signature#PurgeMarks()  "{{{2
+    function! signature#PurgeMarks() "              {{{2
         for i in map(filter(s:MarksList(), 'v:val[1]>0'), 'v:val[0]')
             silent exec 'delmarks ' . i
             silent call s:ToggleSign(i, 0, 0)
         endfor
     endfunction     "}}}2
 
-    function! signature#ToggleMarker(marker)    "{{{2
-        let l:lnum = line('.')
-        if has_key(b:sig_markers, l:lnum) && b:sig_markers[l:lnum] == a:marker
-            call s:ToggleSign(a:marker, 0, l:lnum)
-        else
-            call s:ToggleSign(a:marker, 1, l:lnum)
-        endif
+    function! signature#ToggleMarker(marker, ...) " {{{2
+        let l:mode = has_key(b:sig_markers, l:lnum) && b:sig_markers[l:lnum] == a:marker
+        let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : l:mode    )
+        let l:lnum = ( a:0 >= 2 && a:2 >  0 ? a:2 : line('.') )
+
+        if !l:mode | call remove(b:sig_markers, l:lnum) | endif
+        call s:ToggleSign(a:marker, l:mode, l:lnum)
     endfunction
 
 
-    function! signature#RemoveMarker(marker)    "{{{2
+    function! signature#RemoveMarker(marker) "      {{{2
         let l:markers = keys(filter(copy(b:sig_markers), 'v:val=~#a:marker'))
         for i in l:markers
             call s:ToggleSign(a:marker, 0, i)
@@ -117,7 +123,7 @@
         call filter(b:sig_markers, 'v:val!~#a:marker')
     endfunction     "}}}2
 
-    function! s:ToggleSign(mark, mode, lnum)    "{{{2
+    function! s:ToggleSign(mark, mode, lnum) "      {{{2
         if !has('signs') | return | endif
 
         if stridx(g:SignatureMarkers, a:mark) >= 0
@@ -129,7 +135,6 @@
                 let l:str = stridx(g:SignatureMarkers, a:mark)
                 exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Marker_' . l:str . ' file=' . expand('%:p')
             else
-                call remove(b:sig_markers, l:lnum)
                 if has_key(b:sig_marks, l:lnum)
                     let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
                     if index(s:LowerMarksList(), l:mark) >= 0
@@ -183,8 +188,8 @@
     endfunction     "}}}2
 
 
-" Navigation    {{{1
-    function! signature#GotoMark(mode, dir, loc)  "{{{2
+" Navigation                                        {{{1
+    function! signature#GotoMark(mode, dir, loc) "  {{{2
         "echom a:mode . ", " . a:dir . ", " . a:loc
 
         let l:mark = ""
@@ -205,7 +210,7 @@
         endif
     endfunction
 
-    function! s:GotoMarkByPos(dir)  "{{{2
+    function! s:GotoMarkByPos(dir) "                {{{2
         "echom "Jumping by POS"
 
         let l:MarksList = s:UsedMarks()
@@ -249,7 +254,7 @@
       return l:mark
     endfunction
 
-    function! s:GotoMarkByAlpha(dir)    "{{{2
+    function! s:GotoMarkByAlpha(dir) "              {{{2
         "echom "Jumping by ALPHA"
 
         let l:UsedMarks = s:UsedMarks()
@@ -292,7 +297,7 @@
         endfor
     endfunction     "}}}2
 
-    function! signature#GotoMarker(dir)   "{{{2
+    function! signature#GotoMarker(dir) "           {{{2
         let l:lnum = line('.')
         let l:lmin = line('$') + 1
         let l:lmax = 0
@@ -326,38 +331,58 @@
     endfunction     "}}}2
 
 
-" Misc {{{1
-    function! signature#RefreshMarks()   "{{{2
+" Misc                                              {{{1
+    function! signature#RefreshAll(mode) "               {{{2
         if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
+        " b:sig_markers = { lnum:marks_str }
+
         if !exists('b:sig_markers') | let b:sig_markers = {} | endif
+        " b:sig_markers = { lnum:marker }
 
         let l:used_marks = s:UsedMarks()
 
-        " Remove marks
-        for i in split(g:SignatureIncludeMarks, '\zs')
-            let l:pair = items(filter(copy(b:sig_marks), 'v:val =~# i'))
-            if !empty(l:pair)
-                let l:found = 0
-                for j in l:used_marks
-                    if j[0] ==# i && j[1] == l:pair[0][0]
-                        let l:found = 1
-                        break
-                    endif
-                endfor
-                if !(l:found)
-                    call s:ToggleSign(i, 0, 0)
-                endif
-            endif
-        endfor
+        if a:mode
+            " Signature enabled -> Refresh signs
 
-        " Add marks
-        for k in l:used_marks
-            if !has_key(b:sig_marks, k[1])
-                call s:ToggleSign(k[0], 1, k[1])
-            elseif b:sig_marks[k[1]] !~# k[0]
-                call s:ToggleSign(k[0], 0, 0)
-                call s:ToggleSign(k[0], 1, k[1])
-            endif
-        endfor
+            " Remove signs for absent marks
+            for i in split(g:SignatureIncludeMarks, '\zs')
+                let l:pair = items(filter(copy(b:sig_marks), 'v:val =~# i'))
+                if !empty(l:pair)
+                    let l:found = 0
+                    for j in l:used_marks
+                        if j[0] ==# i && j[1] == l:pair[0][0]
+                            let l:found = 1
+                            break
+                        endif
+                    endfor
+                    if !(l:found)
+                        call s:ToggleSign(i, 0, 0)
+                    endif
+                endif
+            endfor
+
+            " Add signs for present marks
+            for k in l:used_marks
+                if !has_key(b:sig_marks, k[1])
+                    call s:ToggleSign(k[0], 1, k[1])
+                elseif b:sig_marks[k[1]] !~# k[0]
+                    call s:ToggleSign(k[0], 0, 0)
+                    call s:ToggleSign(k[0], 1, k[1])
+                endif
+            endfor
+
+            " Add signs for markers
+            for i in keys(b:sig_markers)
+                call s:ToggleSign(b:sig_markers[i], 1, i)
+            endfor
+
+        else
+            " Signature has been disabled
+            for i in range(1, line('$'))
+                let l:id = ( winbufnr(0) + 1 ) * i
+                exec 'sign unplace ' . l:id
+            endfor
+            unlet b:sig_marks
+        endif
 
     endfunction
