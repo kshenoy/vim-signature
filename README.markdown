@@ -1,3 +1,5 @@
+This version might be broken. Please use the one present at [vim.org](http://www.vim.org/scripts/script.php?script_id=4118)
+
 # vim-signature
 vim-signature is a plugin to toggle, display and navigate marks.  
 What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
@@ -15,9 +17,11 @@ Oh, and I also added some touches of my own such as
 * Displaying multiple marks (upto 2, limited by the signs feature)  
 * Placing custom signs !@#$%^&*() as visual markers  
   
-###Screenshots
+### Screenshots
 [Click](http://imgur.com/a/bPp3m#0)
 
+### Vim.org mirror
+http://www.vim.org/scripts/script.php?script_id=4118  
 
 ## Requirements
 Requires Vim to be compiled with +signs to display marks.
