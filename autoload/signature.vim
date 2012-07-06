@@ -77,7 +77,7 @@
             call s:ToggleSign(l:mark, 1, l:lnum)
 
         else
-            if a:mode == 0 || a:mode == -1
+            if l:mode == 0 || l:mode == -1
                 " Toggle Mark
                 for i in s:MarksAt(line('.'))
                     if i ==# a:mark
@@ -88,7 +88,7 @@
                 endfor
             endif
 
-            if a:mode == 1 || a:mode == -1
+            if l:mode == 1 || l:mode == -1
                 " Mark not present, hence place new mark
                 call s:ToggleSign(a:mark, 0, 0)
                 exec 'normal! m' . a:mark
