@@ -337,6 +337,12 @@
 
 " Misc                                              {{{1
     function! signature#RefreshDisplay(mode) "      {{{2
+        if !exists('b:SignatureIncludeMarks')   | let b:SignatureIncludeMarks   = g:SignatureIncludeMarks   | endif
+        if !exists('b:SignatureIncludeMarkers') | let b:SignatureIncludeMarkers = g:SignatureIncludeMarkers | endif
+        if !exists('b:SignatureWrapJumps')      | let b:SignatureWrapJumps      = g:SignatureWrapJumps      | endif
+        if !exists('b:SignatureLcMarkStr')      | let b:SignatureLcMarkStr      = g:SignatureLcMarkStr      | endif
+        if !exists('b:SignatureUcMarkStr')      | let b:SignatureUcMarkStr      = g:SignatureUcMarkStr      | endif
+
         if !exists('b:sig_status') | let b:sig_status = 1             | endif
         if a:mode                  | let b:sig_status = !b:sig_status | endif
 

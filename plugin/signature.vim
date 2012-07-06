@@ -255,12 +255,7 @@ endfor
 if has('autocmd')
     augroup sig_autocmds
         autocmd!
-        autocmd BufEnter   * call signature#RefreshDisplay(0) 
-        autocmd BufReadPre * if !exists('b:SignatureIncludeMarks')   | let b:SignatureIncludeMarks   = g:SignatureIncludeMarks   | endif
-        autocmd BufReadPre * if !exists('b:SignatureIncludeMarkers') | let b:SignatureIncludeMarkers = g:SignatureIncludeMarkers | endif
-        autocmd BufReadPre * if !exists('b:SignatureWrapJumps')      | let b:SignatureWrapJumps      = g:SignatureWrapJumps      | endif
-        autocmd BufReadPre * if !exists('b:SignatureLcMarkStr')      | let b:SignatureLcMarkStr      = g:SignatureLcMarkStr      | endif
-        autocmd BufReadPre * if !exists('b:SignatureUcMarkStr')      | let b:SignatureUcMarkStr      = g:SignatureUcMarkStr      | endif
+        autocmd BufEnter * call signature#RefreshDisplay(0) 
     augroup END
 endif
 
