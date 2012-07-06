@@ -1,5 +1,3 @@
-This version might be broken. Please use the one present at [vim.org](http://www.vim.org/scripts/script.php?script_id=4118)
-
 # vim-signature
 vim-signature is a plugin to toggle, display and navigate marks.  
 What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
@@ -60,30 +58,30 @@ already contains the mark, it'll be unset.
 The default behavior of `]'`, `['`, ``]` `` and ``[` `` is supported and enhanced by
 wrapping around when beginning or end of file is reached.  
   
-The command `SignatureToggle` can be used to enable/disable vim-signature  
+The command `SignatureToggleDisplay` can be used to show/hide the signs. Note that this does not delete any of the marks but only hides them.  
   
 
 ## Customisation
 The defaults not to your liking bub? Have no fear; use the following
 variables to set things just the way you want it  
 
-`g:SignatureDefaultMappings` ( Default : 1 )  
-Will use the default mappings specified below.  
+* `g:SignatureDefaultMappings` ( Default : 1 )  
+  Will use the default mappings specified below.  
 
-`g:SignatureIncludeMarks` ( Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )  
-Specify the marks that can be controlled by this plugin.
-`b:SignatureIncludeMarks` can be set to specify buffer-specific settings.  
-Only supports Alphabetical marks at the moment.  
-
-`g:SignatureWrapJumps` ( Default : 1 )
-Specify if jumping to marks should wrap-around.  
-`b:SignatureWrapJumps` can be set to specify buffer-specific settings.  
-
-`g:SignatureMarkLeader` ( Default: m )  
-Set the key used to toggle marks.  If this key is set to `<leader>m`  
-`<leader>ma` will toggle the mark 'a'  
-`<leader>m,` will place the next available mark  
-`<leader>m<Space>` will delete all marks  
+* `g:SignatureIncludeMarks` ( Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )  
+  Specify the marks that can be controlled by this plugin.
+  Only supports Alphabetical marks at the moment.  
+  `b:SignatureIncludeMarks` can be set separately to specify buffer-specific settings.  
+  
+* `g:SignatureWrapJumps` ( Default : 1 )  
+  Specify if jumping to marks should wrap-around.
+  `b:SignatureWrapJumps` can be set to specify buffer-specific settings.  
+  
+* `g:SignatureMarkLeader` ( Default: m )  
+  Set the key used to toggle marks.  If this key is set to `<leader>m`,  
+    `<leader>ma` will toggle the mark 'a'  
+    `<leader>m,` will place the next available mark  
+    `<leader>m<Space>` will delete all marks  
 
 ````
   <Plug>SIG_PlaceNextMark    : Place next available mark
@@ -98,11 +96,11 @@ Set the key used to toggle marks.  If this key is set to `<leader>m`
   <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
 ````
   
-`g:SignatureLcMarkStr` ( Default : "\p\m" )  
-Set the manner in which local (lowercase) marks are displayed.  
-`g:SignatureUcMarkStr` ( Default : "\p\m" )  
-Set the manner in which global (uppercase) marks are displayed. Similar to above.  
-`b:SignatureLcMarkStr` and `b:SignatureUcMarkStr`can be set separately to specify buffer-specific settings.  
+* `g:SignatureLcMarkStr` ( Default : "\p\m" )  
+  Set the manner in which local (lowercase) marks are displayed.  
+  `g:SignatureUcMarkStr` ( Default : "\p\m" )  
+  Set the manner in which global (uppercase) marks are displayed. Similar to above.  
+  `b:SignatureLcMarkStr` and `b:SignatureUcMarkStr`can be set separately to specify buffer-specific settings.  
   
 `\m` represents the latest mark added and `\p`, the one previous to it.
 ````
@@ -120,14 +118,14 @@ Oh, and see in all the above strings, I've used double-quotes and not
 single-quotes. That's not cause I love 'em but things go haywire if
 double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_  
 
-`g:SignatureMarkerLeader` ( Default: m )  
-Set the key used to toggle markers.  If this key is set to `<leader>m`  
-`<leader>m1` will toggle the marker '!'  
-`<leader>m!` will remove all the '!' markers  
+* `g:SignatureMarkerLeader` ( Default: m )  
+  Set the key used to toggle markers.  If this key is set to `<leader>m`  
+    `<leader>m1` will toggle the marker '!'  
+    `<leader>m!` will remove all the '!' markers  
   
-`g:SignatureIncludeMarkers` ( Default : '!@#$%^&*()' )
-Specify the markers that can be used by the plugin.
-`b:SignatureIncludeMarkers` can be specified separately for buffer-specific settings  
+* `g:SignatureIncludeMarkers` ( Default : '!@#$%^&*()' )
+  Specify the markers that can be used by the plugin.
+  `b:SignatureIncludeMarkers` can be specified separately for buffer-specific settings  
 
 ````
   <Plug>SIG_NextMarkerByType : Jump to next line having same marker  
