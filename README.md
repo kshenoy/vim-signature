@@ -133,6 +133,15 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
   <Plug>SIG_PurgeMarkers     : Remove all markers  
 ````
 
+* `g:SignatureDisableMenu` ( Default: 0 )  
+  Hides the menu if set to 1  
+
+* `g:SignatureMenuStruct` ( Default: "P&lugins.&Signature" )  
+  Set where the menu options are to be displayed. For more details type,
+````
+  :h usr_42.txt
+````
+
 
 ## Thanks to...
 Restecp to (no, that's a reference and not a typo :P )  

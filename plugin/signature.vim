@@ -135,6 +135,15 @@
 "   <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker  
 "   <Plug>SIG_PurgeMarkers     : Remove all markers  
 " ````
+"
+" * `g:SignatureDisableMenu` ( Default: 0 )  
+"   Hides the menu if set to 1  
+" 
+" * `g:SignatureMenuStruct` ( Default: "P&lugins.&Signature" )  
+"   Set where the menu options are to be displayed. For more details type,
+" ````
+"   :h usr_42.txt
+" ````
 " 
 " 
 " Thanks To:        {{{2
@@ -156,6 +165,11 @@
 "   Kartik Shenoy
 " 
 " Changelist:
+"   2012-07-23:
+"     - Enabled non-default mappings for m, m<Space> and m<BS> which had been left out
+"     - Display mark options in menu
+"     - Modified marker navigation mappings to be consistent with others
+"       in the use of [ and ] to go to the prev and next respectively
 "
 "   2012-07-05:
 "     - Added support to toggle sign display
@@ -207,23 +221,30 @@ endif
 if !exists('g:SignatureUcMarkStr')
     let g:SignatureUcMarkStr = g:SignatureLcMarkStr
 endif
+if !exists('g:SignatureDisableMenu')
+    let g:SignatureDisableMenu = 0
+endif
+if !exists('g:SignatureMenuStruct')
+    let g:SignatureMenuStruct = 'P&lugins.&Signature'
+endif
 
 
 if g:SignatureDefaultMappings
-    if !hasmapto( '<Plug>SIG_PlaceNextMark'    ) | nmap m,       <Plug>SIG_PlaceNextMark| endif
-    if !hasmapto( '<Plug>SIG_PurgeMarks'       ) | nmap m<Space> <Plug>SIG_PurgeMarks| endif
-    if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap ']       <Plug>SIG_NextLineByAlpha| endif
-    if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[       <Plug>SIG_PrevLineByAlpha| endif
-    if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `]       <Plug>SIG_NextSpotByAlpha| endif
-    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[       <Plug>SIG_PrevSpotByAlpha| endif
-    if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]'       <Plug>SIG_NextLineByPos| endif
-    if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap ['       <Plug>SIG_PrevLineByPos| endif
-    if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]`       <Plug>SIG_NextSpotByPos| endif
-    if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [`       <Plug>SIG_PrevSpotByPos| endif
-    if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]=       <Plug>SIG_NextMarkerByType| endif
-    if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap ]-       <Plug>SIG_PrevMarkerByType| endif
-    if !hasmapto( '<Plug>SIG_PurgeMarkers'     ) | nmap m<BS>    <Plug>SIG_PurgeMarkers| endif
+    if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap '] <Plug>SIG_NextLineByAlpha| endif
+    if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[ <Plug>SIG_PrevLineByAlpha| endif
+    if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `] <Plug>SIG_NextSpotByAlpha| endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[ <Plug>SIG_PrevSpotByAlpha| endif
+    if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]' <Plug>SIG_NextLineByPos| endif
+    if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap [' <Plug>SIG_PrevLineByPos| endif
+    if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]` <Plug>SIG_NextSpotByPos| endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [` <Plug>SIG_PrevSpotByPos| endif
+    if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]- <Plug>SIG_NextMarkerByType| endif
+    if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap [- <Plug>SIG_PrevMarkerByType| endif
 endif
+
+if !hasmapto( '<Plug>SIG_PlaceNextMark' ) | exec 'nmap ' . g:SignatureMarkLeader   . ',       <Plug>SIG_PlaceNextMark'| endif
+if !hasmapto( '<Plug>SIG_PurgeMarks'    ) | exec 'nmap ' . g:SignatureMarkLeader   . '<Space> <Plug>SIG_PurgeMarks'| endif
+if !hasmapto( '<Plug>SIG_PurgeMarkers'  ) | exec 'nmap ' . g:SignatureMarkerLeader . '<BS>    <Plug>SIG_PurgeMarkers'| endif
 
 for i in split(g:SignatureIncludeMarks, '\zs')
     silent exec 'nnoremap <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
@@ -260,6 +281,20 @@ if has('autocmd')
 endif
 
 command! -nargs=0 SignatureToggleDisplay call signature#RefreshDisplay(1)
+
+
+if !g:SignatureDisableMenu
+    exec 'menu  ' . g:SignatureMenuStruct . '.Pl&ace\ next\ mark<Tab>' . g:SignatureMarkLeader . ', :call signature#ToggleMark(",")<CR>'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Re&move\ all\ marks\ \ \ \ <Tab>' . g:SignatureMarkLeader . '<Space> :call signature#PurgeMarks()<CR>'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ &next\ mark\ (pos)<Tab>]` :call signature#GotoMark("pos", "next", "spot")'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ p&rev\ mark\ (pos)<Tab>[` :call signature#GotoMark("pos", "prev", "spot")'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ next\ mark\ (a&lpha)<Tab>`] :call signature#GotoMark("alpha", "next", "spot")'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ prev\ mark\ (alp&ha)<Tab>`[ :call signature#GotoMark("alpha", "prev", "spot")'
+    exec 'amenu ' . g:SignatureMenuStruct . '.-s1- :'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Rem&ove\ all\ markers<Tab>' . g:SignatureMarkerLeader . '<BS> :call signature#PurgeMarkers()<CR>'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ nex&t\ marker<Tab>]- :call signature#GotoMarker("next")'
+    exec 'menu  ' . g:SignatureMenuStruct . '.Goto\ pre&v\ marker<Tab>[- :call signature#GotoMarker("prev")'
+endif
 
 
 "===============================================================================
