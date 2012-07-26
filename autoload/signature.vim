@@ -1,4 +1,4 @@
-" vim: fdm=marker:et:ts=4:sw=4:sts=4
+" vim: fdm=marker:et:ts=4:sw=2:sts=2
 "===============================================================================
 
 " Helper Functions                                  {{{1
@@ -65,6 +65,25 @@
             endif
         endfor
         return l:marks
+    endfunction
+
+    function! signature#MapKey(rhs, mode)
+        " Inverse of maparg()
+        " Pass in a key sequence and the first letter of a vim mode.
+        " Returns key mapping mapped to it in that mode, else '' if none.
+        " example:
+        " :nnoremap <Tab> :bn<CR>
+        " :call Mapkey(':bn<CR>', 'n')
+        " returns <Tab>
+        redir => l:mappings | silent! map | redir END
+        let l:rhs = substitute(a:rhs, '\(<\w\+>\)', '\L\1', 'g')
+        for l:map in split(l:mappings, '\n')
+            let l:lhs = matchstr(l:map, '\s\+\zs\S*')
+            if substitute(maparg(l:lhs, a:mode), '\(<\w\+>\)', '\L\1', 'g') == l:rhs
+                return l:lhs
+            endif
+        endfor
+        return ''
     endfunction     "}}}2
 
 
