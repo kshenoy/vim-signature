@@ -83,7 +83,7 @@
                 return l:lhs
             endif
         endfor
-        return ''
+        return ""
     endfunction     "}}}2
 
 

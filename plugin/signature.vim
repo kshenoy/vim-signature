@@ -1,7 +1,7 @@
-" README:               {{{1
-" vim-signature, version 1.1
+" README:             {{{1
+" vim-signature, version 1.3
 " 
-" Description:    {{{2
+" Description:        {{{2
 " vim-signature is a plugin to toggle, display and navigate marks.  
 " What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
 " 
@@ -24,11 +24,11 @@
 " ### Vim.org mirror
 " http://www.vim.org/scripts/script.php?script_id=4118  
 " 
-" Requirements:   {{{2
+" Requirements:       {{{2
 " Requires Vim to be compiled with +signs to display marks.
 " 
 " 
-" Installation:   {{{2
+" Installation:       {{{2
 " I highly recommend using Pathogen or Vundler to do the dirty work for you. If
 " for some reason, you do not want to use any of these excellent plugins, then
 " unzip it to your ~/.vim directory. You know how it goes...  
@@ -64,7 +64,7 @@
 " The command `SignatureToggleDisplay` can be used to show/hide the signs. Note that this does not delete any of the marks but only hides them.  
 " 
 " 
-" Customisation:  {{{2
+" Customisation:      {{{2
 " The defaults not to your liking bub? Have no fear; use the following
 " variables to set things just the way you want it  
 " 
@@ -146,7 +146,7 @@
 " ````
 " 
 " 
-" Thanks To:    {{{2
+" Thanks To:          {{{2
 " Restecp to (no, that's a reference and not a typo :P )  
 " * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
 " * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
@@ -156,12 +156,12 @@
 " Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 " 
 " 
-" ToDo:       {{{2
+" ToDo:               {{{2
 " * Add custom color support for signs
 " * Add support for non-Alphabetical marks
 " 
 " 
-" Maintainer:   {{{2
+" Maintainer:         {{{2
 " Kartik Shenoy
 " 
 " Changelist:
@@ -185,14 +185,14 @@
 " 2012-06-22:
 "   - First release
 " 
-" vim: fdm=marker:et:ts=4:sw=4:sts=4  }}}1
+" vim: fdm=marker:et:ts=4:sw=2:sts=2  }}}1
 "===========================================================================
 
 " Exit when app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_Signature") || &cp
   finish
 endif
-let g:loaded_Signature = "1.1"  " Version Number
+let g:loaded_Signature = "1.3"  " Version Number
 let s:save_cpo       = &cpo
 set cpo&vim
 
@@ -225,7 +225,7 @@ if !exists('g:SignatureDisableMenu')
   let g:SignatureDisableMenu = 0
 endif
 if !exists('g:SignatureMenuStruct')
-  let g:SignatureMenuStruct = 'P&lugins.&Signature'
+  let g:SignatureMenuStruct = 'P&lugin.&Signature'
 endif
 
 
