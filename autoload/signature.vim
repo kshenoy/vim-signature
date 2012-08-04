@@ -162,7 +162,7 @@
       if a:mode
         let b:sig_markers[l:lnum] = a:mark
         let l:str = stridx(l:SignatureIncludeMarkers, a:mark)
-        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Marker_' . l:str . ' file=' . expand('%:p')
+        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Marker_' . l:str . ' buffer=' . winbufnr(0)
       else
         if has_key(b:sig_marks, l:lnum)
           let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
@@ -173,7 +173,7 @@
           endif
           let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
           exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
-          exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
+          exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
         else
           exec 'sign unplace ' . l:id
         endif
@@ -211,7 +211,7 @@
         endif
         let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
         exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
-        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' file=' . expand('%:p')
+        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
       endif
     endif
   endfunction   "}}}2
