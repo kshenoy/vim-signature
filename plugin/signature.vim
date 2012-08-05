@@ -230,24 +230,24 @@ endif
 
 
 if g:SignatureDefaultMappings
-  if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap '] <Plug>SIG_NextLineByAlpha| endif
-  if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap '[ <Plug>SIG_PrevLineByAlpha| endif
-  if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap `] <Plug>SIG_NextSpotByAlpha| endif
-  if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap `[ <Plug>SIG_PrevSpotByAlpha| endif
-  if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap ]' <Plug>SIG_NextLineByPos| endif
-  if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap [' <Plug>SIG_PrevLineByPos| endif
-  if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap ]` <Plug>SIG_NextSpotByPos| endif
-  if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap [` <Plug>SIG_PrevSpotByPos| endif
-  if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap ]- <Plug>SIG_NextMarkerByType| endif
-  if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap [- <Plug>SIG_PrevMarkerByType| endif
+  if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap <unique> '] <Plug>SIG_NextLineByAlpha| endif
+  if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap <unique> '[ <Plug>SIG_PrevLineByAlpha| endif
+  if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap <unique> `] <Plug>SIG_NextSpotByAlpha| endif
+  if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap <unique> `[ <Plug>SIG_PrevSpotByAlpha| endif
+  if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap <unique> ]' <Plug>SIG_NextLineByPos| endif
+  if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap <unique> [' <Plug>SIG_PrevLineByPos| endif
+  if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap <unique> ]` <Plug>SIG_NextSpotByPos| endif
+  if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap <unique> [` <Plug>SIG_PrevSpotByPos| endif
+  if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap <unique> ]- <Plug>SIG_NextMarkerByType| endif
+  if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap <unique> [- <Plug>SIG_PrevMarkerByType| endif
 endif
 
-if !hasmapto( '<Plug>SIG_PlaceNextMark' ) | exec 'nmap ' . g:SignatureMarkLeader   . ', <Plug>SIG_PlaceNextMark'| endif
-if !hasmapto( '<Plug>SIG_PurgeMarks'  )   | exec 'nmap ' . g:SignatureMarkLeader   . '<Space> <Plug>SIG_PurgeMarks'| endif
-if !hasmapto( '<Plug>SIG_PurgeMarkers'  ) | exec 'nmap ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'| endif
+if !hasmapto( '<Plug>SIG_PlaceNextMark' ) | exec 'nmap <unique> ' . g:SignatureMarkLeader   . ', <Plug>SIG_PlaceNextMark'| endif
+if !hasmapto( '<Plug>SIG_PurgeMarks'  )   | exec 'nmap <unique> ' . g:SignatureMarkLeader   . '<Space> <Plug>SIG_PurgeMarks'| endif
+if !hasmapto( '<Plug>SIG_PurgeMarkers'  ) | exec 'nmap <unique> ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'| endif
 
 for i in split(g:SignatureIncludeMarks, '\zs')
-  silent exec 'nnoremap <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+  silent exec 'nnoremap <silent> <unique> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
 endfor
 
 nnoremap <silent> <Plug>SIG_PlaceNextMark    :call signature#ToggleMark(",")<CR>
