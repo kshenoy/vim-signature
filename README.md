@@ -133,6 +133,9 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
   <Plug>SIG_PurgeMarkers     : Remove all markers  
 ````
 
+* `g:SignaturePurgeConfirmation` ( Default: 0 )
+  An option for the more clumsy-fingered. Asks for confirmation before deleting all marks
+
 * `g:SignatureDisableMenu` ( Default: 0 )  
   Hides the menu if set to 1  
 

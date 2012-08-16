@@ -1,8 +1,11 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 "===============================================================================
 
+"
 " Helper Functions                                    {{{1
+"
   function! s:LowerMarksList() "                      {{{2
+    " Description: Returns list of lowercase marks that are permitted to be used
     let l:SignatureIncludeMarks = ( exists('b:SignatureIncludeMarks') ? b:SignatureIncludeMarks : g:SignatureIncludeMarks )
     let l:ref = split("abcdefghijklmnopqrstuvwxyz", '\zs')
     let l:lmarks = []
@@ -14,7 +17,9 @@
     return l:lmarks
   endfunction
 
+
   function! s:UpperMarksList() "                      {{{2
+    " Description: Returns list of uppercase marks that are permitted to be used
     let l:SignatureIncludeMarks = ( exists('b:SignatureIncludeMarks') ? b:SignatureIncludeMarks : g:SignatureIncludeMarks )
     let l:ref = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", '\zs')
     let l:umarks = []
@@ -26,13 +31,17 @@
     return l:umarks
   endfunction
 
+
   function! s:MarksList() "                           {{{2
+    " Description: Returns a list of [mark, line no.] pairs that are in use in
+    "   the buffer or are free to be placed in which case, line no. is 0
     let l:SignatureIncludeMarks = ( exists('b:SignatureIncludeMarks') ? b:SignatureIncludeMarks : g:SignatureIncludeMarks )
     let l:marks = []
     for i in split("abcdefghijklmnopqrstuvwxyz", '\zs')
       if stridx(l:SignatureIncludeMarks, toupper(i)) >= 0
         let [ l:buf, l:line, l:col, l:off ] = getpos("'" . toupper(i))
         if l:buf == bufnr('%') || l:buf == 0
+          " Add uppercase mark to list if it is in use in this buffer or hasn't been used at all.
           let l:marks = add(l:marks, [toupper(i), l:line])
         endif
       endif
@@ -40,24 +49,26 @@
         let l:marks = add(l:marks, [i, line("'" . i)])
       endif
     endfor
-
-    "echo l:marks
     return l:marks
   endfunction
 
+
   function! s:MarksAt(line) "                         {{{2
+    " Description: Return a list of marks that are in use on the specified line no.
     let l:return_var = map(filter(s:MarksList(), 'v:val[1]==' . a:line), 'v:val[0]')
-    "echom l:return_var
     return l:return_var
   endfunction
+
 
   function! s:UsedMarks() "                           {{{2
+    " Description: Return a list of marks that are in use in the current buffer
     let l:return_var = filter(s:MarksList(), 'v:val[1]>0')
-    "echo l:return_var
     return l:return_var
   endfunction
 
+
   function! s:UnusedMarks() "                         {{{2
+    " Description: Return a list of marks that are unused (globally unused for global marks)
     let l:marks = []
     for i in s:LowerMarksList()
       if line("'" . i) == 0
@@ -67,15 +78,16 @@
     return l:marks
   endfunction
 
+
   function! signature#MapKey(rhs, mode) "             {{{2
-    " Inverse of maparg()
-    " Pass in a key sequence and the first letter of a vim mode.
-    " Returns key mapping mapped to it in that mode, else '' if none.
-    " example:
-    " :nnoremap <Tab> :bn<CR>
-    " :call Mapkey(':bn<CR>', 'n')
-    " returns <Tab>
-    exec 'redir => l:mappings | silent! ' . a:mode . 'map | redir END'
+    " Description: Inverse of maparg()
+    "   Pass in a key sequence and the first letter of a vim mode.
+    "   Returns key mapping mapped to it in that mode, else '' if none.
+    "   example:
+    "     :nnoremap <Tab> :bn<CR>
+    "     :call Mapkey(':bn<CR>', 'n')
+    "   returns <Tab>
+    execute 'redir => l:mappings | silent! ' . a:mode . 'map | redir END'
     let l:rhs = tolower(a:rhs)
     for l:map in split(l:mappings, '\n')
       let l:lhs = split(l:map, '\s\+')[1]
@@ -84,18 +96,24 @@
       endif
     endfor
     return ''
-  endfunction   "}}}2
+  endfunction
+  " }}}2
 
 
+"
 " Toggle Marks/Signs                                  {{{1
+"
   function! signature#ToggleMark(mark, ...) "         {{{2
+    " Arguments: mark, [mode], [line no.]
+    " Description: If mode and line no. haven't been specified, toggle the specified mark on the current line
+    " If mode is specified and is 1, place new mark. If line no. is specified, do the above on the specified line no.
     let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : -1      )
     let l:lnum = ( a:0 >= 2 && a:2 >  0 ? a:2 : line('.') )
 
     if a:mark == ","
       " Place new mark
       let l:mark = s:UnusedMarks()[0]
-      exec 'normal! m' . l:mark
+      execute 'normal! m' . l:mark
       call s:ToggleSign(l:mark, 1, l:lnum)
 
     else
@@ -103,7 +121,7 @@
         " Toggle Mark
         for i in s:MarksAt(line('.'))
           if i ==# a:mark
-            exec 'delmarks ' . a:mark
+            execute 'delmarks ' . a:mark
             call s:ToggleSign(a:mark, 0, l:lnum)
             return
           endif
@@ -113,21 +131,34 @@
       if l:mode == 1 || l:mode == -1
         " Mark not present, hence place new mark
         call s:ToggleSign(a:mark, 0, 0)
-        exec 'normal! m' . a:mark
+        execute 'normal! m' . a:mark
         call s:ToggleSign(a:mark, 1, l:lnum)
       endif
 
     endif
   endfunction
 
+
   function! signature#PurgeMarks() "                  {{{2
-    for i in map(filter(s:MarksList(), 'v:val[1]>0'), 'v:val[0]')
-      silent exec 'delmarks ' . i
+    " Description: Remove all marks
+    let l:marks = map(filter(s:MarksList(), 'v:val[1]>0'), 'v:val[0]')
+
+    if g:SignaturePurgeConfirmation && !empty(l:marks)
+      let choice = confirm("Are you sure you want to delete all marks? This cannot be undone.", "&Yes\n&No", 1)
+      if choice == 2 | return | endif
+    endif
+
+    for i in l:marks
+      silent execute 'delmarks ' . i
       silent call s:ToggleSign(i, 0, 0)
     endfor
-  endfunction   "}}}2
+  endfunction
+  " }}}2
 
   function! signature#ToggleMarker(marker, ...) "     {{{2
+    " Arguments: marker, [mode], [line no.]
+    " Description: If mode and line no. haven't been specified, toggle the specified marker on the current line
+    " If mode is specified and is 1, place new marker. If line no. is specified, do the above on the specified line no.
     let l:lnum = ( a:0 >= 2 && a:2 >  0 ? a:2 : line('.') )
     let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : !(has_key(b:sig_markers, l:lnum) && b:sig_markers[l:lnum] == a:marker))
     if !l:mode | call remove(b:sig_markers, l:lnum) | endif
@@ -136,18 +167,22 @@
 
 
   function! signature#RemoveMarker(marker) "          {{{2
+    " Description: Removes all markers of the specified type
     for i in keys(filter(copy(b:sig_markers), 'v:val=~#a:marker'))
       call s:ToggleSign(a:marker, 0, i)
     endfor
     call filter(b:sig_markers, 'v:val!~#a:marker')
   endfunction
 
+
   function! signature#PurgeMarkers() "                {{{2
+    " Description: Removes all markers
     for i in keys(b:sig_markers)
       call s:ToggleSign(b:sig_markers[i], 0, i)
     endfor
     let b:sig_markers = {}
-  endfunction   "}}}2
+  endfunction
+  " }}}2
 
   function! s:ToggleSign(mark, mode, lnum) "          {{{2
     if !has('signs') | return | endif
@@ -162,7 +197,7 @@
       if a:mode
         let b:sig_markers[l:lnum] = a:mark
         let l:str = stridx(l:SignatureIncludeMarkers, a:mark)
-        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Marker_' . l:str . ' buffer=' . winbufnr(0)
+        execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Marker_' . l:str . ' buffer=' . winbufnr(0)
       else
         if has_key(b:sig_marks, l:lnum)
           let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
@@ -172,10 +207,10 @@
             let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
           endif
           let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-          exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
-          exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
+          execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
+          execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
         else
-          exec 'sign unplace ' . l:id
+          execute 'sign unplace ' . l:id
         endif
       endif
 
@@ -196,7 +231,7 @@
         if empty(b:sig_marks[l:lnum]) 
           call remove(b:sig_marks, l:lnum)
           if !has_key(b:sig_markers, l:lnum)
-            exec 'sign unplace ' . l:id
+            execute 'sign unplace ' . l:id
           endif
           return
         endif
@@ -210,17 +245,18 @@
           let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
         endif
         let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-        exec 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
-        exec 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
+        execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
+        execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
       endif
     endif
-  endfunction   "}}}2
+  endfunction
+  "}}}2
 
 
+"
 " Navigation                                          {{{1
+"
   function! signature#GotoMark(mode, dir, loc) "      {{{2
-    "echom a:mode . ", " . a:dir . ", " . a:loc
-
     let l:mark = ""
     let l:dir  = a:dir
 
@@ -230,17 +266,15 @@
       let l:mark = s:GotoMarkByAlpha(a:dir)
     endif
 
-    "echom ">>" . l:mark . "<<"
-
     if a:loc ==? "line"
-      exec "normal! '" . l:mark
+      execute "normal! '" . l:mark
     elseif a:loc ==? "spot"
-      exec 'normal! `' . l:mark
+      execute 'normal! `' . l:mark
     endif
   endfunction
 
+
   function! s:GotoMarkByPos(dir) "                    {{{2
-    "echom "Jumping by POS"
     let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
 
     let l:MarksList = s:UsedMarks()
@@ -284,8 +318,8 @@
     return l:mark
   endfunction
 
+
   function! s:GotoMarkByAlpha(dir) "                  {{{2
-    "echom "Jumping by ALPHA"
     let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
 
     let l:UsedMarks = s:UsedMarks()
@@ -326,7 +360,9 @@
         return l:mark
       endif
     endfor
-  endfunction   "}}}2
+  endfunction
+  " }}}2
+
 
   function! signature#GotoMarker(dir) "               {{{2
     let l:lnum = line('.')
@@ -357,12 +393,15 @@
     endif
 
     if l:targ != 0 && l:targ != line('$') + 1
-      exec 'normal! ' . l:targ . 'G'
+      execute 'normal! ' . l:targ . 'G'
     endif
-  endfunction   "}}}2
+  endfunction
+  " }}}2
 
 
+"
 " Misc                                                {{{1
+"
   function! signature#RefreshDisplay(mode) "          {{{2
     if !exists('b:sig_status')  | let b:sig_status  = 1       | endif
     if  a:mode          | let b:sig_status  = !b:sig_status | endif
@@ -414,7 +453,7 @@
       " Signature has been disabled
       for i in range(1, line('$'))
         let l:id = ( winbufnr(0) + 1 ) * i
-        exec 'sign unplace ' . l:id
+        execute 'sign unplace ' . l:id
       endfor
       unlet b:sig_marks
     endif

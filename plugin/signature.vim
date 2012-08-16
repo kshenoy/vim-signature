@@ -136,6 +136,9 @@
 " <Plug>SIG_PurgeMarkers     : Remove all markers  
 " ````
 "
+" * `g:SignaturePurgeConfirmation` ( Default: 0 )
+" An option for the more clumsy-fingered. Asks for confirmation before deleting all marks
+
 " * `g:SignatureDisableMenu` ( Default: 0 )  
 " Hides the menu if set to 1  
 " 
@@ -165,6 +168,9 @@
 " Kartik Shenoy
 " 
 " Changelist:
+" 2012-08-15:
+"   - Added option to ask for confirmation before deleting all marks
+
 " 2012-07-23:
 "   - Enabled non-default mappings for m, m<Space> and m<BS> which had been left out
 "   - Display mark options in menu
@@ -220,6 +226,9 @@ if !exists('g:SignatureLcMarkStr')
 endif
 if !exists('g:SignatureUcMarkStr')
   let g:SignatureUcMarkStr = g:SignatureLcMarkStr
+endif
+if !exists('g:SignaturePurgeConfirmation')
+  let g:SignaturePurgeConfirmation = 0
 endif
 if !exists('g:SignatureDisableMenu')
   let g:SignatureDisableMenu = 0
