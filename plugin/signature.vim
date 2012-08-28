@@ -285,11 +285,12 @@ endfor
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
-    autocmd BufEnter * call signature#RefreshDisplay(0) 
+    autocmd BufEnter * call signature#RefreshDisplay(1) 
   augroup END
 endif
 
-command! -nargs=0 SignatureToggleDisplay call signature#RefreshDisplay(1)
+command! -nargs=0 SignatureToggleDisplay  call signature#RefreshDisplay(0)
+command! -nargs=0 SignatureRefreshDisplay call signature#RefreshDisplay(1)
 
 
 if !g:SignatureDisableMenu

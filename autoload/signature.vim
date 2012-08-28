@@ -75,6 +75,11 @@
         let l:marks = add(l:marks, i)
       endif
     endfor
+    for i in s:UpperMarksList()
+      if !(buflisted(getpos("'" . i)[0]) == 1 && getpos("'" . i)[1] != 0)
+        let l:marks = add(l:marks, i)
+      endif
+    endfor
     return l:marks
   endfunction
 
@@ -107,12 +112,18 @@
     " Arguments: mark, [mode], [line no.]
     " Description: If mode and line no. haven't been specified, toggle the specified mark on the current line
     " If mode is specified and is 1, place new mark. If line no. is specified, do the above on the specified line no.
-    let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : -1      )
+    let l:mode = ( a:0 >= 1 && a:1 >= 0 ? a:1 : -1 )
     let l:lnum = ( a:0 >= 2 && a:2 >  0 ? a:2 : line('.') )
 
     if a:mark == ","
       " Place new mark
-      let l:mark = s:UnusedMarks()[0]
+      let l:marks = s:UnusedMarks()
+      let l:mark  = l:marks[0]
+      echo l:marks
+      if l:mark == ""
+        echom "No free marks left."
+        return
+      endif
       execute 'normal! m' . l:mark
       call s:ToggleSign(l:mark, 1, l:lnum)
 
@@ -403,11 +414,11 @@
 " Misc                                                {{{1
 "
   function! signature#RefreshDisplay(mode) "          {{{2
-    if !exists('b:sig_status')  | let b:sig_status  = 1       | endif
-    if  a:mode          | let b:sig_status  = !b:sig_status | endif
-    if !exists('b:sig_marks') | let b:sig_marks = {}      | endif
-    if !exists('b:sig_markers') | let b:sig_markers = {}      | endif
+    if !exists('b:sig_status')  | let b:sig_status  = 1  | endif
+    if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
+    if !exists('b:sig_markers') | let b:sig_markers = {} | endif
 
+    if !a:mode | let b:sig_status = !b:sig_status | endif
       " b:sig_markers = { lnum:marks_str }
       " b:sig_markers = { lnum:marker }
 
