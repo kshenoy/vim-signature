@@ -117,9 +117,7 @@
 
     if a:mark == ","
       " Place new mark
-      let l:marks = s:UnusedMarks()
-      let l:mark  = l:marks[0]
-      echo l:marks
+      let l:mark = s:UnusedMarks()[0]
       if l:mark == ""
         echom "No free marks left."
         return
