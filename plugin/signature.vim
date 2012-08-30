@@ -236,6 +236,9 @@ endif
 if !exists('g:SignatureMenuStruct')
   let g:SignatureMenuStruct = 'P&lugin.&Signature'
 endif
+if !exists('g:SignaturePeriodicRefresh')
+  let g:SignaturePeriodicRefresh = 1
+endif
 
 
 if g:SignatureDefaultMappings
@@ -286,16 +289,12 @@ if has('autocmd')
   augroup sig_autocmds
     autocmd!
     autocmd BufEnter * call signature#RefreshDisplay(1) 
+    autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#RefreshDisplay(1) | endif
   augroup END
 endif
 
 command! -nargs=0 SignatureToggleDisplay  call signature#RefreshDisplay(0)
 command! -nargs=0 SignatureRefreshDisplay call signature#RefreshDisplay(1)
-
-augroup Signature
-  autocmd!
-  autocmd CursorHold * call signature#RefreshDisplay(1)
-augroup END
 
 
 if !g:SignatureDisableMenu

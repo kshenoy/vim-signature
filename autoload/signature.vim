@@ -194,6 +194,10 @@
   " }}}2
 
   function! s:ToggleSign(mark, mode, lnum) "          {{{2
+    " Description: Place/Unplace sign for mark
+    " Arguments: mode = 0: Remove sign for mark (lnum ignored)
+    "                   1: Place sign for mark at line# lnum
+    "            lnum - line number at which mark should be placed
     if !has('signs') | return | endif
     let l:SignatureIncludeMarkers = ( exists('b:SignatureIncludeMarkers') ? b:SignatureIncludeMarkers : g:SignatureIncludeMarkers )
     let l:SignatureLcMarkStr    = ( exists('b:SignatureLcMarkStr')    ? b:SignatureLcMarkStr    : g:SignatureLcMarkStr    )
@@ -203,6 +207,7 @@
       " Visual marker has been set
       let l:lnum = a:lnum
       let l:id = ( winbufnr(0) + 1 ) * l:lnum
+
       if a:mode
         let b:sig_markers[l:lnum] = a:mark
         let l:str = stridx(l:SignatureIncludeMarkers, a:mark)
@@ -227,13 +232,16 @@
       " Alphabetical mark has been set
       if a:mode
         let l:lnum = a:lnum
-        let l:id  = ( winbufnr(0) + 1 ) * l:lnum
-        let b:sig_marks[l:lnum] = a:mark . get(b:sig_marks, l:lnum, "")
+        let l:id = ( winbufnr(0) + 1 ) * l:lnum
+        let l:mark = get(b:sig_marks, l:lnum, "")
+        if l:mark !~# a:mark
+          let b:sig_marks[l:lnum] = a:mark . l:mark
+        endif
       else
         let l:arr = keys(filter(copy(b:sig_marks), 'v:val =~# a:mark'))
         if empty(l:arr) | return | endif
         let l:lnum = l:arr[0]
-        let l:id  = ( winbufnr(0) + 1 ) * l:lnum
+        let l:id = ( winbufnr(0) + 1 ) * l:lnum
         let l:save_ic = &ic | set noic
         let b:sig_marks[l:lnum] = substitute(b:sig_marks[l:lnum], a:mark, "", "")
         let &ic = l:save_ic
@@ -420,7 +428,7 @@
     if !exists('b:sig_markers') | let b:sig_markers = {} | endif
 
     if !a:mode | let b:sig_status = !b:sig_status | endif
-      " b:sig_markers = { lnum:marks_str }
+      " b:sig_marks   = { lnum:marks_str }
       " b:sig_markers = { lnum:marker }
 
     let l:SignatureIncludeMarks = ( exists('b:SignatureIncludeMarks') ? b:SignatureIncludeMarks : g:SignatureIncludeMarks )
@@ -428,6 +436,12 @@
 
     if b:sig_status
       " Signature enabled -> Refresh signs
+      sign unplace *
+
+      " Add signs for present marks
+      for k in l:used_marks
+        call s:ToggleSign(k[0], 1, k[1])
+      endfor
 
       " Remove signs for absent marks
       for i in split(l:SignatureIncludeMarks, '\zs')
@@ -446,16 +460,6 @@
         endif
       endfor
 
-      " Add signs for present marks
-      for k in l:used_marks
-        if !has_key(b:sig_marks, k[1])
-          call s:ToggleSign(k[0], 1, k[1])
-        elseif b:sig_marks[k[1]] !~# k[0]
-          call s:ToggleSign(k[0], 0, 0)
-          call s:ToggleSign(k[0], 1, k[1])
-        endif
-      endfor
-
       " Add signs for markers
       for i in keys(b:sig_markers)
         call s:ToggleSign(b:sig_markers[i], 1, i)
@@ -463,11 +467,7 @@
 
     else
       " Signature has been disabled
-      for i in range(1, line('$'))
-        let l:id = ( winbufnr(0) + 1 ) * i
-        execute 'sign unplace ' . l:id
-      endfor
-      unlet b:sig_marks
+      sign unplace *
     endif
 
   endfunction
