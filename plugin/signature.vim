@@ -292,6 +292,11 @@ endif
 command! -nargs=0 SignatureToggleDisplay  call signature#RefreshDisplay(0)
 command! -nargs=0 SignatureRefreshDisplay call signature#RefreshDisplay(1)
 
+augroup Signature
+  autocmd!
+  autocmd CursorHold * call signature#RefreshDisplay(1)
+augroup END
+
 
 if !g:SignatureDisableMenu
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Pl&ace\ next\ mark<Tab>' . g:SignatureMarkLeader . ', :call signature#ToggleMark(",")<CR>'

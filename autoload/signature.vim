@@ -412,6 +412,9 @@
 " Misc                                                {{{1
 "
   function! signature#RefreshDisplay(mode) "          {{{2
+    " Description: Toggle/Refresh Display of signs for marks
+    " Arguments: When mode = 0, toggles the display of signs
+    "                      = 1, refreshes the display
     if !exists('b:sig_status')  | let b:sig_status  = 1  | endif
     if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
     if !exists('b:sig_markers') | let b:sig_markers = {} | endif
