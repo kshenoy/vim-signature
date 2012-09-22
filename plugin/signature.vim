@@ -168,9 +168,15 @@
 " Kartik Shenoy
 " 
 " Changelist:
+" 2012-09-22:
+"   - vim-signature is now initialised ( mappings, sign display etc. ) upon entering the buffer
+"   - Checks buffer type before setting up vim-signature
+"     ( in response to: https://github.com/kshenoy/vim-signature/issues/3 )
+"   - SignatureToggle command now also removes all mappings
+"
 " 2012-08-15:
 "   - Added option to ask for confirmation before deleting all marks
-
+"
 " 2012-07-23:
 "   - Enabled non-default mappings for m, m<Space> and m<BS> which had been left out
 "   - Display mark options in menu
@@ -199,7 +205,7 @@ if exists("g:loaded_Signature") || &cp
   finish
 endif
 let g:loaded_Signature = "1.3"  " Version Number
-let s:save_cpo       = &cpo
+let s:save_cpo = &cpo
 set cpo&vim
 
 
@@ -238,59 +244,18 @@ if !exists('g:SignatureMenuStruct')
 endif
 
 
-if g:SignatureDefaultMappings
-  if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap <unique> '] <Plug>SIG_NextLineByAlpha| endif
-  if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap <unique> '[ <Plug>SIG_PrevLineByAlpha| endif
-  if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap <unique> `] <Plug>SIG_NextSpotByAlpha| endif
-  if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap <unique> `[ <Plug>SIG_PrevSpotByAlpha| endif
-  if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap <unique> ]' <Plug>SIG_NextLineByPos| endif
-  if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap <unique> [' <Plug>SIG_PrevLineByPos| endif
-  if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap <unique> ]` <Plug>SIG_NextSpotByPos| endif
-  if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap <unique> [` <Plug>SIG_PrevSpotByPos| endif
-  if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap <unique> ]- <Plug>SIG_NextMarkerByType| endif
-  if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap <unique> [- <Plug>SIG_PrevMarkerByType| endif
-endif
-
-if !hasmapto( '<Plug>SIG_PlaceNextMark' ) | exec 'nmap <unique> ' . g:SignatureMarkLeader   . ', <Plug>SIG_PlaceNextMark'| endif
-if !hasmapto( '<Plug>SIG_PurgeMarks'  )   | exec 'nmap <unique> ' . g:SignatureMarkLeader   . '<Space> <Plug>SIG_PurgeMarks'| endif
-if !hasmapto( '<Plug>SIG_PurgeMarkers'  ) | exec 'nmap <unique> ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'| endif
-
-for i in split(g:SignatureIncludeMarks, '\zs')
-  silent exec 'nnoremap <silent> <unique> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
-endfor
-
-nnoremap <silent> <Plug>SIG_PlaceNextMark    :call signature#ToggleMark(",")<CR>
-nnoremap <silent> <Plug>SIG_PurgeMarks       :call signature#PurgeMarks()<CR>
-nnoremap <silent> <Plug>SIG_NextSpotByAlpha  :call signature#GotoMark("alpha", "next", "spot")<CR>
-nnoremap <silent> <Plug>SIG_PrevSpotByAlpha  :call signature#GotoMark("alpha", "prev", "spot")<CR>
-nnoremap <silent> <Plug>SIG_NextLineByAlpha  :call signature#GotoMark("alpha", "next", "line")<CR>
-nnoremap <silent> <Plug>SIG_PrevLineByAlpha  :call signature#GotoMark("alpha", "prev", "line")<CR>
-nnoremap <silent> <Plug>SIG_NextSpotByPos    :call signature#GotoMark("pos", "next", "spot")<CR>
-nnoremap <silent> <Plug>SIG_PrevSpotByPos    :call signature#GotoMark("pos", "prev", "spot")<CR>
-nnoremap <silent> <Plug>SIG_NextLineByPos    :call signature#GotoMark("pos", "next", "line")<CR>
-nnoremap <silent> <Plug>SIG_PrevLineByPos    :call signature#GotoMark("pos", "prev", "line")<CR>
-nnoremap <silent> <Plug>SIG_NextMarkerByType :call signature#GotoMarker("next")<CR>
-nnoremap <silent> <Plug>SIG_PrevMarkerByType :call signature#GotoMarker("prev")<CR>
-nnoremap <silent> <Plug>SIG_PurgeMarkers     :call signature#PurgeMarkers()<CR>
-
-
-let s:signature_markers = split(g:SignatureIncludeMarkers, '\zs')
-for i in range(0, len(s:signature_markers)-1)
-  exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
-  silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
-  silent exec 'nnoremap <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
-endfor
+call signature#Init() 
 
 
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
-    autocmd BufEnter * call signature#RefreshDisplay(1) 
+    autocmd BufEnter * call signature#BufferRefresh(1) 
   augroup END
 endif
 
-command! -nargs=0 SignatureToggleDisplay  call signature#RefreshDisplay(0)
-command! -nargs=0 SignatureRefreshDisplay call signature#RefreshDisplay(1)
+command! -nargs=0 SignatureToggle         call signature#BufferRefresh(0)
+command! -nargs=0 SignatureRefreshDisplay call signature#BufferRefresh(1)
 
 
 if !g:SignatureDisableMenu

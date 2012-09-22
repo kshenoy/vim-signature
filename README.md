@@ -58,15 +58,14 @@ already contains the mark, it'll be unset.
 The default behavior of `]'`, `['`, ``]` `` and ``[` `` is supported and enhanced by
 wrapping around when beginning or end of file is reached.  
   
-The command `SignatureToggleDisplay` can be used to show/hide the signs. Note that this does not delete any of the marks but only hides them.  
+The command `SignatureToggle` can be used to show/hide the signs.
+Note that this does not delete any of the marks but only hides them.
+This is a buffer-specific command.  
   
 
 ## Customisation
 The defaults not to your liking bub? Have no fear; use the following
 variables to set things just the way you want it  
-
-* `g:SignatureDefaultMappings` ( Default : 1 )  
-  Will use the default mappings specified below.  
 
 * `g:SignatureIncludeMarks` ( Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )  
   Specify the marks that can be controlled by this plugin.
@@ -83,19 +82,6 @@ variables to set things just the way you want it
     `<leader>m,` will place the next available mark  
     `<leader>m<Space>` will delete all marks  
 
-````
-  <Plug>SIG_PlaceNextMark    : Place next available mark
-  <Plug>SIG_PurgeMarks       : Remove all marks
-  <Plug>SIG_NextSpotByPos    : Jump to next mark  
-  <Plug>SIG_PrevSpotByPos    : Jump to prev mark  
-  <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark  
-  <Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark  
-  <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark  
-  <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark  
-  <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark  
-  <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark  
-````
-  
 * `g:SignatureLcMarkStr` ( Default : "\p\m" )  
   Set the manner in which local (lowercase) marks are displayed.  
   `g:SignatureUcMarkStr` ( Default : "\p\m" )  
@@ -127,10 +113,23 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
   Specify the markers that can be used by the plugin.
   `b:SignatureIncludeMarkers` can be specified separately for buffer-specific settings  
 
+* `g:SignatureDefaultMappings` ( Default : 1 )  
+  Affects all settings which have <Plug> defined. Will use the default mappings specified above.  
+
 ````
-  <Plug>SIG_NextMarkerByType : Jump to next line having same marker  
-  <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker  
-  <Plug>SIG_PurgeMarkers     : Remove all markers  
+  <Plug>SIG_PlaceNextMark    : Place next available mark ( m, )
+  <Plug>SIG_PurgeMarks       : Remove all marks ( m<Space> )
+  <Plug>SIG_NextSpotByPos    : Jump to next mark ( ]` ) 
+  <Plug>SIG_PrevSpotByPos    : Jump to prev mark ( [` ) 
+  <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark ( ]' ) 
+  <Plug>SIG_PrevLineByPos    : Jump to start of prev line containing a mark ( [' )  
+  <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark ( `] )  
+  <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark ( `[ )  
+  <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next line containing a mark ( '] )  
+  <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark ( '[ )  
+  <Plug>SIG_NextMarkerByType : Jump to next line having same marker ( ]= ) 
+  <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker ( [- ) 
+  <Plug>SIG_PurgeMarkers     : Remove all markers ( m<BS> ) 
 ````
 
 * `g:SignaturePurgeConfirmation` ( Default: 0 )
