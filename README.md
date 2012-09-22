@@ -119,6 +119,7 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
 ````
   <Plug>SIG_PlaceNextMark    : Place next available mark ( m, )
   <Plug>SIG_PurgeMarks       : Remove all marks ( m<Space> )
+  <Plug>SIG_PurgeMarkers     : Remove all markers ( m<BackSpace> ) 
   <Plug>SIG_NextSpotByPos    : Jump to next mark ( ]` ) 
   <Plug>SIG_PrevSpotByPos    : Jump to prev mark ( [` ) 
   <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark ( ]' ) 
@@ -129,7 +130,6 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
   <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of prev line containing a mark ( '[ )  
   <Plug>SIG_NextMarkerByType : Jump to next line having same marker ( ]= ) 
   <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker ( [- ) 
-  <Plug>SIG_PurgeMarkers     : Remove all markers ( m<BS> ) 
 ````
 
 * `g:SignaturePurgeConfirmation` ( Default: 0 )

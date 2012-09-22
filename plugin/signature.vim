@@ -258,7 +258,7 @@ command! -nargs=0 SignatureToggle         call signature#BufferRefresh(0)
 command! -nargs=0 SignatureRefreshDisplay call signature#BufferRefresh(1)
 
 
-if !g:SignatureDisableMenu
+if !g:SignatureDisableMenu && has('gui_running')
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Pl&ace\ next\ mark<Tab>' . g:SignatureMarkLeader . ', :call signature#ToggleMark(",")<CR>'
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Re&move\ all\ marks\ \ \ \ <Tab>' . g:SignatureMarkLeader . '<Space> :call signature#PurgeMarks()<CR>'
 
