@@ -1,5 +1,5 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
-"===============================================================================
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 "
 " Helper Functions                                    {{{1
@@ -105,22 +105,27 @@ function! signature#MapKey( rhs, mode ) "             {{{2
   " Description: Inverse of maparg()
   "              Pass in a key sequence and the first letter of a vim mode.
   "              Returns key mapping mapped to it in that mode, else '' if none.
-  "              Eg:
-  "                :nnoremap <Tab> :bn<CR>
-  "                :call Mapkey(':bn<CR>', 'n')
+  " Example:     :nnoremap <Tab> :bn<CR>
+  "              :call Mapkey(':bn<CR>', 'n')
   "              returns <Tab>
-
   execute 'redir => l:mappings | silent! ' . a:mode . 'map | redir END'
-  let l:rhs = tolower(a:rhs)
+
+  " Convert all text between angle-brackets to lowercase
+  " Required to recognize all case-variants of <c-A> and <C-a> as the same thing
+  let l:rhs = substitute(a:rhs, '<[^>]\+>', "\\L\\0", 'g')
+
   for l:map in split(l:mappings, '\n')
+    " Get rhs for each mapping
     let l:lhs = split(l:map, '\s\+')[1]
-    if tolower(maparg(l:lhs, a:mode)) ==# l:rhs
+    let l:lhs_map = maparg(l:lhs, a:mode)
+
+    if substitute(l:lhs_map, '<[^>]\+>', "\\L\\0", 'g') ==# l:rhs
       return l:lhs
     endif
   endfor
-
   return ''
 endfunction
+
 " }}}2
 
 
@@ -219,7 +224,9 @@ endfunction
 " }}}2
 
 function! s:ToggleSign( mark, mode, lnum ) "          {{{2
+
   if !has('signs') | return | endif
+
   let l:SignatureIncludeMarkers = ( exists('b:SignatureIncludeMarkers') ? b:SignatureIncludeMarkers : g:SignatureIncludeMarkers )
   let l:SignatureLcMarkStr  = ( exists('b:SignatureLcMarkStr')    ? b:SignatureLcMarkStr  : g:SignatureLcMarkStr    )
   let l:SignatureUcMarkStr  = ( exists('b:SignatureUcMarkStr')    ? b:SignatureUcMarkStr  : g:SignatureUcMarkStr    )
@@ -460,7 +467,7 @@ function! s:BufferMaps( mode ) "                      {{{2
   " Arguments:   When mode = 0, disable mappings.
   "                   mode = 1, enable  mappings.
 
-  " To prevent maps from being set when re-entering a buffer
+  " To prevent maps from being called again when re-entering a buffer
   if !exists('b:sig_map_set') | let b:sig_map_set = 0  | endif
 
   if ( a:mode && !b:sig_map_set ) "                   {{{
@@ -525,7 +532,6 @@ function! s:BufferMaps( mode ) "                      {{{2
       if hasmapto( '<Plug>SIG_PurgeMarkers' )
         exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarkers', 'n' )
       endif
-
       if hasmapto( '<Plug>SIG_NextLineByAlpha'  )
         exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByAlpha' , 'n' )
       endif
@@ -565,7 +571,11 @@ endfunction
 
 
 function! signature#BufferRefresh( mode ) "           {{{2
+  " Description: Toggles and refreshes sign display in the buffer.
+  " Arguments:   When mode = 0, toggle sign display.
+  "                        = 1, refresh sign display.
 
+  " Added to disable vim-signature in panes created by NERDTree
   if ( &buftype == "nofile" ) | return | endif
 
   if !exists('b:sig_status')  | let b:sig_status  = 1  | endif
@@ -583,7 +593,7 @@ function! signature#BufferRefresh( mode ) "           {{{2
   call s:BufferMaps( b:sig_status )
 
   if b:sig_status
-    " Signature enabled -> Refresh signs
+    " Signature enabled ==> Refresh signs             {{{
 
     " Remove signs for absent marks
     for i in split(l:SignatureIncludeMarks, '\zs')
@@ -616,14 +626,15 @@ function! signature#BufferRefresh( mode ) "           {{{2
     for i in keys(b:sig_markers)
       call s:ToggleSign(b:sig_markers[i], 1, i)
     endfor
-
+  " }}}
   else
-    " Signature has been disabled
+    " Signature has been disabled                     {{{
     for i in range(1, line('$'))
       let l:id = ( winbufnr(0) + 1 ) * i
       execute 'sign unplace ' . l:id
     endfor
     unlet b:sig_marks
+    " }}}
   endif
 
 endfunction

@@ -198,7 +198,7 @@
 "   - First release
 " 
 " vim: fdm=marker:et:ts=4:sw=2:sts=2  }}}1
-"===========================================================================
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Exit when app has already been loaded (or "compatible" mode set)
 if exists("g:loaded_Signature") || &cp
@@ -209,6 +209,9 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Global variables {{{1
+"
 if !exists('g:SignatureIncludeMarks')
   let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 endif
@@ -242,7 +245,7 @@ endif
 if !exists('g:SignatureMenuStruct')
   let g:SignatureMenuStruct = 'P&lugin.&Signature'
 endif
-
+" }}}1
 
 call signature#Init() 
 
@@ -258,6 +261,9 @@ command! -nargs=0 SignatureToggle         call signature#BufferRefresh(0)
 command! -nargs=0 SignatureRefreshDisplay call signature#BufferRefresh(1)
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Create Menu  {{{1
+"
 if !g:SignatureDisableMenu && has('gui_running')
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Pl&ace\ next\ mark<Tab>' . g:SignatureMarkLeader . ', :call signature#ToggleMark(",")<CR>'
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Re&move\ all\ marks\ \ \ \ <Tab>' . g:SignatureMarkLeader . '<Space> :call signature#PurgeMarks()<CR>'
@@ -302,8 +308,8 @@ if !g:SignatureDisableMenu && has('gui_running')
     exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Goto\ pre&v\ marker :call signature#GotoMarker("prev")'
   endif
 endif
+" }}}1
 
-
-"===============================================================================
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let &cpo = s:save_cpo
 unlet s:save_cpo
