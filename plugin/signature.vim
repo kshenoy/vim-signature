@@ -256,6 +256,7 @@ call signature#Init()
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
+    autocmd FileType nerdtree call signature#BufferRefresh(1)
     autocmd BufEnter * call signature#BufferRefresh(1) 
     autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#BufferRefresh(1) | endif
   augroup END
