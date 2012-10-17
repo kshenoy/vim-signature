@@ -509,7 +509,7 @@ function! s:BufferMaps( mode ) "                      {{{2
     let b:sig_map_set = 1
 
   " }}}
-  elseif ( a:mode == 0 ) "                            {{{
+  elseif ( a:mode == 0 && b:sig_map_set ) "           {{{
     " Remove mappings
 
     for i in split(g:SignatureIncludeMarks, '\zs')
@@ -576,7 +576,10 @@ function! signature#BufferRefresh( mode ) "           {{{2
   "                        = 1, refresh sign display.
 
   " Added to disable vim-signature in panes created by NERDTree
-  if ( &buftype == "nofile" ) | return | endif
+  if ( &buftype == "nofile" )
+    call s:BufferMaps(0)
+    return
+  endif
 
   if !exists('b:sig_status')  | let b:sig_status  = 1  | endif
   if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif

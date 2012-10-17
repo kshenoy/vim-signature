@@ -1,7 +1,7 @@
-" README:             {{{1
+" README:               {{{1
 " vim-signature, version 1.3
 " 
-" Description:        {{{2
+" Description:          {{{2
 " vim-signature is a plugin to toggle, display and navigate marks.  
 " What are marks you say... Read [this](http://vim.wikia.com/wiki/Using_marks)
 " 
@@ -24,11 +24,11 @@
 " ### Vim.org mirror
 " http://www.vim.org/scripts/script.php?script_id=4118  
 " 
-" Requirements:       {{{2
+" Requirements:         {{{2
 " Requires Vim to be compiled with +signs to display marks.
 " 
 " 
-" Installation:       {{{2
+" Installation:         {{{2
 " I highly recommend using Pathogen or Vundler to do the dirty work for you. If
 " for some reason, you do not want to use any of these excellent plugins, then
 " unzip it to your ~/.vim directory. You know how it goes...  
@@ -64,7 +64,7 @@
 " The command `SignatureToggleDisplay` can be used to show/hide the signs. Note that this does not delete any of the marks but only hides them.  
 " 
 " 
-" Customisation:      {{{2
+" Customisation:        {{{2
 " The defaults not to your liking bub? Have no fear; use the following
 " variables to set things just the way you want it  
 " 
@@ -149,7 +149,7 @@
 " ````
 " 
 " 
-" Thanks To:          {{{2
+" Thanks To:            {{{2
 " Restecp to (no, that's a reference and not a typo :P )  
 " * Sergey Khorev for [mark-tools](http://www.vim.org/scripts/script.php?script_id=2929)
 " * Zak Johnson for [vim-showmarks](https://github.com/zakj/vim-showmarks)  
@@ -159,12 +159,12 @@
 " Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 " 
 " 
-" ToDo:               {{{2
+" ToDo:                 {{{2
 " * Add custom color support for signs
 " * Add support for non-Alphabetical marks
 " 
 " 
-" Maintainer:         {{{2
+" Maintainer:           {{{2
 " Kartik Shenoy
 " 
 " Changelist:
@@ -210,7 +210,7 @@ set cpo&vim
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Global variables {{{1
+"" Global variables     {{{1
 "
 if !exists('g:SignatureIncludeMarks')
   let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -266,7 +266,7 @@ command! -nargs=0 SignatureRefreshDisplay call signature#BufferRefresh(1)
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Create Menu  {{{1
+"" Create Menu          {{{1
 "
 if !g:SignatureDisableMenu && has('gui_running')
   exec 'menu  <silent> ' . g:SignatureMenuStruct . '.Pl&ace\ next\ mark<Tab>' . g:SignatureMarkLeader . ', :call signature#ToggleMark(",")<CR>'
