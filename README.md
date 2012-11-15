@@ -58,9 +58,12 @@ already contains the mark, it'll be unset.
 The default behavior of `]'`, `['`, ``]` `` and ``[` `` is supported and enhanced by
 wrapping around when beginning or end of file is reached.  
   
-The command `SignatureToggle` can be used to show/hide the signs.
+The command `:SignatureToggle` can be used to show/hide the signs.
 Note that this does not delete any of the marks but only hides them.
 This is a buffer-specific command.  
+  
+If for some reason, the marks and their sign displays go out of sync, 
+use `:SignatureRefreshDisplay` to... well, refresh the display.  
   
 
 ## Customisation
@@ -144,6 +147,9 @@ double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_
   :h usr_42.txt
 ````
 
+* `g:SignaturePeriodicRefresh` ( Default: 1 )  
+  Enable the display to refresh periodically. Generally a good thing to have : /  
+
 
 ## Thanks to...
 Restecp to (no, that's a reference and not a typo :P )  
@@ -158,3 +164,4 @@ Well, you know what they say... _"Good coders use; great coders reuse"_ ;)
 ## ToDo:
 * Add custom color support for signs
 * Add support for non-Alphabetical marks
+* Tie the Signature functions to vim commands that affect mark placement
