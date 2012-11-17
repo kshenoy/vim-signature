@@ -19,7 +19,8 @@ Oh, and I also added some touches of my own such as
 [Click](http://imgur.com/a/bPp3m#0)
 
 ### Vim.org mirror
-http://www.vim.org/scripts/script.php?script_id=4118  
+If you like the plugin, spread the love and rate at http://www.vim.org/scripts/script.php?script_id=4118  
+
 
 ## Requirements
 Requires Vim to be compiled with +signs to display marks.
