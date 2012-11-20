@@ -16,7 +16,7 @@ Oh, and I also added some touches of my own such as
 * Placing custom signs !@#$%^&*() as visual markers  
   
 ### Screenshots
-[Click](http://imgur.com/a/bPp3m#0)
+[Click](http://imgur.com/a/3KQyt)
 
 ### Vim.org mirror
 If you like the plugin, spread the love and rate at http://www.vim.org/scripts/script.php?script_id=4118  
