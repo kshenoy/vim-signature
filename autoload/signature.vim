@@ -269,7 +269,7 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
       let l:save_ic = &ic | set noic
       let b:sig_marks[l:lnum] = substitute(b:sig_marks[l:lnum], a:mark, "", "")
       let &ic = l:save_ic
-      if empty(b:sig_marks[l:lnum]) 
+      if empty(b:sig_marks[l:lnum])
         call remove(b:sig_marks, l:lnum)
         if !has_key(b:sig_markers, l:lnum)
           execute 'sign unplace ' . l:id
@@ -385,7 +385,7 @@ function! s:GotoMarkByAlpha( dir ) "                  {{{2
         if i != len(l:UsedMarks)-1
           let l:mark = l:UsedMarks[i+1][0]
           let b:sig_GotoMarkByAlpha = l:mark
-        elseif l:SignatureWrapJumps 
+        elseif l:SignatureWrapJumps
           let l:mark = l:UsedMarks[0][0]
           let b:sig_GotoMarkByAlpha = l:mark
         endif
@@ -472,15 +472,21 @@ function! s:BufferMaps( mode ) "                      {{{2
 
   if ( a:mode && !b:sig_map_set ) "                   {{{
 
+    " Create maps for marks a-z, A-Z
     for i in split(g:SignatureIncludeMarks, '\zs')
-      silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+      if !hasmapto( g:SignatureMarkLeader . i )
+        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+      endif
     endfor
 
+    " Create maps for markers !@#$%^&*()
     let s:signature_markers = split(g:SignatureIncludeMarkers, '\zs')
     for i in range(0, len(s:signature_markers)-1)
-      exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
-      silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
-      silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
+      if !hasmapto( g:SignatureMarkerLeader . i )
+        exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
+        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
+        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
+      endif
     endfor
 
     if g:SignatureDefaultMappings
