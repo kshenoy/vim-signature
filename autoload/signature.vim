@@ -474,43 +474,69 @@ function! s:BufferMaps( mode ) "                      {{{2
   if ( a:mode && !b:sig_map_set ) "                   {{{
 
     " Create maps for marks a-z, A-Z
-    for i in split(g:SignatureIncludeMarks, '\zs')
-      if !hasmapto( g:SignatureMarkLeader . i )
-        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+    for i in split( g:SignatureIncludeMarks, '\zs' )
+      if maparg( g:SignatureMarkLeader . i, 'n' ) == ""
+        silent exec 'nnoremap <buffer> <unique> <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
+      else
+        echom 'Skipping creating mapping for ' . g:SignatureMarkLeader . i
       endif
     endfor
 
     " Create maps for markers !@#$%^&*()
     let s:signature_markers = split(g:SignatureIncludeMarkers, '\zs')
     for i in range(0, len(s:signature_markers)-1)
-      if !hasmapto( g:SignatureMarkerLeader . i )
+      if maparg( g:SignatureMarkerLeader . i, 'n' ) == ""
         exec 'sign define sig_Marker_' . i . ' text=' . s:signature_markers[i] . ' texthl=WarningMsg'
-        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
-        silent exec 'nnoremap <buffer> <silent> ' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
+        silent exec 'nnoremap <buffer> <unique> <silent>' . g:SignatureMarkerLeader . i . ' :call signature#ToggleMarker("' . s:signature_markers[i] . '")<CR>'
+        silent exec 'nnoremap <buffer> <unique> <silent>' . g:SignatureMarkerLeader . s:signature_markers[i] . ' :call signature#RemoveMarker("' . s:signature_markers[i] . '")<CR>'
       endif
     endfor
 
     if g:SignatureDefaultMappings
-      if !hasmapto( '<Plug>SIG_PlaceNextMark' )
+      " Using hasmapto() allows a flexibility to use custom mappings along with the default mappings.
+      " If g:SignatureDefaultMappings has been set but a particular <Plug> has already been mapped,
+      " it will be skipped and the default mapping won't be assigned.
+
+      if !hasmapto( '<Plug>SIG_PlaceNextMark' ) && maparg( g:SignatureMarkerLeader . ',', 'n' ) == ""
         exec 'nmap <buffer> ' . g:SignatureMarkLeader . ', <Plug>SIG_PlaceNextMark'
       endif
-      if !hasmapto( '<Plug>SIG_PurgeMarks' )
+      if !hasmapto( '<Plug>SIG_PurgeMarks' ) && maparg( g:SignatureMarkerLeader . '<Space>', 'n' ) == ""
         exec 'nmap <buffer> ' . g:SignatureMarkLeader . '<Space> <Plug>SIG_PurgeMarks'
       endif
-      if !hasmapto( '<Plug>SIG_PurgeMarkers' )
+      if !hasmapto( '<Plug>SIG_PurgeMarkers' ) && maparg( g:SignatureMarkerLeader . '<BS>', 'n' ) == ""
         exec 'nmap <buffer> ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'
       endif
 
-      if !hasmapto( '<Plug>SIG_NextLineByAlpha'  ) | nmap <buffer> '] <Plug>SIG_NextLineByAlpha| endif
-      if !hasmapto( '<Plug>SIG_PrevLineByAlpha'  ) | nmap <buffer> '[ <Plug>SIG_PrevLineByAlpha| endif
-      if !hasmapto( '<Plug>SIG_NextSpotByAlpha'  ) | nmap <buffer> `] <Plug>SIG_NextSpotByAlpha| endif
-      if !hasmapto( '<Plug>SIG_PrevSpotByAlpha'  ) | nmap <buffer> `[ <Plug>SIG_PrevSpotByAlpha| endif
-      if !hasmapto( '<Plug>SIG_NextLineByPos'    ) | nmap <buffer> ]' <Plug>SIG_NextLineByPos| endif
-      if !hasmapto( '<Plug>SIG_PrevLineByPos'    ) | nmap <buffer> [' <Plug>SIG_PrevLineByPos| endif
-      if !hasmapto( '<Plug>SIG_NextSpotByPos'    ) | nmap <buffer> ]` <Plug>SIG_NextSpotByPos| endif
-      if !hasmapto( '<Plug>SIG_PrevSpotByPos'    ) | nmap <buffer> [` <Plug>SIG_PrevSpotByPos| endif
-      if !hasmapto( '<Plug>SIG_NextMarkerByType' ) | nmap <buffer> ]- <Plug>SIG_NextMarkerByType| endif
-      if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) | nmap <buffer> [- <Plug>SIG_PrevMarkerByType| endif
+      if !hasmapto( '<Plug>SIG_NextLineByAlpha' ) && maparg( "']", 'n' ) == ""
+        nmap <buffer> '] <Plug>SIG_NextLineByAlpha
+      endif
+      if !hasmapto( '<Plug>SIG_PrevLineByAlpha' ) && maparg( "'[", 'n' ) == ""
+        nmap <buffer> '[ <Plug>SIG_PrevLineByAlpha
+      endif
+      if !hasmapto( '<Plug>SIG_NextSpotByAlpha' ) && maparg( "`]", 'n' ) == ""
+        nmap <buffer> `] <Plug>SIG_NextSpotByAlpha
+      endif
+      if !hasmapto( '<Plug>SIG_PrevSpotByAlpha' ) && maparg( "`[", 'n' ) == ""
+        nmap <buffer> `[ <Plug>SIG_PrevSpotByAlpha
+      endif
+      if !hasmapto( '<Plug>SIG_NextLineByPos' ) && maparg( "]'", 'n' ) == ""
+        nmap <buffer> ]' <Plug>SIG_NextLineByPos
+      endif
+      if !hasmapto( '<Plug>SIG_PrevLineByPos' ) && maparg( "['", 'n' ) == ""
+        nmap <buffer> [' <Plug>SIG_PrevLineByPos
+      endif
+      if !hasmapto( '<Plug>SIG_NextSpotByPos') && maparg( "]`", 'n' ) == ""
+        nmap <buffer> ]` <Plug>SIG_NextSpotByPos
+      endif
+      if !hasmapto( '<Plug>SIG_PrevSpotByPos' ) && maparg( "[`", 'n' ) == ""
+        nmap <buffer> [` <Plug>SIG_PrevSpotByPos
+      endif
+      if !hasmapto( '<Plug>SIG_NextMarkerByType' ) && maparg( "]-", 'n' ) == ""
+        nmap <buffer> ]- <Plug>SIG_NextMarkerByType
+      endif
+      if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) && maparg( "[-", 'n' ) == ""
+        nmap <buffer> [- <Plug>SIG_PrevMarkerByType
+      endif
     endif
 
     let b:sig_map_set = 1
@@ -582,6 +608,7 @@ function! signature#BufferRefresh( mode ) "           {{{2
   " Arguments:   When mode = 0, toggle sign display.
   "                        = 1, refresh sign display.
 
+  "echom "Buffer Refresh called"
   " Added to disable vim-signature in panes created by NERDTree
   if ( &buftype == "nofile" )
     call s:BufferMaps(0)
