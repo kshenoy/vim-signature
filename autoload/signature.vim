@@ -230,6 +230,7 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
   let l:SignatureIncludeMarkers = ( exists('b:SignatureIncludeMarkers') ? b:SignatureIncludeMarkers : g:SignatureIncludeMarkers )
   let l:SignatureLcMarkStr  = ( exists('b:SignatureLcMarkStr')    ? b:SignatureLcMarkStr  : g:SignatureLcMarkStr    )
   let l:SignatureUcMarkStr  = ( exists('b:SignatureUcMarkStr')    ? b:SignatureUcMarkStr  : g:SignatureUcMarkStr    )
+  let l:SignatureSignTextHL  = ( exists('b:SignatureSignTextHL')    ? b:SignatureSignTextHL  : g:SignatureSignTextHL    )
 
   if stridx(l:SignatureIncludeMarkers, a:mark) >= 0
     " Visual marker has been set
@@ -248,7 +249,7 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
           let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
         endif
         let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-        execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
+        execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureSignTextHL
         execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
       else
         execute 'sign unplace ' . l:id
@@ -286,7 +287,7 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
         let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
       endif
       let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
-      execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=Exception'
+      execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureSignTextHL
       execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
     endif
   endif

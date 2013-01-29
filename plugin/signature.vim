@@ -187,6 +187,9 @@ endif
 if !exists('g:SignatureIncludeMarkers')
   let g:SignatureIncludeMarkers = ")!@#$%^&*("
 endif
+if !exists('g:SignatureSignTextHL')
+  let g:SignatureSignTextHL = "Exception"
+endif
 if !exists('g:SignatureWrapJumps')
   let g:SignatureWrapJumps = 1
 endif
