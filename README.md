@@ -108,6 +108,9 @@ Oh, and see in all the above strings, I've used double-quotes and not
 single-quotes. That's not cause I love 'em but things go haywire if
 double-quotes aren't used. Also, `\m` and `\p` cannot be set to _Space_  
 
+* `g:SignatureSignTextHL` ( Default : "Exception" )  
+  The highlight group used for mark displays. 
+
 * `g:SignatureMarkerLeader` ( Default: m )  
   Set the key used to toggle markers.  If this key is set to `<leader>m`  
     `<leader>m1` will toggle the marker '!'  
