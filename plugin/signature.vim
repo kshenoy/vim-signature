@@ -88,7 +88,7 @@
 "
 " ````
 " <Plug>SIG_PlaceNextMark    : Place next available mark
-" <Plug>SIG_PurgeMarks     : Remove all marks
+" <Plug>SIG_PurgeMarks       : Remove all marks
 " <Plug>SIG_NextSpotByPos    : Jump to next mark
 " <Plug>SIG_PrevSpotByPos    : Jump to prev mark
 " <Plug>SIG_NextLineByPos    : Jump to start of next line containing a mark
@@ -159,8 +159,8 @@
 "
 "
 " ToDo:                 {{{2
-" * Add custom color support for signs
 " * Add support for non-Alphabetical marks
+" * Tie the Signature functions to vim commands that affect mark placement
 "
 "
 " Maintainer:           {{{2

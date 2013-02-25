@@ -72,7 +72,7 @@ endfunction
 
 
 function! s:UsedMarks() "                             {{{2
-  " Description: Return a list of marks that are in use in the current buffer
+  " Description: Returns a list of [mark, line no.] pairs that are in use in the current buffer
 
   let l:return_var = filter(s:MarksList(), 'v:val[1]>0')
 
@@ -320,41 +320,55 @@ function! s:GotoMarkByPos( dir ) "                    {{{2
   let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
 
   let l:MarksList = s:UsedMarks()
-  if len(l:MarksList) < 2 | return "" | endif
+  " We need at least one mark to be present
+  if ( len(l:MarksList) < 1 ) | return "" | endif
 
-  let l:pos  = line('.')
-  let l:mark = ""
+  let l:pos    = line('.')
+  let l:mark     = ""
   let l:mark_first = ""
-  let l:dist = 0
+  let l:dist     = 0
 
   if a:dir ==? "next"
     let l:pos_first = line('$') + 1
     for m in l:MarksList
-      if m[1] > l:pos && ( l:dist == 0 || m[1] - l:pos < l:dist )
+      " Find the mark that comes just after the current line
+      if (( m[1] > l:pos ) && ( l:dist == 0 || m[1] - l:pos < l:dist ))
         let l:mark = m[0]
         let l:dist = m[1] - l:pos
       endif
-      if m[1] < l:pos_first
+      " Find the mark that is present first, in case the current line doesn't
+      " have any mark after it and we have to wrap around to the start.
+      if ( m[1] < l:pos_first )
         let l:mark_first = m[0]
         let l:pos_first  = m[1]
       endif
     endfor
+    " If l:mark is an empty string then it means that there is no mark after the current line till EOF
+    " Hence, if WrapJumps is enabled, wrap around to the first mark present in the file
+    if ( empty(l:mark) && l:SignatureWrapJumps )
+      let l:mark = l:mark_first
+    endif
+
   elseif a:dir ==? "prev"
-    let l:pos_first = 0
+    let l:pos_last = 0
     for m in l:MarksList
-      if m[1] < l:pos && ( l:dist == 0 || l:pos - m[1] < l:dist )
+      " Find the mark that comes just before the current line
+      if (( m[1] < l:pos ) && ( l:dist == 0 || l:pos - m[1] < l:dist ))
         let l:mark = m[0]
         let l:dist = l:pos - m[1]
       endif
-      if m[1] > l:pos_first
-        let l:mark_first = m[0]
-        let l:pos_first  = m[1]
+      " Find the mark that is present last, in case the current line doesn't
+      " have any mark after it and we have to wrap around to the end.
+      if ( m[1] > l:pos_last )
+        let l:mark_last = m[0]
+        let l:pos_last  = m[1]
       endif
     endfor
-  endif
-
-  if empty(l:mark) && l:SignatureWrapJumps
-    let l:mark = l:mark_first
+    " If l:mark is an empty string then it means that there is no mark before the current line till start of file
+    " Hence, if WrapJumps is enabled, wrap around to the last mark present in the file
+    if ( empty(l:mark) && l:SignatureWrapJumps )
+      let l:mark = l:mark_last
+    endif
   endif
 
   return l:mark
@@ -364,11 +378,12 @@ endfunction
 function! s:GotoMarkByAlpha( dir ) "                  {{{2
   let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
 
-  let l:UsedMarks = s:UsedMarks()
-  let l:MarksAt = s:MarksAt(line('.'))
-  let l:mark = ""
+  let l:UsedMarks  = s:UsedMarks()
+  let l:MarksAt    = s:MarksAt(line('.'))
+  let l:mark       = ""
   let l:mark_first = ""
 
+  " If there is no mark present on the current line then call GotoMarkByPos to jump to the next line with a mark
   if empty(l:MarksAt)
     if exists('b:sig_GotoMarkByAlpha')
       unlet b:sig_GotoMarkByAlpha
@@ -477,8 +492,6 @@ function! s:BufferMaps( mode ) "                      {{{2
     for i in split( g:SignatureIncludeMarks, '\zs' )
       if maparg( g:SignatureMarkLeader . i, 'n' ) == ""
         silent exec 'nnoremap <buffer> <unique> <silent> ' . g:SignatureMarkLeader . i . ' :call signature#ToggleMark("' . i . '")<CR>'
-      else
-        echom 'Skipping creating mapping for ' . g:SignatureMarkLeader . i
       endif
     endfor
 
@@ -608,7 +621,6 @@ function! signature#BufferRefresh( mode ) "           {{{2
   " Arguments:   When mode = 0, toggle sign display.
   "                        = 1, refresh sign display.
 
-  "echom "Buffer Refresh called"
   " Added to disable vim-signature in panes created by NERDTree
   if ( &buftype == "nofile" )
     call s:BufferMaps(0)
