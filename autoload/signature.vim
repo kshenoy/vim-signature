@@ -228,9 +228,8 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
   if !has('signs') | return | endif
 
   let l:SignatureIncludeMarkers = ( exists('b:SignatureIncludeMarkers') ? b:SignatureIncludeMarkers : g:SignatureIncludeMarkers )
-  let l:SignatureLcMarkStr  = ( exists('b:SignatureLcMarkStr')    ? b:SignatureLcMarkStr  : g:SignatureLcMarkStr    )
-  let l:SignatureUcMarkStr  = ( exists('b:SignatureUcMarkStr')    ? b:SignatureUcMarkStr  : g:SignatureUcMarkStr    )
-  let l:SignatureSignTextHL  = ( exists('b:SignatureSignTextHL')    ? b:SignatureSignTextHL  : g:SignatureSignTextHL    )
+  let l:SignatureMarkOrder  = ( exists('b:SignatureMarkOrder') ? b:SignatureMarkOrder : g:SignatureMarkOrder )
+  let l:SignatureSignTextHL  = ( exists('b:SignatureSignTextHL') ? b:SignatureSignTextHL : g:SignatureSignTextHL )
 
   if stridx(l:SignatureIncludeMarkers, a:mark) >= 0
     " Visual marker has been set
@@ -243,11 +242,7 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
     else
       if has_key(b:sig_marks, l:lnum)
         let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
-        if index(s:LowerMarksList(), l:mark) >= 0
-          let l:str = substitute(l:SignatureLcMarkStr, "\m", l:mark, "")
-        elseif index(s:UpperMarksList(), l:mark) >= 0
-          let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
-        endif
+        let l:str = substitute(l:SignatureMarkOrder, "\m", l:mark, "")
         let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
         execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureSignTextHL
         execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
@@ -281,12 +276,8 @@ function! s:ToggleSign( mark, mode, lnum ) "          {{{2
 
     if !has_key(b:sig_markers, l:lnum)
       let l:mark = strpart(b:sig_marks[l:lnum], 0, 1)
-      if index(s:LowerMarksList(), l:mark) >= 0
-        let l:str = substitute(l:SignatureLcMarkStr, "\m", l:mark, "")
-      elseif index(s:UpperMarksList(), l:mark) >= 0
-        let l:str = substitute(l:SignatureUcMarkStr, "\m", l:mark, "")
-      endif
-      let l:str = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
+      let l:str  = substitute(l:SignatureMarkOrder, "\m", l:mark, "")
+      let l:str  = substitute(l:str, "\p", strpart(b:sig_marks[l:lnum], 1, 1), "")
       execute 'sign define sig_Mark_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureSignTextHL
       execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Mark_' . l:id . ' buffer=' . winbufnr(0)
     endif
@@ -307,6 +298,7 @@ function! signature#GotoMark( mode, dir, loc ) "      {{{2
   elseif a:mode ==? "alpha"
     let l:mark = s:GotoMarkByAlpha(a:dir)
   endif
+  " Note: If l:mark is an empty string then no movement will be made
 
   if a:loc ==? "line"
     execute "normal! '" . l:mark
@@ -320,13 +312,15 @@ function! s:GotoMarkByPos( dir ) "                    {{{2
   let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
 
   let l:MarksList = s:UsedMarks()
-  " We need at least one mark to be present
+  " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
   if ( len(l:MarksList) < 1 ) | return "" | endif
 
-  let l:pos    = line('.')
-  let l:mark     = ""
-  let l:mark_first = ""
-  let l:dist     = 0
+  let l:pos        = line('.')
+  let l:dist       = 0
+  " Initialize l:mark and l:mark_first so that if there is only 1 mark present in the whole file,
+  " then a jump will be made directly to that mark itself
+  let l:mark       = l:MarksList[0][0]
+  let l:mark_first = l:MarksList[0][0]
 
   if a:dir ==? "next"
     let l:pos_first = line('$') + 1
@@ -383,35 +377,45 @@ function! s:GotoMarkByAlpha( dir ) "                  {{{2
   let l:mark       = ""
   let l:mark_first = ""
 
-  " If there is no mark present on the current line then call GotoMarkByPos to jump to the next line with a mark
+  " Since we can place multiple marks on a line, to jump by alphabetical order we need to know what the current mark is.
+  " This information is kept in the b:sig_GotoMarkByAlpha_CurrMark variable. For instance, if we have marks a, b, and c
+  " on the current line and b:sig_GotoMarkByAlpha_CurrMark has the value 'a' then we jump to 'b' and set the value of
+  " the variable to 'b'. Reinvoking this function will thus now jump to 'c'
+
   if empty(l:MarksAt)
-    if exists('b:sig_GotoMarkByAlpha')
-      unlet b:sig_GotoMarkByAlpha
+    if exists('b:sig_GotoMarkByAlpha_CurrMark')
+      unlet b:sig_GotoMarkByAlpha_CurrMark
     endif
+    " If there are no marks present on the current line then call GotoMarkByPos to jump to the next line with a mark
     return s:GotoMarkByPos(a:dir)
   endif
 
-  if len(l:MarksAt) == 1 || !exists('b:sig_GotoMarkByAlpha')
-    let b:sig_GotoMarkByAlpha = l:MarksAt[0]
+  " If there is only one mark in the current file, then return the same
+  if ( len(l:UsedMarks) == 1 )
+    return l:MarksAt[0]
+  endif
+
+  if (( len(l:MarksAt) == 1 ) || !exists('b:sig_GotoMarkByAlpha_CurrMark'))
+    let b:sig_GotoMarkByAlpha_CurrMark = l:MarksAt[0]
   endif
 
   for i in range(0, len(l:UsedMarks)-1)
-    if l:UsedMarks[i][0] ==# b:sig_GotoMarkByAlpha
+    if l:UsedMarks[i][0] ==# b:sig_GotoMarkByAlpha_CurrMark
       if a:dir ==? "next"
         if i != len(l:UsedMarks)-1
           let l:mark = l:UsedMarks[i+1][0]
-          let b:sig_GotoMarkByAlpha = l:mark
+          let b:sig_GotoMarkByAlpha_CurrMark = l:mark
         elseif l:SignatureWrapJumps
           let l:mark = l:UsedMarks[0][0]
-          let b:sig_GotoMarkByAlpha = l:mark
+          let b:sig_GotoMarkByAlpha_CurrMark = l:mark
         endif
       elseif a:dir ==? "prev"
         if i != 0
           let l:mark = l:UsedMarks[i-1][0]
-          let b:sig_GotoMarkByAlpha = l:mark
+          let b:sig_GotoMarkByAlpha_CurrMark = l:mark
         elseif l:SignatureWrapJumps
           let l:mark = l:UsedMarks[-1][0]
-          let b:sig_GotoMarkByAlpha = l:mark
+          let b:sig_GotoMarkByAlpha_CurrMark = l:mark
         endif
       endif
       return l:mark
@@ -475,10 +479,14 @@ function! signature#Init() "                          {{{2
   nnoremap <silent> <Plug>SIG_NextMarkerByType :call signature#GotoMarker("next")<CR>
   nnoremap <silent> <Plug>SIG_PrevMarkerByType :call signature#GotoMarker("prev")<CR>
   nnoremap <silent> <Plug>SIG_PurgeMarkers     :call signature#PurgeMarkers()<CR>
+
+  " Enable/disable mappings
+  call signature#BufferMaps( 1 )
+
 endfunction
 
 
-function! s:BufferMaps( mode ) "                      {{{2
+function! signature#BufferMaps( mode ) "              {{{2
   " Description: Set up mappings
   " Arguments:   When mode = 0, disable mappings.
   "                   mode = 1, enable  mappings.
@@ -505,52 +513,57 @@ function! s:BufferMaps( mode ) "                      {{{2
       endif
     endfor
 
-    if g:SignatureDefaultMappings
-      " Using hasmapto() allows a flexibility to use custom mappings along with the default mappings.
-      " If g:SignatureDefaultMappings has been set but a particular <Plug> has already been mapped,
-      " it will be skipped and the default mapping won't be assigned.
+    " Using hasmapto() allows a flexibility to use custom mappings along with the default mappings.
+    " Similarly, maparg() is used to ensure that mapping is created only if it is free
+    " Thus, using both, we ensure that mapping is done only if RHS (<Plug>) is unmapped and LHS is unassigned
 
-      if !hasmapto( '<Plug>SIG_PlaceNextMark' ) && maparg( g:SignatureMarkerLeader . ',', 'n' ) == ""
-        exec 'nmap <buffer> ' . g:SignatureMarkLeader . ', <Plug>SIG_PlaceNextMark'
-      endif
-      if !hasmapto( '<Plug>SIG_PurgeMarks' ) && maparg( g:SignatureMarkerLeader . '<Space>', 'n' ) == ""
-        exec 'nmap <buffer> ' . g:SignatureMarkLeader . '<Space> <Plug>SIG_PurgeMarks'
-      endif
-      if !hasmapto( '<Plug>SIG_PurgeMarkers' ) && maparg( g:SignatureMarkerLeader . '<BS>', 'n' ) == ""
-        exec 'nmap <buffer> ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'
-      endif
-
-      if !hasmapto( '<Plug>SIG_NextLineByAlpha' ) && maparg( "']", 'n' ) == ""
-        nmap <buffer> '] <Plug>SIG_NextLineByAlpha
-      endif
-      if !hasmapto( '<Plug>SIG_PrevLineByAlpha' ) && maparg( "'[", 'n' ) == ""
-        nmap <buffer> '[ <Plug>SIG_PrevLineByAlpha
-      endif
-      if !hasmapto( '<Plug>SIG_NextSpotByAlpha' ) && maparg( "`]", 'n' ) == ""
-        nmap <buffer> `] <Plug>SIG_NextSpotByAlpha
-      endif
-      if !hasmapto( '<Plug>SIG_PrevSpotByAlpha' ) && maparg( "`[", 'n' ) == ""
-        nmap <buffer> `[ <Plug>SIG_PrevSpotByAlpha
-      endif
-      if !hasmapto( '<Plug>SIG_NextLineByPos' ) && maparg( "]'", 'n' ) == ""
-        nmap <buffer> ]' <Plug>SIG_NextLineByPos
-      endif
-      if !hasmapto( '<Plug>SIG_PrevLineByPos' ) && maparg( "['", 'n' ) == ""
-        nmap <buffer> [' <Plug>SIG_PrevLineByPos
-      endif
-      if !hasmapto( '<Plug>SIG_NextSpotByPos') && maparg( "]`", 'n' ) == ""
-        nmap <buffer> ]` <Plug>SIG_NextSpotByPos
-      endif
-      if !hasmapto( '<Plug>SIG_PrevSpotByPos' ) && maparg( "[`", 'n' ) == ""
-        nmap <buffer> [` <Plug>SIG_PrevSpotByPos
-      endif
-      if !hasmapto( '<Plug>SIG_NextMarkerByType' ) && maparg( "]-", 'n' ) == ""
-        nmap <buffer> ]- <Plug>SIG_NextMarkerByType
-      endif
-      if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) && maparg( "[-", 'n' ) == ""
-        nmap <buffer> [- <Plug>SIG_PrevMarkerByType
-      endif
+    if !hasmapto( '<Plug>SIG_PlaceNextMark' ) && maparg( g:SignatureMarkerLeader . ',', 'n' ) == ""
+      exec 'nmap <buffer> ' . g:SignatureMarkLeader . ', <Plug>SIG_PlaceNextMark'
     endif
+    if !hasmapto( '<Plug>SIG_PurgeMarks' ) && maparg( g:SignatureMarkerLeader . '<Space>', 'n' ) == ""
+      exec 'nmap <buffer> ' . g:SignatureMarkLeader . '<Space> <Plug>SIG_PurgeMarks'
+    endif
+    if !hasmapto( '<Plug>SIG_PurgeMarkers' ) && maparg( g:SignatureMarkerLeader . '<BS>', 'n' ) == ""
+      exec 'nmap <buffer> ' . g:SignatureMarkerLeader . '<BS> <Plug>SIG_PurgeMarkers'
+    endif
+
+    if !hasmapto( '<Plug>SIG_NextLineByAlpha' ) && maparg( "']", 'n' ) == ""
+      nmap <buffer> '] <Plug>SIG_NextLineByAlpha
+    endif
+    if !hasmapto( '<Plug>SIG_PrevLineByAlpha' ) && maparg( "'[", 'n' ) == ""
+      nmap <buffer> '[ <Plug>SIG_PrevLineByAlpha
+    endif
+    if !hasmapto( '<Plug>SIG_NextSpotByAlpha' ) && maparg( "`]", 'n' ) == ""
+      nmap <buffer> `] <Plug>SIG_NextSpotByAlpha
+    endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha' ) && maparg( "`[", 'n' ) == ""
+      nmap <buffer> `[ <Plug>SIG_PrevSpotByAlpha
+    endif
+    if !hasmapto( '<Plug>SIG_NextLineByPos' ) && maparg( "]'", 'n' ) == ""
+      nmap <buffer> ]' <Plug>SIG_NextLineByPos
+    endif
+    if !hasmapto( '<Plug>SIG_PrevLineByPos' ) && maparg( "['", 'n' ) == ""
+      nmap <buffer> [' <Plug>SIG_PrevLineByPos
+    endif
+    if !hasmapto( '<Plug>SIG_NextSpotByPos') && maparg( "]`", 'n' ) == ""
+      nmap <buffer> ]` <Plug>SIG_NextSpotByPos
+    endif
+    if !hasmapto( '<Plug>SIG_PrevSpotByPos' ) && maparg( "[`", 'n' ) == ""
+      nmap <buffer> [` <Plug>SIG_PrevSpotByPos
+    endif
+    if !hasmapto( '<Plug>SIG_NextMarkerByType' ) && maparg( "]-", 'n' ) == ""
+      nmap <buffer> ]- <Plug>SIG_NextMarkerByType
+    endif
+    if !hasmapto( '<Plug>SIG_PrevMarkerByType' ) && maparg( "[-", 'n' ) == ""
+      nmap <buffer> [- <Plug>SIG_PrevMarkerByType
+    endif
+
+    "TODO Call SignRefresh after performing any action that affects marks to adjust the corresponding signs
+    "nnoremap dd dd:call signature#SignRefresh()<CR>
+    "vnoremap d   d:call signature#SignRefresh()<CR>
+    "nnoremap u   u:call signature#SignRefresh()<CR>
+    "nnoremap U   U:call signature#SignRefresh()<CR>
+    "nnoremap J   J:call signature#SignRefresh()<CR>
 
     let b:sig_map_set = 1
 
@@ -568,46 +581,44 @@ function! s:BufferMaps( mode ) "                      {{{2
       silent exec 'nunmap <buffer> ' . g:SignatureMarkerLeader . s:signature_markers[i]
     endfor
 
-    if ( g:SignatureDefaultMappings )
-      if hasmapto( '<Plug>SIG_PlaceNextMark' )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PlaceNextMark', 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PurgeMarks' )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarks', 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PurgeMarkers' )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarkers', 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_NextLineByAlpha'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByAlpha' , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PrevLineByAlpha'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByAlpha' , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_NextSpotByAlpha'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByAlpha' , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PrevSpotByAlpha'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByAlpha' , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_NextLineByPos'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByPos'   , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PrevLineByPos'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByPos'   , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_NextSpotByPos'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByPos'   , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PrevSpotByPos'  )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByPos'   , 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_NextMarkerByType' )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextMarkerByType', 'n' )
-      endif
-      if hasmapto( '<Plug>SIG_PrevMarkerByType' )
-        exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevMarkerByType', 'n' )
-      endif
+    if hasmapto( '<Plug>SIG_PlaceNextMark' )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PlaceNextMark', 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PurgeMarks' )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarks', 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PurgeMarkers' )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarkers', 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_NextLineByAlpha'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByAlpha' , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PrevLineByAlpha'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByAlpha' , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_NextSpotByAlpha'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByAlpha' , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PrevSpotByAlpha'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByAlpha' , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_NextLineByPos'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByPos'   , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PrevLineByPos'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByPos'   , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_NextSpotByPos'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByPos'   , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PrevSpotByPos'  )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByPos'   , 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_NextMarkerByType' )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextMarkerByType', 'n' )
+    endif
+    if hasmapto( '<Plug>SIG_PrevMarkerByType' )
+      exec 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevMarkerByType', 'n' )
     endif
 
     let b:sig_map_set = 0
@@ -616,74 +627,84 @@ function! s:BufferMaps( mode ) "                      {{{2
 endfunction
 
 
-function! signature#BufferRefresh( mode ) "           {{{2
-  " Description: Toggles and refreshes sign display in the buffer.
-  " Arguments:   When mode = 0, toggle sign display.
-  "                        = 1, refresh sign display.
-
-  " Added to disable vim-signature in panes created by NERDTree
-  if ( &buftype == "nofile" )
-    call s:BufferMaps(0)
-    return
-  endif
+function! signature#SignRefresh() "                   {{{2
+  " Description: Add signs for new marks/marksers and remove signs for deleted marks/markers
 
   if !exists('b:sig_status')  | let b:sig_status  = 1  | endif
+
+  " If Signature has been disabled, return
+  if ( !b:sig_status ) | return | endif
+
   if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
   if !exists('b:sig_markers') | let b:sig_markers = {} | endif
-
-  if !a:mode | let b:sig_status = !b:sig_status | endif
-  " b:sig_markers = { lnum:marks_str }
-  " b:sig_markers = { lnum:marker }
 
   let l:SignatureIncludeMarks = ( exists('b:SignatureIncludeMarks') ? b:SignatureIncludeMarks : g:SignatureIncludeMarks )
   let l:used_marks = s:UsedMarks()
 
+  " Remove signs for absent marks
+  for i in split(l:SignatureIncludeMarks, '\zs')
+    let l:pair = items(filter(copy(b:sig_marks), 'v:val =~# i'))
+    if !empty(l:pair)
+      let l:found = 0
+      for j in l:used_marks
+        if j[0] ==# i && j[1] == l:pair[0][0]
+          let l:found = 1
+          break
+        endif
+      endfor
+      if !(l:found)
+        call s:ToggleSign(i, 0, 0)
+      endif
+    endif
+  endfor
+
+  " Add signs for present marks
+  for k in l:used_marks
+    if !has_key(b:sig_marks, k[1])
+      call s:ToggleSign(k[0], 1, k[1])
+    elseif b:sig_marks[k[1]] !~# k[0]
+      call s:ToggleSign(k[0], 0, 0)
+      call s:ToggleSign(k[0], 1, k[1])
+    endif
+  endfor
+
+  " Add signs for markers
+  for i in keys(b:sig_markers)
+    call s:ToggleSign(b:sig_markers[i], 1, i)
+  endfor
+endfunction
+
+
+function! signature#Toggle( mode ) "                  {{{2
+  " Description: Toggles and refreshes sign display in the buffer.
+  " Arguments:   When mode = 1, toggle sign display.
+  "                        = 0, don't toggle, preserve existing state. Useful for recreating maps when returning from
+  "                             buffers in which Signature and its maps have been disabled
+
+  if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
+  " b:sig_marks   = { lnum:marks_str }
+  if !exists('b:sig_markers') | let b:sig_markers = {} | endif
+  " b:sig_markers = { lnum:marker }
+
+  if !exists( 'b:sig_status' )
+    let b:sig_status  = 1
+  elseif ( a:mode )
+    let b:sig_status = !b:sig_status
+  endif
+
   " Enable/disable mappings
-  call s:BufferMaps( b:sig_status )
+  call signature#BufferMaps( b:sig_status )
 
   if b:sig_status
-    " Signature enabled ==> Refresh signs             {{{
-
-    " Remove signs for absent marks
-    for i in split(l:SignatureIncludeMarks, '\zs')
-      let l:pair = items(filter(copy(b:sig_marks), 'v:val =~# i'))
-      if !empty(l:pair)
-        let l:found = 0
-        for j in l:used_marks
-          if j[0] ==# i && j[1] == l:pair[0][0]
-            let l:found = 1
-            break
-          endif
-        endfor
-        if !(l:found)
-          call s:ToggleSign(i, 0, 0)
-        endif
-      endif
-    endfor
-
-    " Add signs for present marks
-    for k in l:used_marks
-      if !has_key(b:sig_marks, k[1])
-        call s:ToggleSign(k[0], 1, k[1])
-      elseif b:sig_marks[k[1]] !~# k[0]
-        call s:ToggleSign(k[0], 0, 0)
-        call s:ToggleSign(k[0], 1, k[1])
-      endif
-    endfor
-
-    " Add signs for markers
-    for i in keys(b:sig_markers)
-      call s:ToggleSign(b:sig_markers[i], 1, i)
-    endfor
-  " }}}
+    " Signature enabled ==> Refresh signs
+    call signature#SignRefresh()
   else
-    " Signature has been disabled                     {{{
+    " Signature has been disabled
     for i in range(1, line('$'))
       let l:id = ( winbufnr(0) + 1 ) * i
       execute 'sign unplace ' . l:id
     endfor
     unlet b:sig_marks
-    " }}}
   endif
 
 endfunction

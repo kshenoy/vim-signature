@@ -1,0 +1,222 @@
+signature.txt  A plugin to toggle, display and navigate marks
+
+     _________.__                            __                              ~
+    /   _____/|__|   ____    ____  _____   _/  |_  __ __ _______   ____      ~
+    \_____  \ |  |  / ___\  /    \ \__  \  \   __\|  |  \\_  __ \_/ __ \     ~
+    /        \|  | / /_/  >|   |  \ / __ \_ |  |  |  |  / |  | \/\  ___/     ~
+   /_______  /|__| \___  / |___|  /(____  / |__|  |____/  |__|    \___  >    ~
+           \/     /_____/       \/      \/                            \/     ~
+
+
+==============================================================================
+1. Contents                                   *signature-contents* *signature*
+
+  1. Contents         |signature-contents|
+  2. Mappings         |signature-mappings|
+  3. Commands         |signature-commands|
+  4. Customization    |signature-customization|
+  5. Contributing     |signature-contributing|
+  6. Credits          |signature-credits|
+  7. License          |signature-license|
+
+
+==============================================================================
+2. Mappings                                               *signature-mappings*
+
+Out of the box, the followings mappings are defined by default
+
+  m[a-zA-Z]    Toggle mark and display it in the leftmost column
+
+  m,           Place the next available mark
+  m<Space>     Delete all marks
+  ]`           Jump to next mark
+  [`           Jump to prev mark
+  ]'           Jump to start of next line containing a mark
+  ['           Jump to start of prev line containing a mark
+  `]           Jump by alphabetical order to next mark
+  `[           Jump by alphabetical order to prev mark
+  ']           Jump by alphabetical order to start of next line having a mark
+  '[           Jump by alphabetical order to start of prev line having a mark
+
+  m[0-9]       Toggle the corresponding marker !@#$%^&*()
+  m<S-[0-9]>   Remove all markers of the same type
+  ]-           Jump to next line having same marker
+  [-           Jump to prev line having same marker
+  m<BS>        Remove all markers
+
+This will allow the use of default behavior of m to set marks and, if
+the line already contains the mark, it'll be unset. The default behavior
+of ]', [', ]` and [` is supported and enhanced by wrapping around when
+beginning or end of file is reached.
+
+
+==============================================================================
+3. Commands                                               *signature-commands*
+
+Signature provides just two commands
+
+'SignatureToggle'
+  Toggle the display of signs. This won't affect the marks
+
+'SignatureRefreshDisplay'
+  Force the display of signs in the buffer to refresh. Use this to correct
+  the signs if things go awry
+
+
+==============================================================================
+4. Customization                                     *signature-customization*
+
+Set up Signature the way you want using the following options
+
+                                                    *SignatureDefaultMappings*
+The following mappings are defined by default
+  <Plug>SIG_PlaceNextMark    : Place next available mark ( m, )
+  <Plug>SIG_PurgeMarks       : Remove all marks ( m<Space> )
+  <Plug>SIG_PurgeMarkers     : Remove all markers ( m<BackSpace> )
+  <Plug>SIG_NextSpotByPos    : Jump to next mark ( ]` )
+  <Plug>SIG_PrevSpotByPos    : Jump to prev mark ( [` )
+  <Plug>SIG_NextLineByPos    : Jump to start of next line with a mark ( ]' )
+  <Plug>SIG_PrevLineByPos    : Jump to start of prev line with a mark ( [' )
+  <Plug>SIG_NextSpotByAlpha  : Jump by alphabetical order to next mark ( `] )
+  <Plug>SIG_PrevSpotByAlpha  : Jump by alphabetical order to prev mark ( `[ )
+  <Plug>SIG_NextLineByAlpha  : Jump by alphabetical order to start of next
+                               line containing a mark ( '] )
+  <Plug>SIG_PrevLineByAlpha  : Jump by alphabetical order to start of previous
+                               line containing a mark ( '[ )
+  <Plug>SIG_NextMarkerByType : Jump to next line having same marker ( ]= )
+  <Plug>SIG_PrevMarkerByType : Jump to prev line having same marker ( [- )
+
+
+'g:SignatureIncludeMarks'                              *SignatureIncludeMarks*
+  String, Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+  Specify the marks that can be controlled by this plugin.
+  Only supports Alphabetical marks at the moment.
+  'b:SignatureIncludeMarks' can be set separately for buffer-specific marks.
+
+
+'g:SignatureWrapJumps'                                    *SignatureWrapJumps*
+  Boolean, Default : 1
+
+  Specify if jumping to marks should wrap-around.
+  'b:SignatureWrapJumps' can be set to specify buffer-specific settings.
+
+
+'g:SignatureMarkLeader'                                  *SignatureMarkLeader*
+  String, Default: 'm'
+
+  Set the key used to toggle marks.
+  For eg. If this key is set to `<leader>m`,
+    `<leader>ma`       will toggle the mark 'a'
+    `<leader>m,`       will place the next available mark
+    `<leader>m<Space>` will delete all marks
+
+
+'g:SignatureMarkOrder'                                    *SignatureMarkOrder*
+  String, Default : "\p\m"
+
+  Signature allows you to display upto marks in front of a line. This controls
+  the order in which marks are displayed.
+    '\m' indicates the current or latest mark placed on the line
+    '\p' indicates the previous mark placed on the line
+
+  For eg.
+    g:SignatureMarkOrder = "\m."  : Display last mark with '.' suffixed
+    g:SignatureMarkOrder = "_\m"  : Display last mark with '_' prefixed
+    g:SignatureMarkOrder = ">"    : Display only a ">" for a line with a mark.
+                                    The mark is not displayed
+    g:SignatureMarkOrder = "\m\p" : Display last two marks placed
+
+  Note:
+  The signs feature allows only 2 characters to be displayed. This is not and
+  arbitratry limitation of the plugin.
+
+
+'g:SignatureSignTextHL'                                  *SignatureSignTextHL*
+  String, Default : 'Exception'
+
+  The highlight group used for mark displays.
+  'b:SignatureSignTextHL' can be specified separately for each buffer
+
+
+'g:SignatureMarkerLeader'                              *SignatureMarkerLeader*
+  String, Default: g:SignatureMarkLeader
+
+  Set the key used to toggle markers.  If this key is set to `<leader>m`
+    `<leader>m1` will toggle the marker '!'
+    `<leader>m!` will remove all the '!' markers
+  Note:
+  Currently, either marks or markers can be displayed in front of a line.
+  Both can't be displayed simultaenously.
+
+
+'g:SignatureIncludeMarkers'                          *SignatureIncludeMarkers*
+  String, Default : '!@#$%^&*()'
+
+  Specify the markers that can be used by the plugin.
+  'b:SignatureIncludeMarkers' can be specified separately for each buffer
+
+
+'g:SignaturePurgeConfirmation'                    *SignaturePurgeConfirmation*
+  Boolean, Default: 0
+
+  An option for the more clumsy-fingered of us. Asks for confirmation before
+  deleting all marks
+
+
+'g:SignatureDisableMenu'                                *SignatureDisableMenu*
+  Boolean, Default: 0
+
+  Hides the menu if set to 1
+
+
+'g:SignatureMenuStruct'                                  *SignatureMenuStruct*
+  String, Default: "P&lugins.&Signature"
+
+  Set where the menu options are to be displayed. For more details refer,
+    `:h usr_42.txt`
+
+
+'g:SignaturePeriodicRefresh'                        *SignaturePeriodicRefresh*
+  Boolean, Default: 1
+
+  Enable the display to refresh periodically. Generally a good thing to have.
+  This makes use of the CursorHold autocmd event to execute periodically.
+  The frequency of this event can be controlled by changing the value of the
+  updatetime variable in milliseconds
+    `set updatetime = 100`
+
+
+==============================================================================
+5. Contributing                                       *signature-contributing*
+
+  Please post any issues and all your suggestions on Github
+    https://github.com/kshenoy/vim-signature
+
+  Show some love by spreading the word and rating on
+    http://www.vim.org/scripts/script.php?script_id=4118
+
+
+==============================================================================
+6. Credits                                                 *signature-credits*
+
+A great thanks to these guys for providing the idea and inspiration to develop
+Signature
+
+* Sergey Khorev for mark-tools
+  http://www.vim.org/scripts/script.php?script_id=2929
+
+* Zak Johnson for vim-showmarks
+  https://github.com/zakj/vim-showmarks
+
+I'd also like to thank Steve J. Losh for learningvimscriptthehardway.com
+without whose detailed guide this plugin would not have seen the light of day.
+
+
+==============================================================================
+7. License                                                 *signature-license*
+
+Signature is MIT/X11 licensed
+
+
+vim:tw=78:ts=2:et:sts=2:sw=2:ft=help
