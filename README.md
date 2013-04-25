@@ -8,7 +8,13 @@ Apart from the above, you can also
 
 
 ### Screenshots  
-[Click](http://imgur.com/a/3KQyt)  
+![vim-signature_marks_markers](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_marks_markers.png?raw=true)  
+Displays the marks as signs. Also place visual markers  
+  
+![Mark jumps](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_mark_jumps.gif?raw=true)  
+Alphabetical mark traversal and more.  
+
+More screenshots [here](http://imgur.com/a/3KQyt)  
   
 ### Vim.org mirror  
 If you like the plugin, spread the love and rate at http://www.vim.org/scripts/script.php?script_id=4118  
