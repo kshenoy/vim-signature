@@ -68,12 +68,11 @@ Signature provides just two commands
 
 Set up Signature the way you want using the following options
 
-'g:SignatureEnableMappings'                          *SignatureEnableMappings*
+'g:SignatureEnableDefaultMappings'            *SignatureEnableDefaultMappings*
   Boolean, Default : 1
 
-  Defines the following |SignatureDefaultMappings| mappings if set to 1.
+  Defines the following mappings by default if set to 1.
 
-                                                    *SignatureDefaultMappings*
   <Plug>SIG_PlaceNextMark    : Place next available mark ( m, )
   <Plug>SIG_PurgeMarks       : Remove all marks ( m<Space> )
   <Plug>SIG_PurgeMarkers     : Remove all markers ( m<BackSpace> )

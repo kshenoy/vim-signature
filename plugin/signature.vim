@@ -18,8 +18,8 @@ set cpo&vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Global variables     {{{1
 "
-if !exists('g:SignatureEnableMappings')
-  let g:SignatureEnableMappings = 1
+if !exists('g:SignatureEnableDefaultMappings')
+  let g:SignatureEnableDefaultMappings = 1
 endif
 if !exists('g:SignatureIncludeMarks')
   let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'

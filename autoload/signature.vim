@@ -481,7 +481,7 @@ function! signature#Init() "                          {{{2
   nnoremap <silent> <Plug>SIG_PurgeMarkers     :call signature#PurgeMarkers()<CR>
 
   " Enable/disable mappings
-  call signature#BufferMaps( g:SignatureEnableMappings )
+  call signature#BufferMaps( g:SignatureEnableDefaultMappings )
 
 endfunction
 
@@ -693,7 +693,7 @@ function! signature#Toggle( mode ) "                  {{{2
   endif
 
   " Enable/disable mappings
-  call signature#BufferMaps( g:SignatureEnableMappings && b:sig_status )
+  call signature#BufferMaps( g:SignatureEnableDefaultMappings && b:sig_status )
 
   if b:sig_status
     " Signature enabled ==> Refresh signs
