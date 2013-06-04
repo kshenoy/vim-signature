@@ -61,7 +61,7 @@ Note that this does not delete any of the marks but only hides them.
 This is a buffer-specific command.
 
 If for some reason, the marks and their sign displays go out of sync,
-use `:SignatureRefreshDisplay` to... well, refresh the display.
+use `:SignatureRefresh` to refresh them.
 
 For more details on customization refer the help
 
