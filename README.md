@@ -72,6 +72,5 @@ For more details on customization refer the help
 
 
 ## ToDo:
-* Add custom color support for signs
 * Add support for non-Alphabetical marks
 * Tie the Signature functions to vim commands that affect mark placement
