@@ -25,11 +25,10 @@ Requires Vim to be compiled with +signs to display marks.
 
 
 ## Installation
-I highly recommend using Pathogen or Vundler to do the grunt work for you.  
-If for some reason, you do not want to use any of these excellent plugins,  
-then unzip it to your ~/.vim directory. You know how it goes...  
+I recommend using a plugin manager to do the grunt work for you.  
+If for some reason, you do not want to use any of them, then unzip the contents of the .zip file to your ~/.vim directory.  
 
-Once that's done, out of the box, the followings mappings are defined by default  
+Once that's done, out of the box, the followings mappings are defined  
 
 ````
   m[a-zA-Z]    : Toggle mark

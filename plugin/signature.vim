@@ -69,7 +69,7 @@ if has('autocmd')
 endif
 
 command! -nargs=0 SignatureToggle  call signature#Toggle()
-command! -nargs=0 SignatureRefresh call signature#SignRefresh()
+command! -nargs=0 SignatureRefresh call signature#SignRefresh(1)
 " }}}1
 
 

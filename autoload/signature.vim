@@ -545,8 +545,9 @@ function! signature#BufferMaps( mode ) "                                        
 endfunction
 
 
-function! signature#SignRefresh() "                                                   {{{2
+function! signature#SignRefresh(...) "                                                   {{{2
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
+  " Arguments: '1' to force a sign refresh
 
   if !exists('b:sig_enabled') | let b:sig_enabled = 1 | endif
   " If Signature has been disabled, return
@@ -569,7 +570,7 @@ function! signature#SignRefresh() "                                             
   for j in s:MarksList( "used" )
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
-    if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0]
+    if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || ( a:0 > 0 && a:1 )
       call s:ToggleSign( j[0], 0, 0 )
       call s:ToggleSign( j[0], 1, j[1] )
     endif
