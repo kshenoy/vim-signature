@@ -58,7 +58,7 @@ Signature provides just two commands
 'SignatureToggle'
   Toggle the display of signs. This won't affect the marks
 
-'SignatureRefreshDisplay'
+'SignatureRefresh'
   Force the display of signs in the buffer to refresh. Use this to correct
   the signs if things go awry
 
