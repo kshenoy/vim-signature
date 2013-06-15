@@ -61,10 +61,14 @@ endif
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
-    " Disable mappings created by Signature in panes created by NERDTree
-    autocmd FileType nerdtree call signature#BufferMaps(0)
     autocmd BufEnter   * call signature#SignRefresh()
     autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#SignRefresh() | endif
+    " Create maps only if we aren't entering a NERDTree pane
+    " We can't use &ft for condition checking as filetype still hasn't been set
+    autocmd FileType *
+      \ if expand('<amatch>') !=? "nerdtree" |
+      \   call signature#BufferMaps( g:SignatureEnableDefaultMappings ) |
+      \ endif
   augroup END
 endif
 

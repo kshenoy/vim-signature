@@ -446,9 +446,6 @@ function! signature#Init() "                                                    
   nnoremap <silent> <Plug>SIG_NextMarkerByType :call signature#GotoMarker("next")<CR>
   nnoremap <silent> <Plug>SIG_PrevMarkerByType :call signature#GotoMarker("prev")<CR>
 
-  " Initial run: set up mappings if g:SignatureEnableDefaultMappings = 1
-  call signature#BufferMaps( g:SignatureEnableDefaultMappings )
-
   let s:Num2Marker = split( ")!@#$%^&*(", '\zs' )
 
 endfunction
@@ -456,11 +453,10 @@ endfunction
 
 function! signature#BufferMaps( mode ) "                                              {{{2
   " Description: Set up mappings
-  " Arguments:   When mode = 0, disable mappings.
-  "                   mode = 1, enable  mappings.
+  " Arguments:   When mode = 1, enable  mappings.
 
   " To prevent maps from being called again when re-entering a buffer
-  if !exists('b:sig_map_set') | let b:sig_map_set = 0  | endif
+  if !exists('b:sig_map_set') | let b:sig_map_set = 0 | endif
 
   if ( a:mode && !b:sig_map_set ) "                                                   {{{
 
@@ -519,27 +515,6 @@ function! signature#BufferMaps( mode ) "                                        
     endif
 
     let b:sig_map_set = 1
-
-  " }}}
-  elseif ( a:mode == 0 && b:sig_map_set ) "                                           {{{
-    " Remove mappings
-
-    silent! execute 'nunmap <buffer> <silent> ' . g:SignatureLeader
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PlaceNextMark'   , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarks'      , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PurgeMarkers'    , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByAlpha' , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByAlpha' , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByAlpha' , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByAlpha' , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextLineByPos'   , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevLineByPos'   , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextSpotByPos'   , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevSpotByPos'   , 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_NextMarkerByType', 'n' )
-    silent! execute 'nunmap <buffer> ' . signature#MapKey( '<Plug>SIG_PrevMarkerByType', 'n' )
-
-    let b:sig_map_set = 0
 
   endif " }}}
 endfunction
