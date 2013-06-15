@@ -122,5 +122,9 @@ if ( g:SignatureMenu != 0 ) && has('gui_running')
 endif
 " }}}1
 
+augroup signature
+    au!
+    au BufEnter * call signature#BufferMaps(g:SignatureEnableDefaultMappings)
+augroup end
 
 call signature#Init()
