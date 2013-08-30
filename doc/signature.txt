@@ -69,13 +69,17 @@ Signature provides just two commands
 Set up Signature the way you want using the following options
 
 'g:SignatureEnableDefaultMappings'            *SignatureEnableDefaultMappings*
-  Boolean, Default : 1
+  Integer, Default : 1
 
   If set to 1, defines the mappings as shown previously |signature-mappings|
   Note that if a mapping is already being used, Signature will preserve the
-  existing mapping and add its functionality
+  existing mapping and add its functionality.
 
-  To set up your own mappings, set this to 0 and use the following plugs
+  If set to 2, defines mappings similar to 1, except "ByAlpha" mappings; that 
+  is, the following mappings will NOT be set:   `]   `[   ']   '[
+
+  If set to 0, no default mappings are set. Use the following plugs to set up 
+  your own mappings:
 
   <Plug>SIG_PlaceNextMark    : Place next available mark
   <Plug>SIG_PurgeMarks       : Remove all marks

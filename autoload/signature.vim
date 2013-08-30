@@ -453,7 +453,8 @@ endfunction
 
 function! signature#BufferMaps( mode ) "                                              {{{2
   " Description: Set up mappings
-  " Arguments:   When mode = 1, enable  mappings.
+  " Arguments:   When mode = 1, enable all mappings.
+  "              When mode = 2, enable mappings except "ByAlpha" mappings.
 
   " To prevent maps from being called again when re-entering a buffer
   if !exists('b:sig_map_set') | let b:sig_map_set = 0 | endif
@@ -483,18 +484,22 @@ function! signature#BufferMaps( mode ) "                                        
       execute 'nmap <buffer> ' . g:SignatureLeader . '<BS>' . maparg( g:SignatureLeader . '<BS>', 'n' )
         \ . ' <Plug>SIG_PurgeMarkers'
     endif
-    if !hasmapto( '<Plug>SIG_NextLineByAlpha' )
-      execute "nmap <buffer> '] " . maparg( "']", 'n' ) . '<Plug>SIG_NextLineByAlpha'
+
+    if a:mode == 1
+      if !hasmapto( '<Plug>SIG_NextLineByAlpha' )
+        execute "nmap <buffer> '] " . maparg( "']", 'n' ) . '<Plug>SIG_NextLineByAlpha'
+      endif
+      if !hasmapto( '<Plug>SIG_PrevLineByAlpha' )
+        execute "nmap <buffer> '[ " . maparg( "'[", 'n' ) . '<Plug>SIG_PrevLineByAlpha'
+      endif
+      if !hasmapto( '<Plug>SIG_NextSpotByAlpha' )
+        execute 'nmap <buffer> `] ' . maparg( "`]", 'n' ) . '<Plug>SIG_NextSpotByAlpha'
+      endif
+      if !hasmapto( '<Plug>SIG_PrevSpotByAlpha' )
+        execute 'nmap <buffer> `[ ' . maparg( "`[", 'n' ) . '<Plug>SIG_PrevSpotByAlpha'
+      endif
     endif
-    if !hasmapto( '<Plug>SIG_PrevLineByAlpha' )
-      execute "nmap <buffer> '[ " . maparg( "'[", 'n' ) . '<Plug>SIG_PrevLineByAlpha'
-    endif
-    if !hasmapto( '<Plug>SIG_NextSpotByAlpha' )
-      execute 'nmap <buffer> `] ' . maparg( "`]", 'n' ) . '<Plug>SIG_NextSpotByAlpha'
-    endif
-    if !hasmapto( '<Plug>SIG_PrevSpotByAlpha' )
-      execute 'nmap <buffer> `[ ' . maparg( "`[", 'n' ) . '<Plug>SIG_PrevSpotByAlpha'
-    endif
+
     if !hasmapto( '<Plug>SIG_NextLineByPos' )
       execute "nmap <buffer> ]' " . maparg( "]'", 'n' ) . '<Plug>SIG_NextLineByPos'
     endif
