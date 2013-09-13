@@ -217,7 +217,8 @@ function! s:ToggleSign( sign, mode, lnum ) "                                    
   let l:lnum = a:lnum
   let l:id   = ( winbufnr(0) + 1 ) * l:lnum
 
-  if stridx( l:SignatureIncludeMarkers, a:sign ) >= 0   " Toggle sign for markers     {{{3
+  " Toggle sign for markers     {{{3
+  if stridx( l:SignatureIncludeMarkers, a:sign ) >= 0
 
     if a:mode
       let b:sig_markers[l:lnum] = a:sign . get( b:sig_markers, l:lnum, "" )
@@ -230,7 +231,8 @@ function! s:ToggleSign( sign, mode, lnum ) "                                    
       endif
     endif
 
-  else    " Toggle sign for marks                                                     {{{3
+  " Toggle sign for marks                                                     {{{3
+  else
     if a:mode
       let b:sig_marks[l:lnum] = a:sign . get( b:sig_marks, l:lnum, "" )
     else
@@ -555,6 +557,9 @@ function! signature#SignRefresh(...) "                                          
       call s:ToggleSign( j[0], 1, j[1] )
     endif
   endfor
+
+  " We do not add signs for markers as SignRefresh is executed periodically and we don't have a way to determine if the
+  " marker already has a sign or not
 endfunction
 
 
@@ -574,14 +579,19 @@ function! signature#Toggle() "                                                  
   if b:sig_enabled
     " Signature enabled ==> Refresh signs
     call signature#SignRefresh()
+
+    " Add signs for markers ...
+    for i in keys( b:sig_markers )
+      call s:ToggleSign( b:sig_markers[i], 1, i )
+    endfor
   else
     " Signature disabled ==> Remove signs
-    for i in keys( 'b:sig_markers' )
-      let l:id = ( winbufnr(0) + 1 ) * b:sig_markers[i]
+    for i in keys( b:sig_markers )
+      let l:id = ( winbufnr(0) + 1 ) * i
       silent! execute 'sign unplace ' . l:id
     endfor
-    for i in keys( 'b:sig_marks' )
-      let l:id = ( winbufnr(0) + 1 ) * b:sig_marks[i]
+    for i in keys( b:sig_marks )
+      let l:id = ( winbufnr(0) + 1 ) * i
       silent! execute 'sign unplace ' . l:id
     endfor
     unlet b:sig_marks
