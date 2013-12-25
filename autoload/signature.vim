@@ -161,7 +161,7 @@ function! s:ToggleMarker( marker ) "                {{{2
 
   let l:lnum = line('.')
   " If marker is found in on current line, remove it, else place it
-  let l:mode = ( get(b:sig_markers, l:lnum) =~# a:marker ? "remove" : "place" )
+  let l:mode = ( get( b:sig_markers, l:lnum, "" ) =~# escape( a:marker, '$^' ) ? "remove" : "place" )
   call s:ToggleSign( a:marker, l:mode, l:lnum )
 endfunction
 
@@ -218,7 +218,7 @@ function! s:ToggleSign( sign, mode, lnum ) "        {{{2
     if a:mode ==? "place"
       let b:sig_markers[l:lnum] = a:sign . get( b:sig_markers, l:lnum, "" )
     else
-      let b:sig_markers[l:lnum] = substitute( b:sig_markers[l:lnum], "\\C" . a:sign, "", "" )
+      let b:sig_markers[l:lnum] = substitute( b:sig_markers[l:lnum], "\\C" . escape( a:sign, '$^' ), "", "" )
 
       " If there are no markers on the line, delete signs on that line
       if b:sig_markers[l:lnum] == ""
