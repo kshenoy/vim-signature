@@ -3,14 +3,14 @@ vim-signature has undergone some changes recently, the biggest of which are
 * Maps are specified using a hash. My hope is that this will allow finer control over which maps to enable/disable and eliminate all the default mapping variables  
 * Maps are now global by default. It was cumbersome to think of a good way to implement buffer-specific maps and support it. The previous method was clunky at best ( see the number of issues related to maps ) and caused more trouble than they were worth. So I decided to get rid of it.  
 
-Q. So how does this affect me?  
-A. Well, if you were using the default maps then I've tried to change things as little as possible (at least in the frontend) and I hope it shouldn't. But if you were using custom maps, then you'll have to set it up again using the new hash method.  
+**Q.** So how does this affect me?  
+**A.** Well, if you were using the default maps then I've tried to change things as little as possible (at least in the frontend) and I hope it shouldn't. But if you were using custom maps, then you'll have to set it up again using the new hash method.  
 
-Q. Are there any changes not related to maps?
-A. Why yes, there is now a new method to jump to marker of any type. This is mapped to `]=` and `[=` by default.  
+**Q.** Are there any changes not related to maps?  
+**A.** Why yes, there is now a new method to jump to marker of any type. This is mapped to `]=` and `[=` by default.  
    There is also a new setting to control if the signs should be shown by default at startup. Check out g:SignatureEnabledAtStartup  
 
-For those who wish to continue the older version, I've created a new branch `stable_4104e0bb6c`  
+For those who wish to continue the older version, I've created a new branch [here](https://github.com/kshenoy/vim-signature/tree/stable_4104e0bb6c)  
   
 
 # vim-signature
