@@ -484,7 +484,6 @@ function! signature#Toggle() "                      {{{2
 
   " If Signature is not enabled, return
   let b:sig_enabled = ( exists('b:sig_enabled') ? !b:sig_enabled : g:SignatureEnabledAtStartup )
-  if !b:sig_enabled | return | endif
 
   if b:sig_enabled
     " Signature enabled ==> Refresh signs
