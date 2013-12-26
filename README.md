@@ -62,8 +62,8 @@ Once that's done, out of the box, the followings mappings are defined
   m<S-[0-9]>   : Remove all markers of the same type
   ]-           : Jump to next line having same marker
   [-           : Jump to prev line having same marker
-  ]=           : Jump to next line having same marker
-  [=           : Jump to prev line having same marker
+  ]=           : Jump to next line having any marker
+  [=           : Jump to prev line having any marker
   m<BackSpace> : Remove all markers
 ````
 
