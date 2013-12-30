@@ -212,6 +212,13 @@ Set up Signature the way you want using the following options
   Control if the signs should be shown by default. If set to 0, the signs
   won't be visible until `:SignatureToggleSigns` has been called
 
+                                                 *'g:SignatureDeferPlacement'*
+  Boolean, Default: 1
+
+  Check if any other plugin has already placed a sign and if set to 1,
+  Signature will hold off from placing a sign. If set to 0, Signature will
+  overwrite any signs that are already present.
+
 
 ==============================================================================
 5. Contributing                                       *signature-contributing*

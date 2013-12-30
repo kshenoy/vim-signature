@@ -49,8 +49,8 @@ endif
 if !exists( 'g:SignatureEnabledAtStartup' )
   let g:SignatureEnabledAtStartup = 1
 endif
-if !exists( 'g:SignatureDeferSigns' )
-  let g:SignatureDeferSigns = 1
+if !exists( 'g:SignatureDeferPlacement' )
+  let g:SignatureDeferPlacement = 1
 endif
 
 

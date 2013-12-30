@@ -270,17 +270,17 @@ function! s:ToggleSign( sign, mode, lnum )        " {{{2
 
   "echom "DEBUG: sign = " . a:sign . ",  mode = " . a:mode . ",  lnum = " . a:lnum
 
-  let l:SignatureIncludeMarkers  = ( exists('b:SignatureIncludeMarkers')  ? b:SignatureIncludeMarkers  : g:SignatureIncludeMarkers )
-  let l:SignatureMarkOrder       = ( exists('b:SignatureMarkOrder')       ? b:SignatureMarkOrder       : g:SignatureMarkOrder )
+  let l:SignatureIncludeMarkers  = ( exists('b:SignatureIncludeMarkers')  ? b:SignatureIncludeMarkers  : g:SignatureIncludeMarkers  )
+  let l:SignatureMarkOrder       = ( exists('b:SignatureMarkOrder')       ? b:SignatureMarkOrder       : g:SignatureMarkOrder       )
   let l:SignaturePrioritizeMarks = ( exists('b:SignaturePrioritizeMarks') ? b:SignaturePrioritizeMarks : g:SignaturePrioritizeMarks )
-  let l:SignatureDeferSigns      = ( exists('b:SignatureDeferSigns')      ? b:SignatureDeferSigns      : g:SignatureDeferSigns )
+  let l:SignatureDeferPlacement  = ( exists('b:SignatureDeferPlacement')  ? b:SignatureDeferPlacement  : g:SignatureDeferPlacement  )
 
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
   " Place sign only if there are no signs from other plugins (eg. syntastic)
   let l:present_signs = signature#SignInfo(1)
-  if l:SignatureDeferSigns && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
+  if l:SignatureDeferPlacement && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
     return
   endif
 
