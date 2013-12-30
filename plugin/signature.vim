@@ -49,6 +49,9 @@ endif
 if !exists( 'g:SignatureEnabledAtStartup' )
   let g:SignatureEnabledAtStartup = 1
 endif
+if !exists( 'g:SignatureDeferSigns' )
+  let g:SignatureDeferSigns = 1
+endif
 
 
 
@@ -64,7 +67,7 @@ if has('autocmd')
 endif
 
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
-command! -nargs=0 SignatureRefresh     call signature#SignRefresh(1)
+command! -nargs=0 SignatureRefresh     call signature#SignRefresh( "force" )
 
 
 

@@ -4,12 +4,12 @@
 "
 " Helper Functions                                  {{{1
 "
-function! s:NumericSort(x, y) "                     {{{2
+function! s:NumericSort(x, y)                     " {{{2
   return a:x - a:y
 endfunction
 
 
-function! s:MarksList(...) "                        {{{2
+function! s:MarksList(...)                        " {{{2
   " Description: Takes two optional arguments - mode and line no.
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
@@ -45,13 +45,81 @@ function! s:MarksList(...) "                        {{{2
     return map( filter( l:marks_list, 'v:val[1] == ' . a:2 ), 'v:val[0]' )
   endif
 endfunction
+
+
+function! signature#SignInfo(...)                 " {{{2
+  " Description: Returns a dictionary of filenames, each of which is dictionary of line numbers on which signs are placed
+  " Arguments: filename (optional).
+  "            If filename is provided, the return value will contain signs only present in the given file
+  " Eg. {
+  "       'vimrc': {
+  "         '711': {
+  "           'id': '1422',
+  "           'name': 'sig_Sign_1422'
+  "         },
+  "         '676': {
+  "           'id': '1352',
+  "           'name': 'sig_Sign_1352'
+  "         }
+  "       }
+  "     }
+
+  " Redirect the input to a variable
+  redir => l:sign_str
+  silent! sign place
+  redir END
+
+  " Create a Hash of files to store the info.
+  let l:signs_dic = {}
+  " The file that is currently being processed is stored into l:file
+  let l:temp_file = ""
+  let l:file_found = 0
+
+  " Split the string into an array of sentences and filter out empty lines
+  for i in filter( split( l:sign_str, '\n' ), 'v:val =~ "^[S ]"' )
+    let l:file_match = matchstr( i, '\v(Signs for )@<=\S+:@=' )
+
+    if l:file_match != ""
+      let l:temp_file = l:file_match
+      let l:signs_dic[l:temp_file] = {}
+    else
+      " Get sign info
+      let l:info_match = matchlist( i, '\vline\=(\d+)\s*id\=(\S+)\s*name\=(\S+)' )
+      if !empty( l:info_match )
+        let l:signs_dic[l:temp_file][l:info_match[1]] = {
+          \ 'id'   : l:info_match[2],
+          \ 'name' : l:info_match[3],
+          \ }
+      endif
+    endif
+  endfor
+
+  if a:0
+    "" Search for the full path first in the hash ...
+    "let l:curr_filepath = expand('%:p')
+    "if has_key( l:signs_dic, l:curr_filepath )
+    "  return filter( l:signs_dic, 'v:key ==# l:curr_filepath' )[l:curr_filepath]
+    "else
+    " ... if no entry is found for the full path, search for the filename in the hash ...
+    " Since we're searching for the current file, if present in the hash, it'll be as a filename and not the full path
+    let l:curr_filename = expand('%:t')
+    if has_key( l:signs_dic, l:curr_filename )
+      return filter( l:signs_dic, 'v:key ==# l:curr_filename' )[l:curr_filename]
+    endif
+
+    " ... if nothing is found, then return an empty hash to indicate that no signs are present in the current file
+    return {}
+  endif
+
+  return l:signs_dic
+endfunction
 " }}}2
 
 
 "
 " Toggle Marks/Signs                                {{{1
 "
-function! signature#Input() "                    {{{2
+function! signature#Input()                       " {{{2
   " Description: Grab input char
 
   let l:SignatureIncludeMarkers = ( exists('b:SignatureIncludeMarkers') ? b:SignatureIncludeMarkers : g:SignatureIncludeMarkers )
@@ -93,7 +161,7 @@ function! signature#Input() "                    {{{2
 endfunction
 
 
-function! s:ToggleMark( mark ) "                    {{{2
+function! s:ToggleMark( mark )                    " {{{2
   " Description: mark = 'next' : Place new mark on current line else toggle specified mark on current line
   " Arguments:   mark [,a-z,A-Z]
 
@@ -137,7 +205,7 @@ function! s:ToggleMark( mark ) "                    {{{2
 endfunction
 
 
-function! signature#PurgeMarks() "                  {{{2
+function! signature#PurgeMarks()                  " {{{2
   " Description: Remove all marks
 
   let l:used_marks = s:MarksList( "used" )
@@ -155,7 +223,7 @@ function! signature#PurgeMarks() "                  {{{2
 endfunction
 
 
-function! s:ToggleMarker( marker ) "                {{{2
+function! s:ToggleMarker( marker )                " {{{2
   " Description: Toggle marker on current line
   " Arguments: marker [!@#$%^&*()]
 
@@ -166,7 +234,7 @@ function! s:ToggleMarker( marker ) "                {{{2
 endfunction
 
 
-function! signature#PurgeMarkers(...) "             {{{2
+function! signature#PurgeMarkers(...)             " {{{2
   " Description: If argument is given, removes marker only of the specified type else all markers are removed
 
   if empty( b:sig_markers ) | return | endif
@@ -191,7 +259,7 @@ function! signature#PurgeMarkers(...) "             {{{2
 endfunction
 
 
-function! s:ToggleSign( sign, mode, lnum ) "        {{{2
+function! s:ToggleSign( sign, mode, lnum )        " {{{2
   " Description: Enable/Disable/Toggle signs for marks/markers on the specified line number, depending on value of mode
   " Arguments:
   "   sign : The mark/marker whose sign is to be placed/removed/toggled
@@ -205,9 +273,16 @@ function! s:ToggleSign( sign, mode, lnum ) "        {{{2
   let l:SignatureIncludeMarkers  = ( exists('b:SignatureIncludeMarkers')  ? b:SignatureIncludeMarkers  : g:SignatureIncludeMarkers )
   let l:SignatureMarkOrder       = ( exists('b:SignatureMarkOrder')       ? b:SignatureMarkOrder       : g:SignatureMarkOrder )
   let l:SignaturePrioritizeMarks = ( exists('b:SignaturePrioritizeMarks') ? b:SignaturePrioritizeMarks : g:SignaturePrioritizeMarks )
+  let l:SignatureDeferSigns      = ( exists('b:SignatureDeferSigns')      ? b:SignatureDeferSigns      : g:SignatureDeferSigns )
 
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
+
+  " Place sign only if there are no signs from other plugins (eg. syntastic)
+  let l:present_signs = signature#SignInfo(1)
+  if l:SignatureDeferSigns && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
+    return
+  endif
 
   let l:lnum = a:lnum
   let l:id   = ( winbufnr(0) + 1 ) * l:lnum
@@ -252,7 +327,7 @@ function! s:ToggleSign( sign, mode, lnum ) "        {{{2
   endif
   "}}}3
 
-  " TODO: Place sign only if there are no signs from other plugins (eg. syntastic)
+  " Place the sign
   if ( has_key( b:sig_marks, l:lnum ) && ( l:SignaturePrioritizeMarks || !has_key( b:sig_markers, l:lnum )))
     let l:str = substitute( l:SignatureMarkOrder, "\m", strpart( b:sig_marks[l:lnum], 0, 1 ), "" )
     let l:str = substitute( l:str,                "\p", strpart( b:sig_marks[l:lnum], 1, 1 ), "" )
@@ -272,7 +347,7 @@ endfunction
 "
 " Navigation                                        {{{1
 "
-function! signature#GotoMark( dir, loc, mode ) "    {{{2
+function! signature#GotoMark( dir, loc, mode )    " {{{2
   " Arguments:
   "   dir  = next  : Jump forward
   "          prev  : Jump backward
@@ -301,7 +376,7 @@ function! signature#GotoMark( dir, loc, mode ) "    {{{2
 endfunction
 
 
-function! s:GotoMarkByPos( dir ) "                  {{{2
+function! s:GotoMarkByPos( dir )                  " {{{2
   " Description: Jump to next/prev mark by location.
   " Arguments: dir = next : Jump forward
   "                  prev : Jump backward
@@ -327,7 +402,7 @@ function! s:GotoMarkByPos( dir ) "                  {{{2
 endfunction
 
 
-function! s:GotoMarkByAlpha( dir ) "                {{{2
+function! s:GotoMarkByAlpha( dir )                " {{{2
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
   let l:SignatureWrapJumps = ( exists('b:SignatureWrapJumps') ? b:SignatureWrapJumps : g:SignatureWrapJumps )
@@ -384,7 +459,7 @@ function! s:GotoMarkByAlpha( dir ) "                {{{2
 endfunction
 
 
-function! signature#GotoMarker( dir, type ) "       {{{2
+function! signature#GotoMarker( dir, type )       " {{{2
   " Description: Jump to next/prev marker by location.
   " Arguments: dir  = next : Jump forward
   "                   prev : Jump backward
@@ -438,7 +513,7 @@ endfunction
 "
 " Misc                                              {{{1
 "
-function! signature#SignRefresh(...) "              {{{2
+function! signature#SignRefresh(...)              " {{{2
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
   " Arguments: '1' to force a sign refresh
 
@@ -463,7 +538,7 @@ function! signature#SignRefresh(...) "              {{{2
   for j in s:MarksList( "used" )
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
-    if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || ( a:0 > 0 && a:1 )
+    if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || a:0
       call s:ToggleSign( j[0], "remove", 0 )
       call s:ToggleSign( j[0], "place", j[1] )
     endif
@@ -474,7 +549,7 @@ function! signature#SignRefresh(...) "              {{{2
 endfunction
 
 
-function! signature#Toggle() "                      {{{2
+function! signature#Toggle()                      " {{{2
   " Description: Toggles and refreshes sign display in the buffer.
 
   if !exists('b:sig_marks')   | let b:sig_marks   = {} | endif
