@@ -27,12 +27,14 @@ function! s:MarksList(...)                        " {{{2
     let l:marks_list = add(l:marks_list, [i, line("'" . i)])
   endfor
 
-  " Add global (uppercase) marks to list only if it is in use in this buffer or hasn't been used at all.
+  " Add global (uppercase) marks to list
   for i in filter( split( l:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
     let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    if l:buf == bufnr('%') || l:buf == 0
-      let l:marks_list = add(l:marks_list, [i, l:line])
+    " If it is not in use in the current buffer treat it as free
+    if l:buf != bufnr('%')
+      let l:line = 0
     endif
+    let l:marks_list = add(l:marks_list, [i, l:line])
   endfor
 
   if ( a:0 == 0 )
