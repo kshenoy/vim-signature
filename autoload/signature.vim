@@ -74,21 +74,21 @@ function! signature#SignInfo(...)                 " {{{2
   " Create a Hash of files to store the info.
   let l:signs_dic = {}
   " The file that is currently being processed is stored into l:file
-  let l:temp_file = ""
+  let l:match_file = ""
   let l:file_found = 0
 
   " Split the string into an array of sentences and filter out empty lines
   for i in filter( split( l:sign_str, '\n' ), 'v:val =~ "^[S ]"' )
-    let l:file_match = matchstr( i, '\v(Signs for )@<=\S+:@=' )
+    let l:temp_file = matchstr( i, '\v(Signs for )@<=\S+:@=' )
 
-    if l:file_match != ""
-      let l:temp_file = l:file_match
-      let l:signs_dic[l:temp_file] = {}
-    else
+    if l:temp_file != ""
+      let l:match_file = l:temp_file
+      let l:signs_dic[l:match_file] = {}
+    else if l:match_file != ""
       " Get sign info
       let l:info_match = matchlist( i, '\vline\=(\d+)\s*id\=(\S+)\s*name\=(\S+)' )
       if !empty( l:info_match )
-        let l:signs_dic[l:temp_file][l:info_match[1]] = {
+        let l:signs_dic[l:match_file][l:info_match[1]] = {
           \ 'id'   : l:info_match[2],
           \ 'name' : l:info_match[3],
           \ }
