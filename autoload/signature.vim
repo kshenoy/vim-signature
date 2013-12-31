@@ -84,7 +84,7 @@ function! signature#SignInfo(...)                 " {{{2
     if l:temp_file != ""
       let l:match_file = l:temp_file
       let l:signs_dic[l:match_file] = {}
-    elseif l:match_file != ""
+    else
       " Get sign info
       let l:info_match = matchlist( i, '\vline\=(\d+)\s*id\=(\S+)\s*name\=(\S+)' )
       if !empty( l:info_match )
@@ -132,17 +132,17 @@ function! signature#Input()                       " {{{2
   let l:char  = nr2char( l:ascii )
 
   " Check if 'PlaceNextMark', 'PurgeMarks' or 'PurgeMarkers' was called
-  if g:SignatureMap['PlaceNextMark'] == "<CR>"    && l:ascii == 13   | return s:ToggleMark('next')     | endif
-  if g:SignatureMap['PlaceNextMark'] == "<Space>" && l:ascii == 32   | return s:ToggleMark('next')     | endif
-  if l:ascii == eval( '"\' . g:SignatureMap['PlaceNextMark'] . '"' ) | return s:ToggleMark('next')     | endif
+  if g:SignatureMap['PlaceNextMark'] == "<CR>"    && l:ascii == 13  | return s:ToggleMark('next')     | endif
+  if g:SignatureMap['PlaceNextMark'] == "<Space>" && l:ascii == 32  | return s:ToggleMark('next')     | endif
+  if l:char == eval( '"\' . g:SignatureMap['PlaceNextMark'] . '"' ) | return s:ToggleMark('next')     | endif
 
-  if g:SignatureMap['PurgeMarks']    == "<CR>"    && l:ascii == 13   | return signature#PurgeMarks()   | endif
-  if g:SignatureMap['PurgeMarks']    == "<Space>" && l:ascii == 32   | return signature#PurgeMarks()   | endif
-  if l:ascii == eval( '"\' . g:SignatureMap['PurgeMarks'] . '"' )    | return signature#PurgeMarks()   | endif
+  if g:SignatureMap['PurgeMarks']    == "<CR>"    && l:ascii == 13  | return signature#PurgeMarks()   | endif
+  if g:SignatureMap['PurgeMarks']    == "<Space>" && l:ascii == 32  | return signature#PurgeMarks()   | endif
+  if l:char == eval( '"\' . g:SignatureMap['PurgeMarks'] . '"' )    | return signature#PurgeMarks()   | endif
 
-  if g:SignatureMap['PurgeMarkers']  == "<CR>"    && l:ascii == 13   | return signature#PurgeMarkers() | endif
-  if g:SignatureMap['PurgeMarkers']  == "<Space>" && l:ascii == 32   | return signature#PurgeMarkers() | endif
-  if l:ascii == eval( '"\' . g:SignatureMap['PurgeMarkers'] . '"' )  | return signature#PurgeMarkers() | endif
+  if g:SignatureMap['PurgeMarkers']  == "<CR>"    && l:ascii == 13  | return signature#PurgeMarkers() | endif
+  if g:SignatureMap['PurgeMarkers']  == "<Space>" && l:ascii == 32  | return signature#PurgeMarkers() | endif
+  if l:char == eval( '"\' . g:SignatureMap['PurgeMarkers'] . '"' )  | return signature#PurgeMarkers() | endif
 
   " ... if the input is not a number eg. '!' ==> Delete all '!' markers
   if stridx( l:SignatureIncludeMarkers, l:char ) >= 0
