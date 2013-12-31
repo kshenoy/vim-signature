@@ -84,7 +84,7 @@ function! signature#SignInfo(...)                 " {{{2
     if l:temp_file != ""
       let l:match_file = l:temp_file
       let l:signs_dic[l:match_file] = {}
-    else
+    elseif l:match_file = ""
       " Get sign info
       let l:info_match = matchlist( i, '\vline\=(\d+)\s*id\=(\S+)\s*name\=(\S+)' )
       if !empty( l:info_match )
