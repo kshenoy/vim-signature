@@ -534,13 +534,6 @@ function! signature#SignRefresh(...)              " {{{2
 
   for i in s:MarksList( "free" )
     " ... remove it
-    "let l:arr = keys( filter( copy(b:sig_marks), 'v:val =~# i' ))
-    "if !empty( l:arr )
-      "if len( l:arr ) > 1
-        "echoe "Unexpected multiple signs of the same mark found"
-      "endif
-      "call s:ToggleSign( i, "remove", l:arr[0] )
-    "endif
     call s:ToggleSign( i, "remove", 0 )
   endfor
 
