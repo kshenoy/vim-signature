@@ -280,11 +280,12 @@ function! s:ToggleSign( sign, mode, lnum )        " {{{2
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
+  " FIXME: Highly inefficient. Needs work
   " Place sign only if there are no signs from other plugins (eg. syntastic)
-  let l:present_signs = signature#SignInfo(1)
-  if l:SignatureDeferPlacement && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
-    return
-  endif
+  "let l:present_signs = signature#SignInfo(1)
+  "if l:SignatureDeferPlacement && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
+    "return
+  "endif
 
   let l:lnum = a:lnum
   let l:id   = ( winbufnr(0) + 1 ) * l:lnum
@@ -533,13 +534,14 @@ function! signature#SignRefresh(...)              " {{{2
 
   for i in s:MarksList( "free" )
     " ... remove it
-    let l:arr = keys( filter( copy(b:sig_marks), 'v:val =~# i' ))
-    if !empty( l:arr )
-      if len( l:arr ) > 1
-        echoe "Unexpected multiple signs of the same mark found"
-      endif
-      call s:ToggleSign( i, "remove", l:arr[0] )
-    endif
+    "let l:arr = keys( filter( copy(b:sig_marks), 'v:val =~# i' ))
+    "if !empty( l:arr )
+      "if len( l:arr ) > 1
+        "echoe "Unexpected multiple signs of the same mark found"
+      "endif
+      "call s:ToggleSign( i, "remove", l:arr[0] )
+    "endif
+    call s:ToggleSign( i, "remove", 0 )
   endfor
 
   " Add signs for marks ...
