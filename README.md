@@ -2,7 +2,7 @@
 vim-signature has undergone some changes recently, the biggest of which are  
 * Maps are specified using a hash. My hope is that this will allow finer control over which maps to enable/disable and eliminate all the default mapping variables  
 * Maps are now global by default. It was cumbersome to think of a good way to implement buffer-specific maps and support it. The previous method was clunky at best ( see the number of issues related to maps ) and caused more trouble than they were worth. So I decided to get rid of it.  
-* Added option to defer the placement of signs if any other plugin has already placed one.  
+* ~~Added option to defer the placement of signs if any other plugin has already placed one.~~ Code was highly ineffiecient. Removed it temporarily  
 
 **Q.** So how does this affect me?  
 **A.** Well, if you were using the default maps then I've tried to change things as little as possible (at least in the frontend) and I hope it shouldn't. But if you were using custom maps, then you'll have to set it up again using the new hash method.  
