@@ -96,55 +96,55 @@ if !has_key( g:SignatureMap, 'GotoNextMarkerAny' ) | let g:SignatureMap['GotoNex
 if !has_key( g:SignatureMap, 'GotoPrevMarkerAny' ) | let g:SignatureMap['GotoPrevMarkerAny'] = "[="      | endif
 
 if g:SignatureMap['Leader'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['Leader'] . ' :call signature#Input()<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['Leader'] . ' :call signature#Input()<CR>'
 endif
 
 if g:SignatureMap['GotoNextLineAlpha'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextLineAlpha'] . ' :call signature#GotoMark( "next", "line", "alpha" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextLineAlpha'] . ' :call signature#GotoMark( "next", "line", "alpha" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevLineAlpha'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevLineAlpha'] . ' :call signature#GotoMark( "prev", "line", "alpha" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevLineAlpha'] . ' :call signature#GotoMark( "prev", "line", "alpha" )<CR>'
 endif
 
 if g:SignatureMap['GotoNextSpotAlpha'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextSpotAlpha'] . ' :call signature#GotoMark( "next", "spot", "alpha" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextSpotAlpha'] . ' :call signature#GotoMark( "next", "spot", "alpha" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevSpotAlpha'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevSpotAlpha'] . ' :call signature#GotoMark( "prev", "spot", "alpha" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevSpotAlpha'] . ' :call signature#GotoMark( "prev", "spot", "alpha" )<CR>'
 endif
 
 if g:SignatureMap['GotoNextLineByPos'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextLineByPos'] . ' :call signature#GotoMark( "next", "line", "pos" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextLineByPos'] . ' :call signature#GotoMark( "next", "line", "pos" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevLineByPos'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevLineByPos'] . ' :call signature#GotoMark( "prev", "line", "pos" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevLineByPos'] . ' :call signature#GotoMark( "prev", "line", "pos" )<CR>'
 endif
 
 if g:SignatureMap['GotoNextSpotByPos'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextSpotByPos'] . ' :call signature#GotoMark( "next", "spot", "pos" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextSpotByPos'] . ' :call signature#GotoMark( "next", "spot", "pos" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevSpotByPos'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevSpotByPos'] . ' :call signature#GotoMark( "prev", "spot", "pos" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevSpotByPos'] . ' :call signature#GotoMark( "prev", "spot", "pos" )<CR>'
 endif
 
 if g:SignatureMap['GotoNextMarker'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextMarker'] . ' :call signature#GotoMarker( "next", "same" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextMarker'] . ' :call signature#GotoMarker( "next", "same" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevMarker'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevMarker'] . ' :call signature#GotoMarker( "prev", "same" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevMarker'] . ' :call signature#GotoMarker( "prev", "same" )<CR>'
 endif
 
 if g:SignatureMap['GotoNextMarkerAny'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoNextMarkerAny'] . ' :call signature#GotoMarker( "next", "any" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoNextMarkerAny'] . ' :call signature#GotoMarker( "next", "any" )<CR>'
 endif
 
 if g:SignatureMap['GotoPrevMarkerAny'] != ""
-  execute 'nmap <silent> <unique> ' . g:SignatureMap['GotoPrevMarkerAny'] . ' :call signature#GotoMarker( "prev", "any" )<CR>'
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevMarkerAny'] . ' :call signature#GotoMarker( "prev", "any" )<CR>'
 endif
 
 
