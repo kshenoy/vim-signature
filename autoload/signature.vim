@@ -417,7 +417,7 @@ function! s:GotoMarkByAlpha( dir )                " {{{2
 
   " If there is only one mark in the current file, then return the same
   if ( len(l:used_marks) == 1 )
-    return l:used_marks[0]
+    return l:used_marks[0][0]
   endif
 
   " Since we can place multiple marks on a line, to jump by alphabetical order we need to know what the current mark is.
