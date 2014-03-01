@@ -6,8 +6,11 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Exit when app has already been loaded (or "compatible" mode set)
-if exists("g:loaded_Signature") || &cp
+" Exit if the signs feature is not available or if the app has already been loaded (or "compatible" mode set)
+if !has('signs') || &cp
+  finish
+endif
+if exists("g:loaded_Signature")
   finish
 endif
 let g:loaded_Signature = "3"
