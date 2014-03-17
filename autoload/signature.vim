@@ -585,3 +585,22 @@ function! signature#Toggle()                      " {{{2
   endif
 
 endfunction
+
+function! signature#ListLocalMarks()              " {{{2
+  " Description: Opens and populates location list with local marks
+    call setloclist(0,
+                \filter(
+                \map(
+                \copy(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']),
+                \'{"bufnr": bufnr("%"), "lnum": line("''" . v:val), "col": col("''" . v:val),
+                \"type": "m", "text": v:val . ": " . getline(line("''" . v:val))}'),
+                \'v:val.lnum > 0'))
+    lopen
+    if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
+        nnoremap <buffer> <silent> q        :q<CR>
+        noremap  <buffer> <silent> <ESC>    :q<CR>
+        noremap  <buffer> <silent> <ENTER>  <CR>:lcl<CR>
+    endif
+endfunction
+
+" }}}2
