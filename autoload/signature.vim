@@ -209,11 +209,12 @@ function! s:ToggleMark( mark )                    " {{{2
 
   if a:mark == "next"
     " Place new mark
-    let l:mark = s:MarksList( "free" )[0]
-    if l:mark == ""
+    let l:marks_list = s:MarksList( "free" )
+    if empty(l:marks_list)
       echoe "Signature: No free marks left."
       return
     endif
+    let l:mark = l:marks_list[0]
 
     execute 'normal! m' . l:mark
     call s:ToggleSign( l:mark, "place", l:lnum )
