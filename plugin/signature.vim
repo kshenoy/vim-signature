@@ -55,6 +55,12 @@ endif
 if !exists( 'g:SignatureDeferPlacement' )
   let g:SignatureDeferPlacement = 1
 endif
+if !exists( 'g:SignatureUnconditionallyRecycleMarks' )
+  let g:SignatureUnconditionallyRecycleMarks = 0
+endif
+if !exists( 'g:SignatureErrorIfNoAvailableMarks' )
+  let g:SignatureErrorIfNoAvailableMarks = 1
+endif
 
 
 

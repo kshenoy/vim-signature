@@ -115,11 +115,20 @@ function! signature#SignInfo(...)                 " {{{2
 
   return l:signs_dic
 endfunction
+
+function! s:ReportNoAvailableMarks()
+    if g:SignatureErrorIfNoAvailableMarks
+      echoe "Signature: No free marks left."
+    else
+      echohl WarningMsg
+      echomsg "Signature: No free marks left."
+      echohl None
+    endif
+endfunction
+
 " }}}2
 
-"
 " Patched-in support fron Nark-Tools                                  {{{2
-"
 let s:local_marks_nlist = split("abcdefghijklmnopqrstuvwxyz", '\zs')
 
 function! s:LocalMarkList()
@@ -209,10 +218,27 @@ function! s:ToggleMark( mark )                    " {{{2
 
   if a:mark == "next"
     " Place new mark
+
+    " get new mark
     let l:marks_list = s:MarksList( "free" )
     if empty(l:marks_list)
-      echoe "Signature: No free marks left."
-      return
+      if g:SignatureUnconditionallyRecycleMarks
+        " reuse existing mark
+        let l:used_marks = s:UsedMarks()
+        if empty(l:used_marks)
+          " no existing mark available
+          call s:ReportNoAvailableMarks()
+          return
+        else
+          " reuse first used mark
+          call s:ToggleMark(l:used_marks[0])
+          return
+        endif
+      else
+        " no marks available and mark re-use not in effect
+        call s:ReportNoAvailableMarks()
+        return
+      endif
     endif
     let l:mark = l:marks_list[0]
 

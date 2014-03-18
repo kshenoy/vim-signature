@@ -228,6 +228,23 @@ Set up Signature the way you want using the following options
   Signature will hold off from placing a sign. If set to 0, Signature will
   overwrite any signs that are already present.
 
+                                    *'g:SignatureUnconditionallyRecycleMarks'*
+  Boolean, Default: 0
+
+  Controls behavior when trying to place next available mark and all marks
+  have been used. If set to 0, then either an error or warning message will be
+  emitted, depending on the setting of |g:SignatureErrorIfNoAvailableMarks|.
+  If set to 1, then the first local mark (e.g., 'a') will be removed from its
+  existing location and applied to the current line.
+
+
+                                        *'g:SignatureErrorIfNoAvailableMarks'*
+  Boolean, Default: 1
+
+  Controls behavior when unable to place a new mark. If set to 1, then an
+  error is raised. If set to 0, then just a warning message.
+
+
 
 ==============================================================================
 5. Contributing                                       *signature-contributing*
