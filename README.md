@@ -50,6 +50,7 @@ Once that's done, out of the box, the followings mappings are defined
   m[a-zA-Z]    : Toggle mark
   m<Space>     : Delete all marks
   m,           : Place the next available mark
+  m.           : If no mark on line, place the next available mark. Otherwise, remove (first) existing mark.
   ]`           : Jump to next mark
   [`           : Jump to prev mark
   ]'           : Jump to start of next line containing a mark

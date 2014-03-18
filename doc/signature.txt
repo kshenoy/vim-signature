@@ -28,6 +28,8 @@ Out of the box, the followings mappings are defined by default
   m[a-zA-Z]    Toggle mark and display it in the leftmost column
 
   m,           Place the next available mark
+  m.           If no mark on line, place the next available mark. Otherwise,
+               remove (first) existing mark.
   m<Space>     Delete all marks
   ]`           Jump to next mark
   [`           Jump to prev mark
@@ -78,6 +80,7 @@ Set up Signature the way you want using the following options
     let g:SignatureMap = {
       \ 'Leader'             :  "m",
       \ 'PlaceNextMark'      :  ",",
+      \ 'ToggleMarkAtLine'   :  ".",
       \ 'PurgeMarks'         :  "<Space>",
       \ 'PurgeMarkers'       :  "<BS>",
       \ 'GotoNextLineAlpha'  :  "']",
@@ -124,6 +127,9 @@ Set up Signature the way you want using the following options
   For eg. If this key is set to `<leader>m`,
     `<leader>ma`       will toggle the mark 'a' on the current line
     `<leader>m,`       will place the next available mark
+    `<leader>m.`       will place the next available mark if there are no
+                     marks already on the line; otherwise, will remove
+                     first mark from line
     `<leader>m<Space>` will delete all marks
     `<leader>m1`       will toggle the marker '!'
     `<leader>m!`       will remove all the '!' markers
