@@ -71,8 +71,7 @@ endif
 
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
 command! -nargs=0 SignatureRefresh     call signature#SignRefresh( "force" )
-
-
+command! -nargs=0 SignatureList        call signature#ListLocalMarks
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Create Maps                {{{1
@@ -97,6 +96,7 @@ if !has_key( g:SignatureMap, 'GotoNextMarker'    ) | let g:SignatureMap['GotoNex
 if !has_key( g:SignatureMap, 'GotoPrevMarker'    ) | let g:SignatureMap['GotoPrevMarker'   ] = "[-"      | endif
 if !has_key( g:SignatureMap, 'GotoNextMarkerAny' ) | let g:SignatureMap['GotoNextMarkerAny'] = "]="      | endif
 if !has_key( g:SignatureMap, 'GotoPrevMarkerAny' ) | let g:SignatureMap['GotoPrevMarkerAny'] = "[="      | endif
+if !has_key( g:SignatureMap, 'ListLocalMarks   ' ) | let g:SignatureMap['ListLocalMarks'   ] = "'?"      | endif
 
 if g:SignatureMap['Leader'] != ""
   execute 'nnoremap <silent> <unique> ' . g:SignatureMap['Leader'] . ' :call signature#Input()<CR>'
@@ -150,6 +150,9 @@ if g:SignatureMap['GotoPrevMarkerAny'] != ""
   execute 'nnoremap <silent> <unique> ' . g:SignatureMap['GotoPrevMarkerAny'] . ' :call signature#GotoMarker( "prev", "any" )<CR>'
 endif
 
+if g:SignatureMap['ListLocalMarks'] != ""
+  execute 'nnoremap <silent> <unique> ' . g:SignatureMap['ListLocalMarks'] . ' :call signature#ListLocalMarks()<CR>'
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -223,4 +226,5 @@ if ( g:SignatureMenu != 0 ) && has('gui_running')
 
   execute 'menu  <silent> ' . g:SignatureMenu . '.Rem&ove\ all\ markers<Tab>' . g:SignatureMap['Leader'] . g:SignatureMap['PurgeMarkers'] . ' :call signature#PurgeMarkers()<CR>'
 endif
+
 " }}}1

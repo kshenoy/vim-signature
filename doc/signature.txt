@@ -37,6 +37,7 @@ Out of the box, the followings mappings are defined by default
   `[           Jump by alphabetical order to prev mark
   ']           Jump by alphabetical order to start of next line having a mark
   '[           Jump by alphabetical order to start of prev line having a mark
+  '?           Open location list and display local marks
 
   m[0-9]       Toggle the corresponding marker !@#$%^&*()
   m<S-[0-9]>   Remove all markers of the same type
@@ -91,6 +92,8 @@ Set up Signature the way you want using the following options
       \ 'GotoPrevMarker'     :  "[-",
       \ 'GotoNextMarkerAny'  :  "]=",
       \ 'GotoPrevMarkerAny'  :  "[=",
+      \ 'GotoPrevMarkerAny'  :  "[=",
+      \ 'ListLocalMarks'     :  "'?",
       \ }
 
   By default, it defines the mappings as shown in |signature-mappings|

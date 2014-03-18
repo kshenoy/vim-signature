@@ -1,50 +1,50 @@
-### NOTE  
-vim-signature has undergone some changes recently, the biggest of which are  
-* Maps are specified using a hash. My hope is that this will allow finer control over which maps to enable/disable and eliminate all the default mapping variables  
-* Maps are now global by default. It was cumbersome to think of a good way to implement buffer-specific maps and support it. The previous method was clunky at best ( see the number of issues related to maps ) and caused more trouble than they were worth. So I decided to get rid of it.  
-* ~~Added option to defer the placement of signs if any other plugin has already placed one.~~ Code was highly inefficient. Removed it temporarily  
+### NOTE
+vim-signature has undergone some changes recently, the biggest of which are
+* Maps are specified using a hash. My hope is that this will allow finer control over which maps to enable/disable and eliminate all the default mapping variables
+* Maps are now global by default. It was cumbersome to think of a good way to implement buffer-specific maps and support it. The previous method was clunky at best ( see the number of issues related to maps ) and caused more trouble than they were worth. So I decided to get rid of it.
+* ~~Added option to defer the placement of signs if any other plugin has already placed one.~~ Code was highly inefficient. Removed it temporarily
 
-**Q.** So how does this affect me?  
-**A.** Well, if you were using the default maps then I've tried to change things as little as possible (at least in the frontend) and I hope it shouldn't. But if you were using custom maps, then you'll have to set it up again using the new hash method.  
+**Q.** So how does this affect me?
+**A.** Well, if you were using the default maps then I've tried to change things as little as possible (at least in the frontend) and I hope it shouldn't. But if you were using custom maps, then you'll have to set it up again using the new hash method.
 
-**Q.** Are there any changes not related to maps?  
-**A.** Why yes, there is now a new method to jump to marker of any type. This is mapped to `]=` and `[=` by default.  
-   There is also a new setting to control if the signs should be shown by default at startup. Check out g:SignatureEnabledAtStartup  
+**Q.** Are there any changes not related to maps?
+**A.** Why yes, there is now a new method to jump to marker of any type. This is mapped to `]=` and `[=` by default.
+   There is also a new setting to control if the signs should be shown by default at startup. Check out g:SignatureEnabledAtStartup
 
-For those who wish to continue using the older version, I've created a new branch [here](https://github.com/kshenoy/vim-signature/tree/stable_4104e0bb6c)  
-  
+For those who wish to continue using the older version, I've created a new branch [here](https://github.com/kshenoy/vim-signature/tree/stable_4104e0bb6c)
+
 
 # vim-signature
-vim-signature is a plugin to place, toggle and display marks.  
-  
-Apart from the above, you can also  
-* Navigate forward/backward by position/alphabetical order  
-* Displaying multiple marks (upto 2, limited by the signs feature)  
-* Placing custom signs !@#$%^&*() as visual markers  
+vim-signature is a plugin to place, toggle and display marks.
+
+Apart from the above, you can also
+* Navigate forward/backward by position/alphabetical order
+* Displaying multiple marks (upto 2, limited by the signs feature)
+* Placing custom signs !@#$%^&*() as visual markers
 
 
-### Screenshots  
-![vim-signature_marks_markers](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_marks_markers.png?raw=true)  
-Displays the marks as signs. Also place visual markers  
-  
-![Mark jumps](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_mark_jumps.gif?raw=true)  
-Alphabetical mark traversal and more.  
+### Screenshots
+![vim-signature_marks_markers](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_marks_markers.png?raw=true)
+Displays the marks as signs. Also place visual markers
 
-More screenshots [here](http://imgur.com/a/3KQyt)  
-  
-### Vim.org mirror  
-If you like the plugin, spread the love and rate at http://www.vim.org/scripts/script.php?script_id=4118  
+![Mark jumps](https://github.com/kshenoy/vim-signature/blob/images/screens/vim-signature_mark_jumps.gif?raw=true)
+Alphabetical mark traversal and more.
+
+More screenshots [here](http://imgur.com/a/3KQyt)
+
+### Vim.org mirror
+If you like the plugin, spread the love and rate at http://www.vim.org/scripts/script.php?script_id=4118
 
 
-## Requirements  
-Requires Vim to be compiled with +signs to display marks.  
+## Requirements
+Requires Vim to be compiled with +signs to display marks.
 
 
 ## Installation
-I recommend using a plugin manager to do the grunt work for you.  
-If for some reason, you do not want to use any of them, then unzip the contents of the .zip file to your ~/.vim directory.  
+I recommend using a plugin manager to do the grunt work for you.
+If for some reason, you do not want to use any of them, then unzip the contents of the .zip file to your ~/.vim directory.
 
-Once that's done, out of the box, the followings mappings are defined  
+Once that's done, out of the box, the followings mappings are defined
 
 ````
   m[a-zA-Z]    : Toggle mark
@@ -58,6 +58,7 @@ Once that's done, out of the box, the followings mappings are defined
   `[           : Jump by alphabetical order to prev mark
   ']           : Jump by alphabetical order to start of next line containing a mark
   '[           : Jump by alphabetical order to start of prev line containing a mark
+  '?           : Open location list and display local marks
 
   m[0-9]       : Toggle the corresponding marker !@#$%^&*()
   m<S-[0-9]>   : Remove all markers of the same type
