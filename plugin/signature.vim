@@ -55,6 +55,12 @@ endif
 if !exists( 'g:SignatureDeferPlacement' )
   let g:SignatureDeferPlacement = 1
 endif
+if !exists( 'g:SignatureUnconditionallyRecycleMarks' )
+  let g:SignatureUnconditionallyRecycleMarks = 0
+endif
+if !exists( 'g:SignatureErrorIfNoAvailableMarks' )
+  let g:SignatureErrorIfNoAvailableMarks = 1
+endif
 
 
 
@@ -83,6 +89,7 @@ if !exists ('g:SignatureMap'                     ) | let g:SignatureMap         
 if !has_key( g:SignatureMap, 'Leader'            ) | let g:SignatureMap['Leader'           ] = "m"       | endif
 if !has_key( g:SignatureMap, 'PlaceNextMark'     ) | let g:SignatureMap['PlaceNextMark'    ] = ","       | endif
 if !has_key( g:SignatureMap, 'ToggleMarkAtLine'  ) | let g:SignatureMap['ToggleMarkAtLine' ] = "."       | endif
+if !has_key( g:SignatureMap, 'PurgeMarksAtLine'  ) | let g:SignatureMap['PurgeMarksAtLine' ] = "-"       | endif
 if !has_key( g:SignatureMap, 'PurgeMarks'        ) | let g:SignatureMap['PurgeMarks'       ] = "<Space>" | endif
 if !has_key( g:SignatureMap, 'PurgeMarkers'      ) | let g:SignatureMap['PurgeMarkers'     ] = "<BS>"    | endif
 if !has_key( g:SignatureMap, 'GotoNextLineAlpha' ) | let g:SignatureMap['GotoNextLineAlpha'] = "']"      | endif

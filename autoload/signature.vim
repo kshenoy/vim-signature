@@ -115,11 +115,20 @@ function! signature#SignInfo(...)                 " {{{2
 
   return l:signs_dic
 endfunction
+
+function! s:ReportNoAvailableMarks()
+    if g:SignatureErrorIfNoAvailableMarks
+      echoe "Signature: No free marks left."
+    else
+      echohl WarningMsg
+      echomsg "Signature: No free marks left."
+      echohl None
+    endif
+endfunction
+
 " }}}2
 
-"
 " Patched-in support fron Nark-Tools                                  {{{2
-"
 let s:local_marks_nlist = split("abcdefghijklmnopqrstuvwxyz", '\zs')
 
 function! s:LocalMarkList()
@@ -156,6 +165,10 @@ function! signature#Input()                       " {{{2
   if g:SignatureMap['ToggleMarkAtLine'] == "<CR>"    && l:ascii == 13  | return s:ToggleMarkAtLine()      | endif
   if g:SignatureMap['ToggleMarkAtLine'] == "<Space>" && l:ascii == 32  | return s:ToggleMarkAtLine()      | endif
   if l:char == eval( '"\' . g:SignatureMap['ToggleMarkAtLine'] . '"' ) | return s:ToggleMarkAtLine()      | endif
+
+  if g:SignatureMap['PurgeMarksAtLine'] == "<CR>"    && l:ascii == 13  | return s:PurgeMarksAtLine()      | endif
+  if g:SignatureMap['PurgeMarksAtLine'] == "<Space>" && l:ascii == 32  | return s:PurgeMarksAtLine()      | endif
+  if l:char == eval( '"\' . g:SignatureMap['PurgeMarksAtLine'] . '"' ) | return s:PurgeMarksAtLine()      | endif
 
   if g:SignatureMap['PurgeMarks']    == "<CR>"    && l:ascii == 13     | return signature#PurgeMarks()   | endif
   if g:SignatureMap['PurgeMarks']    == "<Space>" && l:ascii == 32     | return signature#PurgeMarks()   | endif
@@ -201,6 +214,22 @@ function! s:ToggleMarkAtLine()                    " {{{2
 endfunction
 " }}}2
 
+function! s:PurgeMarksAtLine()                    " {{{2
+  " Description: If no mark on current line, add one. If marks are on the
+  " current line, remove one.
+  let l:lnum = line('.')
+  " get list of marks wt this line (from s:MarksAt())
+  let l:marks_here = map(filter(s:LocalMarkList(), 'v:val[1]==' . l:lnum), 'v:val[0]')
+  if !empty(l:marks_here)
+    " delete one mark
+    for l:mark in l:marks_here
+      call s:ToggleMark(l:mark)
+    endfor
+    return
+  endif
+endfunction
+" }}}2
+
 function! s:ToggleMark( mark )                    " {{{2
   " Description: mark = 'next' : Place new mark on current line else toggle specified mark on current line
   " Arguments:   mark [,a-z,A-Z]
@@ -209,10 +238,27 @@ function! s:ToggleMark( mark )                    " {{{2
 
   if a:mark == "next"
     " Place new mark
+
+    " get new mark
     let l:marks_list = s:MarksList( "free" )
     if empty(l:marks_list)
-      echoe "Signature: No free marks left."
-      return
+      if g:SignatureUnconditionallyRecycleMarks
+        " reuse existing mark
+        let l:used_marks = s:UsedMarks()
+        if empty(l:used_marks)
+          " no existing mark available
+          call s:ReportNoAvailableMarks()
+          return
+        else
+          " reuse first used mark
+          call s:ToggleMark(l:used_marks[0])
+          return
+        endif
+      else
+        " no marks available and mark re-use not in effect
+        call s:ReportNoAvailableMarks()
+        return
+      endif
     endif
     let l:mark = l:marks_list[0]
 
