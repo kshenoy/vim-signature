@@ -166,6 +166,10 @@ function! signature#Input()                       " {{{2
   if g:SignatureMap['ToggleMarkAtLine'] == "<Space>" && l:ascii == 32  | return s:ToggleMarkAtLine()      | endif
   if l:char == eval( '"\' . g:SignatureMap['ToggleMarkAtLine'] . '"' ) | return s:ToggleMarkAtLine()      | endif
 
+  if g:SignatureMap['PurgeMarksAtLine'] == "<CR>"    && l:ascii == 13  | return s:PurgeMarksAtLine()      | endif
+  if g:SignatureMap['PurgeMarksAtLine'] == "<Space>" && l:ascii == 32  | return s:PurgeMarksAtLine()      | endif
+  if l:char == eval( '"\' . g:SignatureMap['PurgeMarksAtLine'] . '"' ) | return s:PurgeMarksAtLine()      | endif
+
   if g:SignatureMap['PurgeMarks']    == "<CR>"    && l:ascii == 13     | return signature#PurgeMarks()   | endif
   if g:SignatureMap['PurgeMarks']    == "<Space>" && l:ascii == 32     | return signature#PurgeMarks()   | endif
   if l:char == eval( '"\' . g:SignatureMap['PurgeMarks'] . '"' )       | return signature#PurgeMarks()   | endif
@@ -205,6 +209,22 @@ function! s:ToggleMarkAtLine()                    " {{{2
   else
     " delete one mark
     call s:ToggleMark(l:marks_here[0])
+    return
+  endif
+endfunction
+" }}}2
+
+function! s:PurgeMarksAtLine()                    " {{{2
+  " Description: If no mark on current line, add one. If marks are on the
+  " current line, remove one.
+  let l:lnum = line('.')
+  " get list of marks wt this line (from s:MarksAt())
+  let l:marks_here = map(filter(s:LocalMarkList(), 'v:val[1]==' . l:lnum), 'v:val[0]')
+  if !empty(l:marks_here)
+    " delete one mark
+    for l:mark in l:marks_here
+      call s:ToggleMark(l:mark)
+    endfor
     return
   endif
 endfunction
