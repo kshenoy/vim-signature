@@ -77,7 +77,7 @@ endif
 
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
 command! -nargs=0 SignatureRefresh     call signature#SignRefresh( "force" )
-command! -nargs=0 SignatureList        call signature#ListLocalMarks
+command! -nargs=0 SignatureList        call signature#ListLocalMarks()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Create Maps                {{{1
