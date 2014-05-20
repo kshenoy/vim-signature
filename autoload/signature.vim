@@ -692,7 +692,7 @@ function! signature#CreateMaps()                                                
   " We create separate mappings for PlaceNextMark, PurgeMarks and PurgeMarkers instead of combining it with Leader/Input
   " as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able to identify it.
   " Eg. the nr2char(getchar()) will fail if the user presses a <BS>
-  let s:SignatureMap = ( exists('g:SignatureMap') ? g:SignatureMap : {} )
+  let s:SignatureMap = ( exists('g:SignatureMap') ? copy(g:SignatureMap) : {} )
   if !has_key( s:SignatureMap, 'Leader'            ) | let s:SignatureMap.Leader             =  "m"       | endif
   if !has_key( s:SignatureMap, 'PlaceNextMark'     ) | let s:SignatureMap.PlaceNextMark      =  ","       | endif
   if !has_key( s:SignatureMap, 'ToggleMarkAtLine'  ) | let s:SignatureMap.ToggleMarkAtLine   =  "."       | endif
