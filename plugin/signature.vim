@@ -41,7 +41,7 @@ if !exists( 'g:SignatureMarkOrder' )
   let g:SignatureMarkOrder = "\p\m"
 endif
 if !exists( 'g:SignatureDeleteConfirmation' )
-  let g:SignatureDeleteConfirmation = 1
+  let g:SignatureDeleteConfirmation = 0
 endif
 if !exists( 'g:SignaturePurgeConfirmation' )
   let g:SignaturePurgeConfirmation = 0

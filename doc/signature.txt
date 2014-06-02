@@ -186,10 +186,17 @@ Set up Signature the way you want using the following options
   The highlight group used for marker signs.
 
 
-                                              *'g:SignaturePurgeConfirmation'*
+                                             *'g:SignatureDeleteConfirmation'*
   Boolean, Default: 0
 
   An option for the more clumsy-fingered of us. Asks for confirmation before
+  moving/replacing/overwriting any marks
+
+
+                                              *'g:SignaturePurgeConfirmation'*
+  Boolean, Default: 0
+
+  Similar to g:SignatureDeleteConfirmation. Asks for confirmation before
   deleting all marks/markers
 
 
