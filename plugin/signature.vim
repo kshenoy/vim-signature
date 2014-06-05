@@ -73,7 +73,7 @@ endif
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
-    autocmd BufEnter   * call signature#SignRefresh()
+    autocmd BufEnter,CmdwinEnter * call signature#SignRefresh()
     autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#SignRefresh() | endif
   augroup END
 endif
