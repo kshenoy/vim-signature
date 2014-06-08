@@ -34,14 +34,15 @@ endfunction
 
 
 function! s:MarksList(...)                        " {{{2
-  " Description: Takes two optional arguments - mode and line no.
+  " Description: Takes two optional arguments - mode/line no. and scope
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
   "
-  " Arguments: a:1 (mode) = 'used' : Returns list of [ [used marks, line no.] ]
-  "                         'free' : Returns list of [ free marks ]
-  "            a:2 (line no.)      : Returns list of used marks on current line. Note that mode = 'free' is meaningless
-  "                                  here and thus, is ignored
+  " Arguments: a:1 (mode)  = 'used' : Returns list of [ [used marks, line no.] ]
+  "                          'free' : Returns list of [ free marks ]
+  "                          <lnum> : Returns list of used marks on current line.
+  "            a:2 (scope) = 'b'    : Limits scope to current buffer i.e used/free marks in current buffer
+  "                          'g'    : Set scope to global i.e used/free marks from all buffers
 
   let l:marks_list = []
 
@@ -53,21 +54,23 @@ function! s:MarksList(...)                        " {{{2
   " Add global (uppercase) marks to list
   for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
     let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    " If it is not in use in the current buffer treat it as free
-    if l:buf != bufnr('%')
-      let l:line = 0
+    if ( a:0 > 1) && ( a:2 ==? "b" )
+      " If it is not in use in the current buffer treat it as free
+      if l:buf != bufnr('%')
+        let l:line = 0
+      endif
     endif
     let l:marks_list = add(l:marks_list, [i, l:line])
   endfor
 
   if ( a:0 == 0 )
     return l:marks_list
-  elseif (( a:0 == 1 ) && ( a:1 ==? "used" ))
+  elseif ( a:1 ==? "used" )
     return filter( l:marks_list, 'v:val[1] > 0' )
-  elseif (( a:0 == 1 ) && ( a:1 ==? "free" ))
+  elseif ( a:1 ==? "free" )
     return map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
-  elseif (( a:0 == 2 ) && ( a:2 > 0 ))
-    return map( filter( l:marks_list, 'v:val[1] == ' . a:2 ), 'v:val[0]' )
+  elseif ( a:1 > 0 ) && ( a:1 < line('$'))
+    return map( filter( l:marks_list, 'v:val[1] == ' . a:1 ), 'v:val[0]' )
   endif
 endfunction
 
@@ -257,12 +260,10 @@ function! s:ToggleMark( mark )                    " {{{2
 
   if a:mark == "next"
     " Place new mark
-
-    " get new mark
     let l:marks_list = s:MarksList( "free" )
     if empty(l:marks_list)
       if g:SignatureUnconditionallyRecycleMarks
-        " reuse existing mark
+        " Reuse existing mark
         let l:used_marks = s:UsedMarks()
         if empty(l:used_marks)
           " no existing mark available
@@ -299,7 +300,7 @@ function! s:ToggleMark( mark )                    " {{{2
       " Mark is not present on current line but it may be present somewhere else. We will first place and remove the
       " sign to avoid the shifting of the Foldcolumn when there is only 1 mark placed and we re-place it somewhere else
 
-      " Ask for confirmation before moving mark. l:mark_pos == 0 indicates that the mark was free.
+      " Ask for confirmation before moving mark. l:mark_pos != 0 indicates that the mark was used.
       if (  g:SignatureDeleteConfirmation && ( l:mark_pos != 0 ))
         let choice = confirm("Overwrite mark '" . l:mark ."'?", "&Yes\n&No", 1)
         if choice == 2 | return | endif
@@ -321,7 +322,7 @@ endfunction
 function! signature#PurgeMarks()                  " {{{2
   " Description: Remove all marks
 
-  let l:used_marks = s:MarksList( "used" )
+  let l:used_marks = s:MarksList( "used", "b" )
   if empty( l:used_marks ) | return | endif
 
   if g:SignaturePurgeConfirmation
@@ -513,8 +514,8 @@ endfunction
 function! s:GotoMarkByAlpha( dir )                " {{{2
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
-  let l:used_marks = s:MarksList( "used" )
-  let l:line_marks = s:MarksList( "used", line('.') )
+  let l:used_marks = s:MarksList( "used", "b" )
+  let l:line_marks = s:MarksList( line('.') )
 
   " If there is only one mark in the current file, then return the same
   if ( len(l:used_marks) == 1 )
@@ -610,15 +611,13 @@ function! signature#SignRefresh(...)              " {{{2
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
-  let l:used_marks = map( copy(s:MarksList( "used" )), 'v:val[0]')
-
   for i in s:MarksList( "free" )
     " ... remove it
     call s:ToggleSign( i, "remove", 0 )
   endfor
 
   " Add signs for marks ...
-  for j in s:MarksList( "used" )
+  for j in s:MarksList( "used", "b" )
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
     if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || a:0
