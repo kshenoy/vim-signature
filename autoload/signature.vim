@@ -455,11 +455,11 @@ endfunction
 
 
 " Patched-in support fron Nark-Tools                                                                              " {{{2
-let signature#local_marks_nlist = split("abcdefghijklmnopqrstuvwxyz", '\zs')
+let s:local_marks_nlist = split("abcdefghijklmnopqrstuvwxyz", '\zs')
 
 
 function! signature#LocalMarkList()                                                                                       " {{{2
-  return map(copy(signature#local_marks_nlist), '[v:val, line("''" . v:val)]')
+  return map(copy(s:local_marks_nlist), '[v:val, line("''" . v:val)]')
 endfunction
 
 
@@ -478,7 +478,7 @@ function! signature#ListLocalMarks()              " {{{2
     call setloclist(0,
                 \filter(
                 \map(
-                \copy(signature#local_marks_nlist),
+                \copy(s:local_marks_nlist),
                 \'{"bufnr": bufnr("%"), "lnum": line("''" . v:val), "col": col("''" . v:val),
                 \"type": "m", "text": v:val . ": " . getline(line("''" . v:val))}'),
                 \'v:val.lnum > 0'))
