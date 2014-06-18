@@ -1,4 +1,4 @@
-signature.txt  A plugin to toggle, display and navigate marks
+*signature.txt*  A plugin to toggle, display and navigate marks
 
      _________.__                            __                              ~
     /   _____/|__|   ____    ____  _____   _/  |_  __ __ _______   ____      ~
