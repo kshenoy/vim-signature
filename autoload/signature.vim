@@ -176,7 +176,6 @@ function! signature#Input()                                                     
     return signature#ToggleMark( l:char )
   else
     " l:char is probably one of `'[]<>
-    echom "Defaulting to mark " . l:char
     execute 'normal! m' . l:char
   endif
 endfunction
