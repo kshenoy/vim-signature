@@ -263,6 +263,7 @@ function! signature#ToggleMark( mark )                                          
       " Mark is present on the current line. Remove it and return
       execute 'delmarks ' . l:mark
       call signature#ToggleSign( l:mark, "remove", l:lnum )
+      call signature#ForceGlobalMarkRemoval( l:mark )
       return
 
     else
@@ -288,6 +289,23 @@ function! signature#ToggleMark( mark )                                          
 endfunction
 
 
+function! signature#ForceGlobalMarkRemoval( mark )
+  " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
+  " Arguments:   mark - The mark to delete
+
+  if a:mark !~# '[A-Z]'
+    return
+  endif
+  if !g:SignatureForceRemoveGlobal
+    return
+  endif
+
+  if has('unix')
+    silent! call system('command sed -i "/^' . "'" . a:mark . '/d" ~/.viminfo > /dev/null' )
+  endif
+endfunction
+
+
 function! signature#PurgeMarks()                                                                                  " {{{2
   " Description: Remove all marks
 
@@ -302,6 +320,7 @@ function! signature#PurgeMarks()                                                
   for i in l:used_marks
     silent execute 'delmarks ' . i[0]
     silent call signature#ToggleSign( i[0], "remove", i[1] )
+    call signature#ForceGlobalMarkRemoval(i[0])
   endfor
 endfunction
 

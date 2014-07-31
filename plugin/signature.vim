@@ -64,6 +64,9 @@ endif
 if !exists( 'g:SignatureErrorIfNoAvailableMarks' )
   let g:SignatureErrorIfNoAvailableMarks = 1
 endif
+if !exists( 'g:SignatureForceRemoveGlobal' )
+  let g:SignatureForceRemoveGlobal = 1
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
