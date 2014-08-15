@@ -97,7 +97,6 @@ Set up Signature the way you want using the following options
       \ 'GotoPrevMarker'     :  "[-",
       \ 'GotoNextMarkerAny'  :  "]=",
       \ 'GotoPrevMarkerAny'  :  "[=",
-      \ 'GotoPrevMarkerAny'  :  "[=",
       \ 'ListLocalMarks'     :  "'?",
       \ }
 
