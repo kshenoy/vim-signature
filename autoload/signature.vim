@@ -301,7 +301,24 @@ function! signature#ForceGlobalMarkRemoval( mark )
   endif
 
   if has('unix')
-    silent! call system('command sed -i "/^' . "'" . a:mark . '/d" ~/.viminfo > /dev/null' )
+    let l:filename = expand($HOME . '/.viminfo')
+  else
+    let l:filename = expand($HOME . '/_viminfo')
+  endif
+  if filewritable(l:filename) == 1
+    let l:lines = readfile(l:filename, 'b')
+    call filter(l:lines, 'v:val !~ "^''' . a:mark. '"')
+    if has('win32')
+      " for some reason writefile(_viminfo) only works after editing directly
+      exe "noautocmd split " . l:filename
+      noautocmd write
+      noautocmd bdelete
+    endif
+    call writefile(l:lines, l:filename, 'b')
+  else
+      echohl WarningMsg
+      echomsg "Signature: Unable to read/write .viminfo ('" . l:filename . "')"
+      echohl None
   endif
 endfunction
 
