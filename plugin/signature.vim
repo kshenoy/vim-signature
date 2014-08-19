@@ -19,27 +19,31 @@ let g:loaded_Signature = "3"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Global variables                                                                                                 {{{1
 "
-function s:Set(var, default)
+function! s:Set(var, default)
   if !exists(a:var)
-    execute 'let' a:var '=' a:default
+    if type(a:default)
+      execute 'let' a:var '=' string(a:default)
+    else
+      execute 'let' a:var '=' a:default
+    endif
   endif
 endfunction
-call s:Set( g:SignaturePrioritizeMarks,             1                                                      )
-call s:Set( g:SignatureIncludeMarks,                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
-call s:Set( g:SignatureIncludeMarkers,              ")!@#$%^&*("                                           )
-call s:Set( g:SignatureMarkTextHL,                  "Exception"                                            )
-call s:Set( g:SignatureMarkerTextHL,                "WarningMsg"                                           )
-call s:Set( g:SignatureWrapJumps,                   1                                                      )
-call s:Set( g:SignatureMarkOrder,                   "\p\m"                                                 )
-call s:Set( g:SignatureDeleteConfirmation,          0                                                      )
-call s:Set( g:SignaturePurgeConfirmation,           0                                                      )
-call s:Set( g:SignatureMenu,                        'P&lugin.&Signature'                                   )
-call s:Set( g:SignaturePeriodicRefresh,             1                                                      )
-call s:Set( g:SignatureEnabledAtStartup,            1                                                      )
-call s:Set( g:SignatureDeferPlacement,              1                                                      )
-call s:Set( g:SignatureUnconditionallyRecycleMarks, 0                                                      )
-call s:Set( g:SignatureErrorIfNoAvailableMarks,     1                                                      )
-call s:Set( g:SignatureForceRemoveGlobal,           1                                                      )
+call s:Set( 'g:SignaturePrioritizeMarks',             1                                                      )
+call s:Set( 'g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
+call s:Set( 'g:SignatureIncludeMarkers',              ")!@#$%^&*("                                           )
+call s:Set( 'g:SignatureMarkTextHL',                  "Exception"                                            )
+call s:Set( 'g:SignatureMarkerTextHL',                "WarningMsg"                                           )
+call s:Set( 'g:SignatureWrapJumps',                   1                                                      )
+call s:Set( 'g:SignatureMarkOrder',                   "\p\m"                                                 )
+call s:Set( 'g:SignatureDeleteConfirmation',          0                                                      )
+call s:Set( 'g:SignaturePurgeConfirmation',           0                                                      )
+call s:Set( 'g:SignatureMenu',                        'P&lugin.&Signature'                                   )
+call s:Set( 'g:SignaturePeriodicRefresh',             1                                                      )
+call s:Set( 'g:SignatureEnabledAtStartup',            1                                                      )
+call s:Set( 'g:SignatureDeferPlacement',              1                                                      )
+call s:Set( 'g:SignatureUnconditionallyRecycleMarks', 0                                                      )
+call s:Set( 'g:SignatureErrorIfNoAvailableMarks',     1                                                      )
+call s:Set( 'g:SignatureForceRemoveGlobal',           1                                                      )
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -76,16 +80,16 @@ function! signature#Init()                                                      
     let b:sig_enabled = g:SignatureEnabledAtStartup
   endif
 
-  if !exists('b:SignatureIncludeMarks'   ) | let b:SignatureIncludeMarks    = g:SignatureIncludeMarks    | endif
-  if !exists('b:SignatureIncludeMarkers' ) | let b:SignatureIncludeMarkers  = g:SignatureIncludeMarkers  | endif
-  if !exists('b:SignatureMarkOrder'      ) | let b:SignatureMarkOrder       = g:SignatureMarkOrder       | endif
-  if !exists('b:SignaturePrioritizeMarks') | let b:SignaturePrioritizeMarks = g:SignaturePrioritizeMarks | endif
-  if !exists('b:SignatureDeferPlacement' ) | let b:SignatureDeferPlacement  = g:SignatureDeferPlacement  | endif
-  if !exists('b:SignatureWrapJumps'      ) | let b:SignatureWrapJumps       = g:SignatureWrapJumps       | endif
+  call s:Set( 'b:SignatureIncludeMarks',    g:SignatureIncludeMarks    )
+  call s:Set( 'b:SignatureIncludeMarkers',  g:SignatureIncludeMarkers  )
+  call s:Set( 'b:SignatureMarkOrder',       g:SignatureMarkOrder       )
+  call s:Set( 'b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks )
+  call s:Set( 'b:SignatureDeferPlacement',  g:SignatureDeferPlacement  )
+  call s:Set( 'b:SignatureWrapJumps',       g:SignatureWrapJumps       )
 endfunction
 
 
-function! signature#MarksList(...)                                                                                        " {{{2
+function! signature#MarksList(...)                                                                                " {{{2
   " Description: Takes two optional arguments - mode/line no. and scope
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
