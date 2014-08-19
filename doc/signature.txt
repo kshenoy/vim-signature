@@ -199,14 +199,6 @@ Set up Signature the way you want using the following options
   deleting all marks/markers
 
 
-                                                           *'g:SignatureMenu'*
-  String, Default: "P&lugins.&Signature"
-
-  Set where the menu options are to be displayed. For more details refer,
-    `:h usr_42.txt`
-  To disable the menu, set to 0
-
-
                                                 *'g:SignaturePeriodicRefresh'*
   Boolean, Default: 1
 

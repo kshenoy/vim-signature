@@ -30,14 +30,13 @@ function! s:Set(var, default)
 endfunction
 call s:Set( 'g:SignaturePrioritizeMarks',             1                                                      )
 call s:Set( 'g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
-call s:Set( 'g:SignatureIncludeMarkers',              ")!@#$%^&*("                                           )
-call s:Set( 'g:SignatureMarkTextHL',                  "Exception"                                            )
-call s:Set( 'g:SignatureMarkerTextHL',                "WarningMsg"                                           )
+call s:Set( 'g:SignatureIncludeMarkers',              ')!@#$%^&*('                                           )
+call s:Set( 'g:SignatureMarkTextHL',                  'Exception'                                            )
+call s:Set( 'g:SignatureMarkerTextHL',                'WarningMsg'                                           )
 call s:Set( 'g:SignatureWrapJumps',                   1                                                      )
 call s:Set( 'g:SignatureMarkOrder',                   "\p\m"                                                 )
 call s:Set( 'g:SignatureDeleteConfirmation',          0                                                      )
 call s:Set( 'g:SignaturePurgeConfirmation',           0                                                      )
-call s:Set( 'g:SignatureMenu',                        'P&lugin.&Signature'                                   )
 call s:Set( 'g:SignaturePeriodicRefresh',             1                                                      )
 call s:Set( 'g:SignatureEnabledAtStartup',            1                                                      )
 call s:Set( 'g:SignatureDeferPlacement',              1                                                      )
@@ -257,65 +256,6 @@ function! signature#SignRefresh(...)              " {{{2
 endfunction
 
 
-function! s:CreateMenu()                                                                                  " {{{2
-  if ( g:SignatureMenu != 0 ) && has('gui_running')
-    if s:SignatureMap.PlaceNextMark != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Pl&ace\ next\ mark<Tab>' . s:SignatureMap.Leader . s:SignatureMap.PlaceNextMark . ' :call signature#ToggleMark("next")<CR>'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Pl&ace\ next\ mark :call signature#ToggleMark("next")<CR>'
-    endif
-    if s:SignatureMap.PurgeMarks != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Re&move\ all\ marks\ \ \ \ <Tab>' . s:SignatureMap.Leader . s:SignatureMap.PurgeMarks ' :call signature#PurgeMarks()<CR>'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Re&move\ all\ marks :call signature#PurgeMarks()<CR>'
-    endif
-    execute  'amenu <silent> ' . g:SignatureMenu . '.-s1- :'
-    if s:SignatureMap.GotoNextSpotByPos != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ &next\ mark\ (pos)<Tab>' . s:SignatureMap.GotoNextSpotByPos . ' :call signature#GotoMark( "next", "spot", "pos" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ &next\ mark\ (pos) :call signature#GotoMark( "next", "spot", "pos" )'
-    endif
-    if s:SignatureMap.PrevSpotByPos != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ p&rev\ mark\ (pos)<Tab>' . s:SignatureMap.GotoPrevSpotByPos . ' :call signature#GotoMark( "prev", "spot", "pos" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ p&rev\ mark\ (pos) :call signature#GotoMark( "prev", "spot", "pos" )'
-    endif
-    if s:SignatureMap.NextSpotByAlpha != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ next\ mark\ (a&lpha)<Tab>' . s:SignatureMap.GotoNextSpotByAlpha . ' :call signature#GotoMark( "next", "spot", "alpha" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ next\ mark\ (a&lpha) :call signature#GotoMark( "next", "spot", "alpha" )'
-    endif
-    if s:SignatureMap.PrevSpotByAlpha != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ prev\ mark\ (alp&ha)<Tab>' . s:SignatureMap.GotoPrevSpotByAlpha . ' :call signature#GotoMark( "prev", "spot", "alpha" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ prev\ mark\ (alp&ha)<Tab> :call signature#GotoMark( "prev", "spot", "alpha" )'
-    endif
-    execute  'amenu <silent> ' . g:SignatureMenu . '.-s2- :'
-    if s:SignatureMap.GotoNextMarker != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ nex&t\ marker<Tab>' . s:SignatureMap.GotoNextMarker . ' :call signature#GotoMarker( "next", "same" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ nex&t\ marker :call signature#GotoMarker( "next", "same" )'
-    endif
-    if s:SignatureMap.GotoPrevMarker != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ pre&v\ marker<Tab>' . s:SignatureMap.GotoPrevMarker . ' :call signature#GotoMarker( "prev", "same" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ pre&v\ marker :call signature#GotoMarker( "prev", "same" )'
-    endif
-    if s:SignatureMap.GotoNextMarkerAny != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ nex&t\ marker\ (any)<Tab>' . s:SignatureMap.GotoNextMarkerAny . ' :call signature#GotoMarker( "next", "any" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ nex&t\ marker\ (any) :call signature#GotoMarker( "next", "any" )'
-    endif
-    if s:SignatureMap.GotoPrevMarkerAny != ""
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ pre&v\ marker\ (any)<Tab>' . s:SignatureMap.GotoPrevMarkerAny . ' :call signature#GotoMarker( "prev", "any" )'
-    else
-      execute 'menu <silent> ' . g:SignatureMenu . '.Goto\ pre&v\ marker\ (any) :call signature#GotoMarker( "prev", "any" )'
-    endif
-    execute   'menu <silent> ' . g:SignatureMenu . '.Rem&ove\ all\ markers<Tab>' . s:SignatureMap.Leader . s:SignatureMap.PurgeMarkers . ' :call signature#PurgeMarkers()<CR>'
-  endif
-endfunction
-
-
 function! signature#CreateMaps()                                                                                  " {{{2
   " We create separate mappings for PlaceNextMark, PurgeMarks and PurgeMarkers instead of combining it with Leader/Input
   " as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able to identify it.
@@ -398,9 +338,6 @@ function! signature#CreateMaps()                                                
   if s:SignatureMap.ListLocalMarks    != ""
     execute 'nnoremap <silent> <unique> ' . s:SignatureMap.ListLocalMarks    . ' :call signature#ListLocalMarks()<CR>'
   endif
-
-  " Update the menu
-  call s:CreateMenu()
 endfunction
 call signature#CreateMaps()
 " }}}1
