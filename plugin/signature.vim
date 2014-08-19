@@ -19,54 +19,27 @@ let g:loaded_Signature = "3"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Global variables                                                                                                 {{{1
 "
-if !exists( 'g:SignaturePrioritizeMarks' )
-  let g:SignaturePrioritizeMarks = 1
-endif
-if !exists( 'g:SignatureIncludeMarks' )
-  let g:SignatureIncludeMarks = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-endif
-if !exists( 'g:SignatureIncludeMarkers' )
-  let g:SignatureIncludeMarkers = ")!@#$%^&*("
-endif
-if !exists( 'g:SignatureMarkTextHL' )
-  let g:SignatureMarkTextHL = "Exception"
-endif
-if !exists( 'g:SignatureMarkerTextHL' )
-  let g:SignatureMarkerTextHL = "WarningMsg"
-endif
-if !exists( 'g:SignatureWrapJumps' )
-  let g:SignatureWrapJumps = 1
-endif
-if !exists( 'g:SignatureMarkOrder' )
-  let g:SignatureMarkOrder = "\p\m"
-endif
-if !exists( 'g:SignatureDeleteConfirmation' )
-  let g:SignatureDeleteConfirmation = 0
-endif
-if !exists( 'g:SignaturePurgeConfirmation' )
-  let g:SignaturePurgeConfirmation = 0
-endif
-if !exists( 'g:SignatureMenu' )
-  let g:SignatureMenu = 'P&lugin.&Signature'
-endif
-if !exists( 'g:SignaturePeriodicRefresh' )
-  let g:SignaturePeriodicRefresh = 1
-endif
-if !exists( 'g:SignatureEnabledAtStartup' )
-  let g:SignatureEnabledAtStartup = 1
-endif
-if !exists( 'g:SignatureDeferPlacement' )
-  let g:SignatureDeferPlacement = 1
-endif
-if !exists( 'g:SignatureUnconditionallyRecycleMarks' )
-  let g:SignatureUnconditionallyRecycleMarks = 0
-endif
-if !exists( 'g:SignatureErrorIfNoAvailableMarks' )
-  let g:SignatureErrorIfNoAvailableMarks = 1
-endif
-if !exists( 'g:SignatureForceRemoveGlobal' )
-  let g:SignatureForceRemoveGlobal = 1
-endif
+function s:Set(var, default)
+  if !exists(a:var)
+    execute 'let' a:var '=' a:default
+  endif
+endfunction
+call s:Set( g:SignaturePrioritizeMarks,             1                                                      )
+call s:Set( g:SignatureIncludeMarks,                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
+call s:Set( g:SignatureIncludeMarkers,              ")!@#$%^&*("                                           )
+call s:Set( g:SignatureMarkTextHL,                  "Exception"                                            )
+call s:Set( g:SignatureMarkerTextHL,                "WarningMsg"                                           )
+call s:Set( g:SignatureWrapJumps,                   1                                                      )
+call s:Set( g:SignatureMarkOrder,                   "\p\m"                                                 )
+call s:Set( g:SignatureDeleteConfirmation,          0                                                      )
+call s:Set( g:SignaturePurgeConfirmation,           0                                                      )
+call s:Set( g:SignatureMenu,                        'P&lugin.&Signature'                                   )
+call s:Set( g:SignaturePeriodicRefresh,             1                                                      )
+call s:Set( g:SignatureEnabledAtStartup,            1                                                      )
+call s:Set( g:SignatureDeferPlacement,              1                                                      )
+call s:Set( g:SignatureUnconditionallyRecycleMarks, 0                                                      )
+call s:Set( g:SignatureErrorIfNoAvailableMarks,     1                                                      )
+call s:Set( g:SignatureForceRemoveGlobal,           1                                                      )
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
