@@ -130,6 +130,20 @@ function! signature#MarksList(...)                                              
 endfunction
 
 
+function! signature#ToggleSignDummy( mode )                                                                       " {{{2
+  " Arguments:
+  "   mode : 'remove'
+  "        : 'place'
+
+  if a:mode ==? 'place'
+    sign define Signature_Dummy
+    execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
+  else
+    execute 'sign unplace 666 buffer=' . bufnr('%')
+  endif
+endfunction
+
+
 function! signature#ToggleSign( sign, mode, lnum )        " {{{2
   " Description: Enable/Disable/Toggle signs for marks/markers on the specified line number, depending on value of mode
   " Arguments:
@@ -152,12 +166,12 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
   "endif
 
   let l:lnum = a:lnum
-  let l:id   = ( winbufnr(0) + 1 ) * l:lnum
+  let l:id   = l:lnum * 1000 + bufnr('%')
 
   " Toggle sign for markers                         {{{3
   if stridx( b:SignatureIncludeMarkers, a:sign ) >= 0
 
-    if a:mode ==? "place"
+    if a:mode ==? 'place'
       let b:sig_markers[l:lnum] = a:sign . get( b:sig_markers, l:lnum, "" )
     else
       let b:sig_markers[l:lnum] = substitute( b:sig_markers[l:lnum], "\\C" . escape( a:sign, '$^' ), "", "" )
@@ -182,7 +196,7 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
       endif
 
       for l:lnum in l:arr
-        let l:id   = ( winbufnr(0) + 1 ) * l:lnum
+        let l:id   = l:lnum * 1000 + bufnr('%')
         let b:sig_marks[l:lnum] = substitute( b:sig_marks[l:lnum], "\\C" . a:sign, "", "" )
 
         " If there are no marks on the line, delete signs on that line
@@ -191,6 +205,11 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
         endif
       endfor
     endif
+  endif
+
+  " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
+  if len(b:sig_marks) + len(b:sig_markers) == 1
+    call signature#ToggleSignDummy( 'place' )
   endif
   "}}}3
 
@@ -206,7 +225,7 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
     else
       let l:SignatureMarkTextHL = g:SignatureMarkTextHL
     endif
-    execute 'sign define sig_Sign_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
 
   elseif has_key( b:sig_markers, l:lnum )
     let l:str = strpart( b:sig_markers[l:lnum], 0, 1 )
@@ -218,13 +237,14 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
     else
       let l:SignatureMarkerTextHL = g:SignatureMarkerTextHL
     endif
-    execute 'sign define sig_Sign_' . l:id . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL
 
   else
+    " FIXME: Clean-up. Undefine the sign
     execute 'sign unplace ' . l:id
     return
   endif
-  execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=sig_Sign_' . l:id . ' buffer=' . winbufnr(0)
+  execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
 endfunction
 
 
