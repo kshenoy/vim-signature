@@ -137,6 +137,9 @@ function! signature#ToggleSignDummy( mode )                                     
 
   if a:mode ==? 'place'
     sign define Signature_Dummy
+    " When only 1 sign is present and we delete the line that the sign is on and undo the delete,
+    " ToggleSignDummy('place') is called again. To avoid placing multiple dummy signs we unplace and place it.
+    execute 'sign unplace 666 buffer=' . bufnr('%')
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
   else
     execute 'sign unplace 666 buffer=' . bufnr('%')
@@ -206,11 +209,6 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
       endfor
     endif
   endif
-
-  " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
-  if len(b:sig_marks) + len(b:sig_markers) == 1
-    call signature#ToggleSignDummy( 'place' )
-  endif
   "}}}3
 
   " Place the sign
@@ -245,6 +243,11 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
     return
   endif
   execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
+
+  " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
+  if len(b:sig_marks) + len(b:sig_markers) == 1
+    call signature#ToggleSignDummy( 'place' )
+  endif
 endfunction
 
 
