@@ -77,29 +77,30 @@ Set up Signature the way you want using the following options
                                                             *'g:SignatureMap'*
   Type: Dictionary, Default:
   To set up your own mappings copy the following dictionary and edit it
+  
+      let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'PurgeMarks'         :  "m<Space>",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "]`",
+        \ 'GotoPrevSpotByPos'  :  "[`",
+        \ 'GotoNextMarker'     :  "[+",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListLocalMarks'     :  "'?"
+        \ }
 
-    let g:SignatureMap = {
-      \ 'Leader'             :  "m",
-      \ 'PlaceNextMark'      :  ",",
-      \ 'ToggleMarkAtLine'   :  ".",
-      \ 'PurgeMarksAtLine'   :  "-",
-      \ 'PurgeMarks'         :  "<Space>",
-      \ 'PurgeMarkers'       :  "<BS>",
-      \ 'GotoNextLineAlpha'  :  "']",
-      \ 'GotoPrevLineAlpha'  :  "'[",
-      \ 'GotoNextSpotAlpha'  :  "`]",
-      \ 'GotoPrevSpotAlpha'  :  "`[",
-      \ 'GotoNextLineByPos'  :  "]'",
-      \ 'GotoPrevLineByPos'  :  "['",
-      \ 'GotoNextSpotByPos'  :  "]`",
-      \ 'GotoPrevSpotByPos'  :  "[`",
-      \ 'GotoNextMarker'     :  "]-",
-      \ 'GotoPrevMarker'     :  "[-",
-      \ 'GotoNextMarkerAny'  :  "]=",
-      \ 'GotoPrevMarkerAny'  :  "[=",
-      \ 'ListLocalMarks'     :  "'?",
-      \ }
-
+  
   By default, it defines the mappings as shown in |signature-mappings|
   To disable a map entirely, specify it as an empty string.
   If a key is not specified, the default value will be picked up.
