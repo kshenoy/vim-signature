@@ -216,25 +216,17 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
     let l:str = substitute( b:SignatureMarkOrder, "\m", strpart( b:sig_marks[l:lnum], 0, 1 ), "" )
     let l:str = substitute( l:str,                "\p", strpart( b:sig_marks[l:lnum], 1, 1 ), "" )
 
-    " If g:SignatureMarkTextHL points to a function then call it and use its output as the highlight group.
+    " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    if g:SignatureMarkTextHL =~ ')$'
-      exec 'let l:SignatureMarkTextHL = ' . g:SignatureMarkTextHL
-    else
-      let l:SignatureMarkTextHL = g:SignatureMarkTextHL
-    endif
+    let l:SignatureMarkTextHL = eval( g:SignatureMarkTextHL )
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
 
   elseif has_key( b:sig_markers, l:lnum )
     let l:str = strpart( b:sig_markers[l:lnum], 0, 1 )
 
-    " If g:SignatureMarkerTextHL points to a function then call it and use its output as the highlight group.
+    " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    if g:SignatureMarkerTextHL =~ ')$'
-      exec 'let l:SignatureMarkerTextHL = ' . g:SignatureMarkerTextHL
-    else
-      let l:SignatureMarkerTextHL = g:SignatureMarkerTextHL
-    endif
+    let l:SignatureMarkerTextHL = eval( g:SignatureMarkerTextHL )
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL
 
   else
