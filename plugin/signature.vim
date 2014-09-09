@@ -199,12 +199,14 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
       endif
 
       for l:lnum in l:arr
-        let l:id   = l:lnum * 1000 + bufnr('%')
-        let b:sig_marks[l:lnum] = substitute( b:sig_marks[l:lnum], "\\C" . a:sign, "", "" )
-
-        " If there are no marks on the line, delete signs on that line
-        if b:sig_marks[l:lnum] == ""
-          call remove( b:sig_marks, l:lnum )
+        let l:id = l:lnum * 1000 + bufnr('%')
+        " FIXME: Placed guard to avoid triggering issue #53
+        if has_key( b:sig_marks, l:lnum )
+          let b:sig_marks[l:lnum] = substitute( b:sig_marks[l:lnum], "\\C" . a:sign, "", "" )
+          " If there are no marks on the line, delete signs on that line
+          if b:sig_marks[l:lnum] == ""
+            call remove( b:sig_marks, l:lnum )
+          endif
         endif
       endfor
     endif
