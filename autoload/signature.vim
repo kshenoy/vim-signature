@@ -327,18 +327,19 @@ function! signature#PurgeMarks()                                                
   " Description: Remove all marks
 
   let l:used_marks = signature#MarksList( "used", "b" )
-  if empty( l:used_marks ) | return | endif
 
-  if g:SignaturePurgeConfirmation
-    let choice = confirm("Are you sure you want to delete all marks? This cannot be undone.", "&Yes\n&No", 1)
-    if choice == 2 | return | endif
+  if !empty( l:used_marks )
+    if g:SignaturePurgeConfirmation
+      let choice = confirm("Are you sure you want to delete all marks? This cannot be undone.", "&Yes\n&No", 1)
+      if choice == 2 | return | endif
+    endif
+
+    for i in l:used_marks
+      silent execute 'delmarks ' . i[0]
+      silent call signature#ToggleSign( i[0], "remove", i[1] )
+      call signature#ForceGlobalMarkRemoval(i[0])
+    endfor
   endif
-
-  for i in l:used_marks
-    silent execute 'delmarks ' . i[0]
-    silent call signature#ToggleSign( i[0], "remove", i[1] )
-    call signature#ForceGlobalMarkRemoval(i[0])
-  endfor
 
   " If there are no marks and markers left, also remove the dummy sign
   if len(b:sig_marks) + len(b:sig_markers) == 0
