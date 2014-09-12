@@ -100,24 +100,27 @@ function! signature#MarksList(...)                                              
   "                          'g'    : Set scope to global i.e used/free marks from all buffers
 
   let l:marks_list = []
+  let l:line_tot = line('$')
+  let l:buf_curr = bufnr('%')
 
   " Add local marks first
   for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[a-z]"' )
-    let l:marks_list = add(l:marks_list, [i, line("'" . i), bufnr('%')])
+    let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
   endfor
 
   " Add global (uppercase) marks to list
   for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
     let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    if ( a:0 > 1) && ( a:2 ==? "b" )
+    if ( a:0 > 1 ) && ( a:2 ==? "b" )
       " If it is not in use in the current buffer treat it as free
-      if l:buf != bufnr('%')
+      if l:buf != l:buf_curr
         let l:line = 0
       endif
     endif
     let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
   endfor
 
+  call filter( l:marks_list, '( v:val[2] == l:buf_curr ) && ( v:val[1] <= l:line_tot )' )
   if ( a:0 == 0 )
     return l:marks_list
   elseif ( a:1 ==? "used" )
