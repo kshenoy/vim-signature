@@ -39,6 +39,7 @@ function! s:GotoMarkByPos( dir )                                                
   " Arguments: dir = next : Jump forward
   "                  prev : Jump backward
 
+  call s:UpdateMarks()
   " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
   if empty( b:sig_marks ) | return "" | endif
 
@@ -62,6 +63,7 @@ endfunction
 function! s:GotoMarkByAlpha( dir )                                                                                " {{{2
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
+  call s:UpdateMarks()
   let l:used_marks = signature#MarksList( "used", "b" )
   let l:line_marks = signature#MarksList( line('.') )
 
@@ -101,6 +103,19 @@ function! s:GotoMarkByAlpha( dir )                                              
       return b:sig_GotoMarkByAlpha_CurrMark
     endif
   endfor
+endfunction
+
+function! s:UpdateMarks()
+   redir => l:marks
+   silent marks
+   redir end
+   " echo l:marks
+   let l:invalid_marks = filter(split(l:marks, '\n'), 'v:val =~ "invalid"')
+   call map(l:invalid_marks, 'split(v:val)')
+   " echo l:invalid_marks
+   for l:elem in l:invalid_marks
+      call eval('signature#ToggleSign('.string(l:elem[0]).', "remove", '.l:elem[1].')')
+   endfor
 endfunction
 
 
@@ -261,7 +276,6 @@ function! signature#ToggleMark( mark )                                          
 
     if ( l:mark_buf == bufnr('%') ) && ( l:mark_pos == l:lnum )
       " Mark is present on the current line. Remove it and return
-      execute 'delmarks ' . l:mark
       call signature#ToggleSign( l:mark, "remove", l:lnum )
       call signature#ForceGlobalMarkRemoval( l:mark )
       return
