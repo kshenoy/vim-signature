@@ -70,11 +70,23 @@ function! signature#Init()                                                      
   if !exists('b:sig_marks')
     " b:sig_marks   = { lnum => signs_str }
     let b:sig_marks = {}
+  else
+    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are now
+    " greater than the total number of lines in the file.
+    let l:line_tot = line('$')
+    call filter( b:sig_marks, 'v:key <= l:line_tot' )
   endif
+
   if !exists('b:sig_markers')
     " b:sig_markers = { lnum => marker }
     let b:sig_markers = {}
+  else
+    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are now
+    " greater than the total number of lines in the file.
+    let l:line_tot = line('$')
+    call filter( b:sig_markers, 'v:key <= l:line_tot' )
   endif
+
   if !exists('b:sig_enabled')
     let b:sig_enabled = g:SignatureEnabledAtStartup
   endif
