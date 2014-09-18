@@ -526,12 +526,12 @@ endfunction
 function! signature#ListLocalMarks()                                                                              " {{{2
   " Description: Opens and populates location list with local marks
     call setloclist(0,
-                \filter(
-                \map(
-                \copy(s:local_marks_nlist),
-                \'{"bufnr": bufnr("%"), "lnum": line("''" . v:val), "col": col("''" . v:val),
-                \"type": "m", "text": v:val . ": " . getline(line("''" . v:val))}'),
-                \'v:val.lnum > 0'))
+       \   map(
+       \     signature#MarksList('used'),
+       \     '{"bufnr": bufnr("%"), "lnum": line("''" . v:val[0]), "col": col("''" . v:val[0]),
+       \     "type": "m", "text": v:val[0] . ": " . getline(line("''" . v:val[0]))}'
+       \   ),
+       \ )
     lopen
     if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
         nnoremap <buffer> <silent> q        :q<CR>
