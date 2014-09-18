@@ -205,6 +205,9 @@ function! signature#ToggleSign( sign, mode, lnum )        " {{{2
     if a:mode ==? "place"
       let b:sig_marks[l:lnum] = a:sign . get( b:sig_marks, l:lnum, "" )
     else
+      if a:sign !~ "'"
+         execute 'delmarks ' . a:sign
+      endif
       " If l:lnum == 0, remove from all lines
       if l:lnum == 0
         let l:arr = keys( filter( copy(b:sig_marks), 'v:val =~# a:sign' ))
