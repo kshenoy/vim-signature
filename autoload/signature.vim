@@ -392,6 +392,7 @@ function! signature#Toggle()                                                    
   " Description: Toggles and refreshes sign display in the buffer.
 
   call signature#Init()
+  let b:sig_enabled = !b:sig_enabled
 
   if b:sig_enabled
     " Signature enabled ==> Refresh signs
@@ -412,6 +413,8 @@ function! signature#Toggle()                                                    
       silent! execute 'sign unplace ' . l:id
     endfor
     unlet b:sig_marks
+    " Also remove the dummy sign
+    call signature#ToggleSignDummy( 'remove' )
   endif
 endfunction
 " }}}2

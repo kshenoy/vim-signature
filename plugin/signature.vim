@@ -157,7 +157,7 @@ function! signature#ToggleSignDummy( mode )                                     
     execute 'sign unplace 666 buffer=' . bufnr('%')
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
   else
-    execute 'sign unplace 666 buffer=' . bufnr('%')
+    silent! execute 'sign unplace 666 buffer=' . bufnr('%')
   endif
 endfunction
 
