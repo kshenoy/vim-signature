@@ -311,7 +311,7 @@ function! signature#CreateMaps()                                                
   if !has_key( s:SignatureMap, 'GotoPrevMarker'    ) | let s:SignatureMap.GotoPrevMarker     =  "[-"                              | endif
   if !has_key( s:SignatureMap, 'GotoNextMarkerAny' ) | let s:SignatureMap.GotoNextMarkerAny  =  "]="                              | endif
   if !has_key( s:SignatureMap, 'GotoPrevMarkerAny' ) | let s:SignatureMap.GotoPrevMarkerAny  =  "[="                              | endif
-  if !has_key( s:SignatureMap, 'ListLocalMarks   ' ) | let s:SignatureMap.ListLocalMarks     =  "'?"                              | endif
+  if !has_key( s:SignatureMap, 'ListLocalMarks'    ) | let s:SignatureMap.ListLocalMarks     =  "'?"                              | endif
 
   if s:SignatureMap.Leader            != ""
     execute 'nnoremap <silent> <unique> ' . s:SignatureMap.Leader            . ' :call signature#Input()<CR>'
