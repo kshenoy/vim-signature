@@ -261,7 +261,7 @@ function! signature#ToggleMark( mark )                                          
 
     if (  (l:mark_buf == bufnr('%'))
      \ && (l:mark_pos == l:lnum    )
-     \ && !g:SignatureDisableMarkToggle
+     \ && !g:SignatureForceMarkPlacement
      \ )
       " Mark is present on the current line. Remove it and return
       execute 'delmarks ' . l:mark
