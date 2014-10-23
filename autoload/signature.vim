@@ -259,7 +259,10 @@ function! signature#ToggleMark( mark )                                          
       let l:mark_buf = l:used_marks[0][2]
     endif
 
-    if ( l:mark_buf == bufnr('%') ) && ( l:mark_pos == l:lnum )
+    if (  (l:mark_buf == bufnr('%'))
+     \ && (l:mark_pos == l:lnum    )
+     \ && !g:SignatureDisableMarkToggle
+     \ )
       " Mark is present on the current line. Remove it and return
       execute 'delmarks ' . l:mark
       call signature#ToggleSign( l:mark, "remove", l:lnum )
@@ -267,8 +270,9 @@ function! signature#ToggleMark( mark )                                          
       return
 
     else
-      " Mark is not present on current line but it may be present somewhere else. We first place the new sign and only
-      " then remove the old sign to avoid shifting of Foldcolumn if there is only 1 mark placed.
+      " Mark is not present on current line but it may be present somewhere else.
+      " We first remove the old sign and then place the new sign. The presence of the dummy mark avoids twitching of
+      " Foldcolumn if there is only 1 mark placed.
 
       " Ask for confirmation before moving mark. l:mark_pos != 0 indicates that the mark was used.
       if (  g:SignatureDeleteConfirmation && ( l:mark_pos != 0 ))
@@ -276,14 +280,14 @@ function! signature#ToggleMark( mark )                                          
         if choice == 2 | return | endif
       endif
 
-      " Place new sign
-      execute 'normal! m' . l:mark
-      call signature#ToggleSign( l:mark, "place", l:lnum )
-
       " If not, we have to remove the sign for the original mark
       if ( l:mark_buf == bufnr('%') ) && ( l:mark_pos != 0 )
         call signature#ToggleSign( l:mark, "remove", l:mark_pos )
       endif
+
+      " Place new sign
+      execute 'normal! m' . l:mark
+      call signature#ToggleSign( l:mark, "place", l:lnum )
     endif
   endif
 endfunction
@@ -354,7 +358,11 @@ function! s:ToggleMarker( marker )                                              
 
   let l:lnum = line('.')
   " If marker is found in on current line, remove it, else place it
-  let l:mode = ( get( b:sig_markers, l:lnum, "" ) =~# escape( a:marker, '$^' ) ? "remove" : "place" )
+  let l:mode = ( (  !g:SignatureForceMarkerPlacement
+             \   && (get( b:sig_markers, l:lnum, "" ) =~# escape( a:marker, '$^' ))
+             \   )
+             \ ? "remove" : "place"
+             \ )
   call signature#ToggleSign( a:marker, l:mode, l:lnum )
 endfunction
 

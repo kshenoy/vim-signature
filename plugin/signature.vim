@@ -43,6 +43,8 @@ call s:Set( 'g:SignatureDeferPlacement',              1                         
 call s:Set( 'g:SignatureUnconditionallyRecycleMarks', 0                                                      )
 call s:Set( 'g:SignatureErrorIfNoAvailableMarks',     1                                                      )
 call s:Set( 'g:SignatureForceRemoveGlobal',           1                                                      )
+call s:Set( 'g:SignatureForceMarkPlacement',          0                                                      )
+call s:Set( 'g:SignatureForceMarkerPlacement',        0                                                      )
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

@@ -227,6 +227,7 @@ Set up Signature the way you want using the following options
                                                  *'g:SignatureDeferPlacement'*
   Boolean, Default: 1
 
+  NOTE: Not supported currently. Code was highly inefficient.
   Check if any other plugin has already placed a sign and if set to 1,
   Signature will hold off from placing a sign. If set to 0, Signature will
   overwrite any signs that are already present.
@@ -254,7 +255,18 @@ Set up Signature the way you want using the following options
 
   Vim's handling of global marks is a bit iffy. This option forces the removal
   of global marks by deleting it from the .viminfo file.
-  Currently works only for *nix systems
+
+
+                                             *'g:SignatureForceMarkPlacement'*
+  Boolean, Default: 0
+
+  When set to 1, will always place marks instead of toggling them
+
+
+                                           *'g:SignatureForceMarkerPlacement'*
+  Boolean, Default: 0
+
+  When set to 1, will always place markers instead of toggling them
 
 
 
