@@ -25,7 +25,8 @@
 
 Out of the box, the followings mappings are defined by default
 
-  m[a-zA-Z]    Toggle mark and display it in the leftmost column
+  mx           Toggle mark 'x' and display it in the leftmost column
+  dmx          Remove mark 'x' where x is a-zA-Z
 
   m,           Place the next available mark
   m.           If no mark on line, place the next available mark. Otherwise,
@@ -79,6 +80,7 @@ beginning or end of file is reached.
         \ 'PlaceNextMark'      :  "m,",
         \ 'ToggleMarkAtLine'   :  "m.",
         \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
         \ 'PurgeMarks'         :  "m<Space>",
         \ 'PurgeMarkers'       :  "m<BS>",
         \ 'GotoNextLineAlpha'  :  "']",
@@ -95,7 +97,6 @@ beginning or end of file is reached.
         \ 'GotoPrevMarkerAny'  :  "[=",
         \ 'ListLocalMarks'     :  "'?"
         \ }
-
 
   By default, it defines the mappings as shown in |signature-mappings|
   To disable a map entirely, specify it as an empty string.
@@ -118,7 +119,7 @@ beginning or end of file is reached.
   'b:SignatureIncludeMarkers' can be specified separately for each buffer
 
 
-                             *g:SignatureMap['Leader']* *'SignatureMapLeader'*
+                               *g:SignatureMap['Leader']* *'SignatureMapLeader'*
   String, Default: 'm'
 
   Set the key used to toggle marks and markers.

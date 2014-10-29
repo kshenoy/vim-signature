@@ -65,7 +65,7 @@ function! signature#mark#Remove(...)                                            
     return
   endif
 
-  let l:lnum = line("'" . l:mark)                                                                                 " {{{2
+  let l:lnum = line("'" . l:mark)
   call signature#ToggleSign(l:mark, "remove", l:lnum)
   execute 'delmarks ' . l:mark
   call signature#mark#ForceGlobalRemoval(l:mark)
