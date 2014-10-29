@@ -59,8 +59,6 @@ beginning or end of file is reached.
 ==============================================================================
 3. Commands                                               *signature-commands*
 
-Signature provides just two commands
-
 'SignatureToggleSigns'
   Toggle the display of signs. This won't affect the marks or the mappings.
 
@@ -72,12 +70,10 @@ Signature provides just two commands
 ==============================================================================
 4. Customization                                     *signature-customization*
 
-Set up Signature the way you want using the following options
-
                                                             *'g:SignatureMap'*
   Type: Dictionary, Default:
   To set up your own mappings copy the following dictionary and edit it
-  
+
       let g:SignatureMap = {
         \ 'Leader'             :  "m",
         \ 'PlaceNextMark'      :  "m,",
@@ -100,7 +96,7 @@ Set up Signature the way you want using the following options
         \ 'ListLocalMarks'     :  "'?"
         \ }
 
-  
+
   By default, it defines the mappings as shown in |signature-mappings|
   To disable a map entirely, specify it as an empty string.
   If a key is not specified, the default value will be picked up.

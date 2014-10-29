@@ -59,8 +59,8 @@ if has('autocmd')
 endif
 
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
-command! -nargs=0 SignatureRefresh     call signature#SignRefresh( "force" )
-command! -nargs=0 SignatureList        call signature#ListLocalMarks()
+command! -nargs=0 SignatureRefresh     call signature#SignRefresh('force')
+command! -nargs=0 SignatureList        call signature#mark#ListLocal('buf_curr')
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -102,16 +102,15 @@ function! signature#Init()                                                      
 endfunction
 
 
-function! signature#MarksList(...)                                                                                " {{{2
+function! signature#GetMarks(mode, scope)                                                                        " {{{2
   " Description: Takes two optional arguments - mode/line no. and scope
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
   "
-  " Arguments: a:1 (mode)  = 'used' : Returns list of [ [used marks, line no., buf no.] ]
-  "                          'free' : Returns list of [ free marks ]
-  "                          <lnum> : Returns list of used marks on current line.
-  "            a:2 (scope) = 'b'    : Limits scope to current buffer i.e used/free marks in current buffer
-  "                          'g'    : Set scope to global i.e used/free marks from all buffers
+  " Arguments: mode  = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
+  "                    'free'     : Returns list of [ free marks ]
+  "            scope = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
+  "                    'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
 
   let l:marks_list = []
   let l:line_tot = line('$')
@@ -125,7 +124,7 @@ function! signature#MarksList(...)                                              
   " Add global (uppercase) marks to list
   for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
     let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    if ( a:0 > 1 ) && ( a:2 ==? "b" )
+    if (a:scope ==? 'buf_curr')
       " If it is not in use in the current buffer treat it as free
       if l:buf != l:buf_curr
         let l:line = 0
@@ -134,16 +133,22 @@ function! signature#MarksList(...)                                              
     let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
   endfor
 
-  call filter( l:marks_list, '( v:val[2] == l:buf_curr ) && ( v:val[1] <= l:line_tot )' )
-  if ( a:0 == 0 )
-    return l:marks_list
-  elseif ( a:1 ==? "used" )
-    return filter( l:marks_list, 'v:val[1] > 0' )
-  elseif ( a:1 ==? "free" )
-    return map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
-  elseif ( a:1 > 0 ) && ( a:1 < line('$'))
-    return map( filter( l:marks_list, 'v:val[1] == ' . a:1 ), 'v:val[0]' )
+  if (a:mode ==? 'used')
+    if (a:scope ==? 'buf_curr')
+      call filter( l:marks_list, '(v:val[2] == l:buf_curr) && (v:val[1] > 0)' )
+    else
+      call filter( l:marks_list, 'v:val[1] > 0' )
+    endif
+  else
+    if (a:scope ==? 'buf_all')
+      call filter( l:marks_list, 'v:val[1] == 0' )
+    else
+      call filter( l:marks_list, '(v:val[1] == 0) || (v:val[2] != l:buf_curr)' )
+    endif
+    call map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
   endif
+
+  return l:marks_list
 endfunction
 
 
@@ -270,13 +275,13 @@ function! signature#SignRefresh(...)              " {{{2
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
-  for i in signature#MarksList( 'free', 'b' )
+  for i in signature#GetMarks( 'free', 'buf_curr' )
     " ... remove it
     call signature#ToggleSign( i, "remove", 0 )
   endfor
 
   " Add signs for marks ...
-  for j in signature#MarksList( 'used', 'b' )
+  for j in signature#GetMarks( 'used', 'buf_curr' )
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
     if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || a:0
@@ -291,7 +296,7 @@ endfunction
 
 
 function! signature#CreateMaps()                                                                                  " {{{2
-  " We create separate mappings for PlaceNextMark, PurgeMarks and PurgeMarkers instead of combining it with Leader/Input
+  " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with Leader/Input
   " as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able to identify it.
   " Eg. the nr2char(getchar()) will fail if the user presses a <BS>
   let s:SignatureMap = ( exists('g:SignatureMap') ? copy(g:SignatureMap) : {} )
@@ -319,58 +324,58 @@ function! signature#CreateMaps()                                                
     execute 'nnoremap <silent> <unique> ' . s:SignatureMap.Leader            . ' :call signature#Input()<CR>'
   endif
   if s:SignatureMap.PlaceNextMark     != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PlaceNextMark     . ' :call signature#ToggleMark("next")<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PlaceNextMark     . ' :call signature#mark#Toggle("next")<CR>'
   endif
   if s:SignatureMap.ToggleMarkAtLine  != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.ToggleMarkAtLine  . ' :call signature#ToggleMarkAtLine()<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.ToggleMarkAtLine  . ' :call signature#mark#ToggleAtLine()<CR>'
   endif
   if s:SignatureMap.PurgeMarksAtLine  != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarksAtLine  . ' :call signature#PurgeMarksAtLine()<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarksAtLine  . ' :call signature#mark#Purge("line")<CR>'
   endif
   if s:SignatureMap.PurgeMarks        != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarks        . ' :call signature#PurgeMarks()<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarks        . ' :call signature#mark#Purge("all")<CR>'
   endif
   if s:SignatureMap.PurgeMarkers      != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarkers      . ' :call signature#PurgeMarkers()<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.PurgeMarkers      . ' :call signature#marker#Purge()<CR>'
   endif
   if s:SignatureMap.GotoNextLineAlpha != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextLineAlpha . ' :call signature#GotoMark( "next", "line", "alpha" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextLineAlpha . ' :call signature#mark#Goto( "next", "line", "alpha" )<CR>'
   endif
   if s:SignatureMap.GotoPrevLineAlpha != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevLineAlpha . ' :call signature#GotoMark( "prev", "line", "alpha" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevLineAlpha . ' :call signature#mark#Goto( "prev", "line", "alpha" )<CR>'
   endif
   if s:SignatureMap.GotoNextSpotAlpha != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextSpotAlpha . ' :call signature#GotoMark( "next", "spot", "alpha" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextSpotAlpha . ' :call signature#mark#Goto( "next", "spot", "alpha" )<CR>'
   endif
   if s:SignatureMap.GotoPrevSpotAlpha != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevSpotAlpha . ' :call signature#GotoMark( "prev", "spot", "alpha" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevSpotAlpha . ' :call signature#mark#Goto( "prev", "spot", "alpha" )<CR>'
   endif
   if s:SignatureMap.GotoNextLineByPos != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextLineByPos . ' :call signature#GotoMark( "next", "line", "pos" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextLineByPos . ' :call signature#mark#Goto( "next", "line", "pos" )<CR>'
   endif
   if s:SignatureMap.GotoPrevLineByPos != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevLineByPos . ' :call signature#GotoMark( "prev", "line", "pos" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevLineByPos . ' :call signature#mark#Goto( "prev", "line", "pos" )<CR>'
   endif
   if s:SignatureMap.GotoNextSpotByPos != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextSpotByPos . ' :call signature#GotoMark( "next", "spot", "pos" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextSpotByPos . ' :call signature#mark#Goto( "next", "spot", "pos" )<CR>'
   endif
   if s:SignatureMap.GotoPrevSpotByPos != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevSpotByPos . ' :call signature#GotoMark( "prev", "spot", "pos" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevSpotByPos . ' :call signature#mark#Goto( "prev", "spot", "pos" )<CR>'
   endif
   if s:SignatureMap.GotoNextMarker    != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextMarker    . ' :call signature#GotoMarker( "next", "same" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextMarker    . ' :call signature#marker#Goto( "next", "same" )<CR>'
   endif
   if s:SignatureMap.GotoPrevMarker    != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevMarker    . ' :call signature#GotoMarker( "prev", "same" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevMarker    . ' :call signature#marker#Goto( "prev", "same" )<CR>'
   endif
   if s:SignatureMap.GotoNextMarkerAny != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextMarkerAny . ' :call signature#GotoMarker( "next", "any" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoNextMarkerAny . ' :call signature#marker#Goto( "next", "any" )<CR>'
   endif
   if s:SignatureMap.GotoPrevMarkerAny != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevMarkerAny . ' :call signature#GotoMarker( "prev", "any" )<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.GotoPrevMarkerAny . ' :call signature#marker#Goto( "prev", "any" )<CR>'
   endif
   if s:SignatureMap.ListLocalMarks    != ""
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.ListLocalMarks    . ' :call signature#ListLocalMarks()<CR>'
+    execute 'nnoremap <silent> <unique> ' . s:SignatureMap.ListLocalMarks    . ' :call signature#mark#List("buf_curr")<CR>'
   endif
 endfunction
 call signature#CreateMaps()
