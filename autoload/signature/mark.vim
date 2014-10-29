@@ -8,8 +8,8 @@ function! signature#mark#Remove(...)
   let l:mark = (a:0 ? a:1 : nr2char(getchar()))
 
   " Sanity check: Return if mark is not an alphabet
-  if stridx(b:SignatureIncludeMarks, l:mark) >= 0
-    return;
+  if stridx(b:SignatureIncludeMarks, l:mark) == -1
+    return
   endif
 
   " Remove the sign (Only from current buffer)
