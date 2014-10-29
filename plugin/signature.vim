@@ -28,23 +28,24 @@ function! s:Set(var, default)
     endif
   endif
 endfunction
-call s:Set( 'g:SignaturePrioritizeMarks',             1                                                      )
-call s:Set( 'g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' )
-call s:Set( 'g:SignatureIncludeMarkers',              ')!@#$%^&*('                                           )
-call s:Set( 'g:SignatureMarkTextHL',                  '"Exception"'                                          )
-call s:Set( 'g:SignatureMarkerTextHL',                '"WarningMsg"'                                         )
-call s:Set( 'g:SignatureWrapJumps',                   1                                                      )
-call s:Set( 'g:SignatureMarkOrder',                   "\p\m"                                                 )
-call s:Set( 'g:SignatureDeleteConfirmation',          0                                                      )
-call s:Set( 'g:SignaturePurgeConfirmation',           0                                                      )
-call s:Set( 'g:SignaturePeriodicRefresh',             1                                                      )
-call s:Set( 'g:SignatureEnabledAtStartup',            1                                                      )
-call s:Set( 'g:SignatureDeferPlacement',              1                                                      )
-call s:Set( 'g:SignatureUnconditionallyRecycleMarks', 0                                                      )
-call s:Set( 'g:SignatureErrorIfNoAvailableMarks',     1                                                      )
-call s:Set( 'g:SignatureForceRemoveGlobal',           1                                                      )
-call s:Set( 'g:SignatureForceMarkPlacement',          0                                                      )
-call s:Set( 'g:SignatureForceMarkerPlacement',        0                                                      )
+call s:Set('g:SignaturePrioritizeMarks',             1                                                     )
+call s:Set('g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+call s:Set('g:SignatureIncludeMarkers',              ')!@#$%^&*('                                          )
+call s:Set('g:SignatureMarkTextHL',                  '"Exception"'                                         )
+call s:Set('g:SignatureMarkerTextHL',                '"WarningMsg"'                                        )
+call s:Set('g:SignatureWrapJumps',                   1                                                     )
+call s:Set('g:SignatureMarkOrder',                   "\p\m"                                                )
+call s:Set('g:SignatureDeleteConfirmation',          0                                                     )
+call s:Set('g:SignaturePurgeConfirmation',           0                                                     )
+call s:Set('g:SignaturePeriodicRefresh',             1                                                     )
+call s:Set('g:SignatureEnabledAtStartup',            1                                                     )
+call s:Set('g:SignatureDeferPlacement',              1                                                     )
+call s:Set('g:SignatureUnconditionallyRecycleMarks', 0                                                     )
+call s:Set('g:SignatureErrorIfNoAvailableMarks',     1                                                     )
+call s:Set('g:SignatureForceRemoveGlobal',           1                                                     )
+call s:Set('g:SignatureForceMarkPlacement',          0                                                     )
+call s:Set('g:SignatureForceMarkerPlacement',        0                                                     )
+call s:Set('g:SignatureMap',                         {}                                                    )
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -291,12 +292,10 @@ function! signature#SignRefresh(...)              " {{{2
 endfunction
 
 
-function! s:CreateMap(key, value, map)                                                                            " {{{2
-  if (!has_key(s:SignatureMap, a:key))
-    let s:SignatureMap[a:key] = a:value
-  endif
-  if (s:SignatureMap[a:key] != "")
-    execute 'nnoremap <silent> <unique> ' . s:SignatureMap[a:key] . ' ' . ':<C-U>call signature#' . a:map . '<CR>'
+function! s:CreateMap(key, map_lhs, map_rhs)                                                                        " {{{2
+  let l:map_lhs = get(g:SignatureMap, a:key, a:map_lhs)
+  if (l:map_lhs != "")
+    execute 'nnoremap <silent> <unique> ' . l:map_lhs . ' ' . ':<C-U>call signature#' . a:map_rhs . '<CR>'
   endif
 endfunction
 
@@ -304,27 +303,30 @@ function! signature#CreateMaps()                                                
   " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with Leader/Input
   " as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able to identify it.
   " Eg. the nr2char(getchar()) will fail if the user presses a <BS>
-  let s:SignatureMap = (exists('g:SignatureMap') ? copy(g:SignatureMap) : {})
-  call s:CreateMap('Leader'           , "m"                              , 'Input()'                              )
-  call s:CreateMap('PlaceNextMark'    , s:SignatureMap.Leader . ","      , 'mark#Toggle("next")'                  )
-  call s:CreateMap('ToggleMarkAtLine' , s:SignatureMap.Leader . "."      , 'mark#ToggleAtLine()'                  )
-  call s:CreateMap('PurgeMarksAtLine' , s:SignatureMap.Leader . "-"      , 'mark#Purge("line")'                   )
-  call s:CreateMap('PurgeMarks'       , s:SignatureMap.Leader . "<Space>", 'mark#Purge("all")'                    )
-  call s:CreateMap('PurgeMarkers'     , s:SignatureMap.Leader . "<BS>"   , 'marker#Purge()'                       )
-  call s:CreateMap('DeleteMark'       , "dm"                             , 'mark#Remove()'                        )
-  call s:CreateMap('GotoNextLineAlpha', "']"                             , 'mark#Goto( "next", "line", "alpha" )' )
-  call s:CreateMap('GotoPrevLineAlpha', "'["                             , 'mark#Goto( "prev", "line", "alpha" )' )
-  call s:CreateMap('GotoNextSpotAlpha', "`]"                             , 'mark#Goto( "next", "spot", "alpha" )' )
-  call s:CreateMap('GotoPrevSpotAlpha', "`["                             , 'mark#Goto( "prev", "spot", "alpha" )' )
-  call s:CreateMap('GotoNextLineByPos', "]'"                             , 'mark#Goto( "next", "line", "pos" )'   )
-  call s:CreateMap('GotoPrevLineByPos', "['"                             , 'mark#Goto( "prev", "line", "pos" )'   )
-  call s:CreateMap('GotoNextSpotByPos', "]`"                             , 'mark#Goto( "next", "spot", "pos" )'   )
-  call s:CreateMap('GotoPrevSpotByPos', "[`"                             , 'mark#Goto( "prev", "spot", "pos" )'   )
-  call s:CreateMap('GotoNextMarker'   , "]-"                             , 'marker#Goto( "next", "same" )'        )
-  call s:CreateMap('GotoPrevMarker'   , "[-"                             , 'marker#Goto( "prev", "same" )'        )
-  call s:CreateMap('GotoNextMarkerAny', "]="                             , 'marker#Goto( "next", "any" )'         )
-  call s:CreateMap('GotoPrevMarkerAny', "[="                             , 'marker#Goto( "prev", "any" )'         )
-  call s:CreateMap('ListLocalMarks'   , "'?"                             , 'mark#List("buf_curr")'                )
+  let s:SignatureMapLeader = get(g:SignatureMap, 'Leader', 'm')
+  if (s:SignatureMapLeader == "")
+    echoe "Signature: SignatureLeader shouldn't be left blank"
+  endif
+  call s:CreateMap('Leader'           , s:SignatureMapLeader            , 'Input()'                             )
+  call s:CreateMap('PlaceNextMark'    , s:SignatureMapLeader . ","      , 'mark#Toggle("next")'                 )
+  call s:CreateMap('ToggleMarkAtLine' , s:SignatureMapLeader . "."      , 'mark#ToggleAtLine()'                 )
+  call s:CreateMap('PurgeMarksAtLine' , s:SignatureMapLeader . "-"      , 'mark#Purge("line")'                  )
+  call s:CreateMap('PurgeMarks'       , s:SignatureMapLeader . "<Space>", 'mark#Purge("all")'                   )
+  call s:CreateMap('PurgeMarkers'     , s:SignatureMapLeader . "<BS>"   , 'marker#Purge()'                      )
+  call s:CreateMap('DeleteMark'       , "dm"                            , 'mark#Remove()'                       )
+  call s:CreateMap('GotoNextLineAlpha', "']"                            , 'mark#Goto( "next", "line", "alpha" )')
+  call s:CreateMap('GotoPrevLineAlpha', "'["                            , 'mark#Goto( "prev", "line", "alpha" )')
+  call s:CreateMap('GotoNextSpotAlpha', "`]"                            , 'mark#Goto( "next", "spot", "alpha" )')
+  call s:CreateMap('GotoPrevSpotAlpha', "`["                            , 'mark#Goto( "prev", "spot", "alpha" )')
+  call s:CreateMap('GotoNextLineByPos', "]'"                            , 'mark#Goto( "next", "line", "pos" )'  )
+  call s:CreateMap('GotoPrevLineByPos', "['"                            , 'mark#Goto( "prev", "line", "pos" )'  )
+  call s:CreateMap('GotoNextSpotByPos', "]`"                            , 'mark#Goto( "next", "spot", "pos" )'  )
+  call s:CreateMap('GotoPrevSpotByPos', "[`"                            , 'mark#Goto( "prev", "spot", "pos" )'  )
+  call s:CreateMap('GotoNextMarker'   , "]-"                            , 'marker#Goto( "next", "same" )'       )
+  call s:CreateMap('GotoPrevMarker'   , "[-"                            , 'marker#Goto( "prev", "same" )'       )
+  call s:CreateMap('GotoNextMarkerAny', "]="                            , 'marker#Goto( "next", "any" )'        )
+  call s:CreateMap('GotoPrevMarkerAny', "[="                            , 'marker#Goto( "prev", "any" )'        )
+  call s:CreateMap('ListLocalMarks'   , "'?"                            , 'mark#List("buf_curr")'               )
 endfunction
 call signature#CreateMaps()
 " }}}1
