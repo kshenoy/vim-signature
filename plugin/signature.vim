@@ -57,7 +57,6 @@ if has('autocmd')
     autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#SignRefresh() | endif
   augroup END
 endif
-
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
 command! -nargs=0 SignatureRefresh     call signature#SignRefresh('force')
 command! -nargs=0 SignatureList        call signature#mark#ListLocal('buf_curr')
@@ -310,9 +309,9 @@ function! signature#CreateMaps()                                                
   call s:CreateMap('PlaceNextMark'    , s:SignatureMap.Leader . ","      , 'mark#Toggle("next")'                  )
   call s:CreateMap('ToggleMarkAtLine' , s:SignatureMap.Leader . "."      , 'mark#ToggleAtLine()'                  )
   call s:CreateMap('PurgeMarksAtLine' , s:SignatureMap.Leader . "-"      , 'mark#Purge("line")'                   )
-  call s:CreateMap('PurgeMarks'       , s:SignatureMap.Leader . "<Space>", 'mark#Remove()'                        )
-  call s:CreateMap('PurgeMarkers'     , s:SignatureMap.Leader . "<BS>"   , 'mark#Purge("all")'                    )
-  call s:CreateMap('DeleteMark'       , "dm"                             , 'marker#Purge()'                       )
+  call s:CreateMap('PurgeMarks'       , s:SignatureMap.Leader . "<Space>", 'mark#Purge("all")'                    )
+  call s:CreateMap('PurgeMarkers'     , s:SignatureMap.Leader . "<BS>"   , 'marker#Purge()'                       )
+  call s:CreateMap('DeleteMark'       , "dm"                             , 'mark#Remove()'                        )
   call s:CreateMap('GotoNextLineAlpha', "']"                             , 'mark#Goto( "next", "line", "alpha" )' )
   call s:CreateMap('GotoPrevLineAlpha', "'["                             , 'mark#Goto( "prev", "line", "alpha" )' )
   call s:CreateMap('GotoNextSpotAlpha', "`]"                             , 'mark#Goto( "next", "spot", "alpha" )' )
