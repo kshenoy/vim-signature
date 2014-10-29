@@ -156,9 +156,8 @@ function! signature#Input()                                                     
 
   call signature#Init()
 
-  " ... if not, obtain input from user ...
-  let l:ascii = getchar()
-  let l:char  = nr2char( l:ascii )
+  " Obtain input from user ...
+  let l:char = nr2char(getchar())
 
   " ... if the input is not a number eg. '!' ==> Delete all '!' markers
   if stridx( b:SignatureIncludeMarkers, l:char ) >= 0
@@ -200,15 +199,14 @@ endfunction
 
 
 function! signature#PurgeMarksAtLine()                                                                            " {{{2
-  " Description: If no mark on current line, add one. If marks are on the
-  " current line, remove one.
+  " Description: Delete all marks from current line
   let l:lnum = line('.')
   " get list of marks wt this line (from s:MarksAt())
   let l:marks_here = map(filter(signature#LocalMarkList(), 'v:val[1]==' . l:lnum), 'v:val[0]')
   if !empty(l:marks_here)
     " delete one mark
     for l:mark in l:marks_here
-      call signature#ToggleMark(l:mark)
+      call signature#mark#Remove(l:mark)
     endfor
     return
   endif
@@ -218,8 +216,6 @@ endfunction
 function! signature#ToggleMark( mark )                                                                            " {{{2
   " Description: mark = 'next' : Place new mark on current line else toggle specified mark on current line
   " Arguments:   mark [a-z,A-Z]
-
-  let l:lnum = line('.')
 
   if a:mark == "next"
     " Place new mark
@@ -245,50 +241,38 @@ function! signature#ToggleMark( mark )                                          
     endif
     let l:mark = l:marks_list[0]
 
-    execute 'normal! m' . l:mark
-    call signature#ToggleSign( l:mark, "place", l:lnum )
+    call signature#mark#Place(l:mark)
 
   else
     " Toggle Mark
-    let l:mark = a:mark
-    let l:mark_pos = 0
-    let l:mark_buf = bufnr('%')
-    let l:used_marks = filter( signature#MarksList( 'used', 'g' ), 'v:val[0] ==# l:mark' )
+    let l:used_marks = filter( signature#MarksList( 'used', 'g' ), 'v:val[0] ==# a:mark' )
     if ( len(l:used_marks) > 0 )
       let l:mark_pos = l:used_marks[0][1]
       let l:mark_buf = l:used_marks[0][2]
+
+      if (l:mark_buf == bufnr('%'))
+        " If the mark is not in use in current buffer then mostly it's a global ==> Don't worry about deleting it
+        if (  (l:mark_pos == line('.'))
+         \ && !g:SignatureForceMarkPlacement
+         \ )
+          " Mark is present on the current line. Remove it and return
+          call signature#mark#Remove(a:mark)
+          return
+        else
+          " Mark is present elsewhere in the current buffer or g:SignatureForceMarkPlacement is set
+          " Remove it but fall-through to place new mark
+          " Ask for confirmation before moving mark
+          if (g:SignatureDeleteConfirmation)
+            let choice = confirm("Mark '" . a:mark . "' has been used elsewhere. Reuse it?", "&Yes\n&No", 1)
+            if choice == 2 | return | endif
+          endif
+          call signature#mark#Remove(a:mark)
+        endif
+      endif
     endif
 
-    if (  (l:mark_buf == bufnr('%'))
-     \ && (l:mark_pos == l:lnum    )
-     \ && !g:SignatureForceMarkPlacement
-     \ )
-      " Mark is present on the current line. Remove it and return
-      execute 'delmarks ' . l:mark
-      call signature#ToggleSign( l:mark, "remove", l:lnum )
-      call signature#ForceGlobalMarkRemoval( l:mark )
-      return
-
-    else
-      " Mark is not present on current line but it may be present somewhere else.
-      " We first remove the old sign and then place the new sign. The presence of the dummy mark avoids twitching of
-      " Foldcolumn if there is only 1 mark placed.
-
-      " Ask for confirmation before moving mark. l:mark_pos != 0 indicates that the mark was used.
-      if (  g:SignatureDeleteConfirmation && ( l:mark_pos != 0 ))
-        let choice = confirm("Mark '" . l:mark . "' has been used elsewhere. Reuse it?", "&Yes\n&No", 1)
-        if choice == 2 | return | endif
-      endif
-
-      " If not, we have to remove the sign for the original mark
-      if ( l:mark_buf == bufnr('%') ) && ( l:mark_pos != 0 )
-        call signature#ToggleSign( l:mark, "remove", l:mark_pos )
-      endif
-
-      " Place new sign
-      execute 'normal! m' . l:mark
-      call signature#ToggleSign( l:mark, "place", l:lnum )
-    endif
+    " Place new mark
+    call signature#mark#Place(a:mark)
   endif
 endfunction
 
@@ -339,9 +323,7 @@ function! signature#PurgeMarks()                                                
     endif
 
     for i in l:used_marks
-      silent execute 'delmarks ' . i[0]
-      silent call signature#ToggleSign( i[0], "remove", i[1] )
-      call signature#ForceGlobalMarkRemoval(i[0])
+      call signature#mark#Remove(i[0])
     endfor
   endif
 
