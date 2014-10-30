@@ -11,11 +11,11 @@ function! signature#marker#Toggle(marker)                                       
   let l:lnum = line('.')
   " If marker is found in on current line, remove it, else place it
   let l:mode = ( (  !g:SignatureForceMarkerPlacement
-        \   && (get( b:sig_markers, l:lnum, "" ) =~# escape( a:marker, '$^' ))
-        \   )
-        \ ? "remove" : "place"
-        \ )
-  call signature#ToggleSign( a:marker, l:mode, l:lnum )
+        \        && (get(b:sig_markers, l:lnum, "") =~# escape( a:marker, '$^' ))
+        \        )
+        \      ? "remove" : "place"
+        \      )
+  call signature#sign#Toggle( a:marker, l:mode, l:lnum )
 endfunction
 
 
@@ -36,13 +36,13 @@ function! signature#marker#Purge(...)                                           
 
   for l:marker in l:markers
     for l:lnum in keys( filter( copy(b:sig_markers), 'v:val =~# l:marker' ))
-      call signature#ToggleSign( l:marker, "remove", l:lnum )
+      call signature#sign#Toggle( l:marker, "remove", l:lnum )
     endfor
   endfor
 
   " If there are no marks and markers left, also remove the dummy sign
   if (len(b:sig_marks) + len(b:sig_markers) == 0)
-    call signature#ToggleSignDummy('remove')
+    call signature#sign#ToggleDummy('remove')
   endif
 endfunction
 
@@ -50,7 +50,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Navigation                                                                                                       {{{1
 "
-function! signature#marker#Goto( dir, type )                                                                     " {{{2
+function! signature#marker#Goto( dir, type )                                                                      " {{{2
   " Description: Jump to next/prev marker by location.
   " Arguments: dir  = next : Jump forward
   "                   prev : Jump backward
@@ -65,9 +65,9 @@ function! signature#marker#Goto( dir, type )                                    
    \ && (a:type ==? 'same')
    \ )
     let l:marker_lnums = sort( keys( filter( copy(b:sig_markers),
-          \ 'strpart(v:val, 0, 1) == strpart(b:sig_markers[l:lnum], 0, 1)' )), "signature#NumericSort" )
+          \ 'strpart(v:val, 0, 1) == strpart(b:sig_markers[l:lnum], 0, 1)' )), "signature#utils#NumericSort" )
   else
-    let l:marker_lnums = sort( keys( b:sig_markers ), "signature#NumericSort" )
+    let l:marker_lnums = sort( keys( b:sig_markers ), "signature#utils#NumericSort" )
   endif
 
   if (a:dir ==? 'next')
@@ -89,5 +89,45 @@ function! signature#marker#Goto( dir, type )                                    
   endif
 
   execute 'normal! ' . l:targ . 'G'
+endfunction
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"" Misc                                                                                                             {{{1
+"
+function! signature#marker#List(...)                                                                              " {{{2
+  " Description: Opens and populates location list with markers from current buffer
+  " Argument:    Show all markers in location list. If any particular marker is specified, list only that
+
+  " If a:1 == 0                    ==> No count was specified, list all markers
+  " If a:1 == ')'                  ==> List only the ')' marker
+  " If a:1 == [1-9] or '!@#$%^&*(' ==> List the corresponding marker
+  let l:marker = ''
+  if (a:0 != '')
+    let l:marker = a:1
+    if (match(l:marker, '\d') >= 0)
+      let l:marker = (l:marker == 0 ? '' : split(')!@#$%^&*(', '\zs')[l:marker])
+    endif
+  endif
+  if (  (l:marker != '')
+   \ && (stridx(b:SignatureIncludeMarkers, l:marker) == -1)
+   \ )
+    return
+  endif
+
+  let l:list_map = map(
+                   \   sort(
+                   \     keys(l:marker != "" ? filter(copy(b:sig_markers), 'v:val == l:marker') : b:sig_markers),
+                   \     'signature#utils#NumericSort'
+                   \   ),
+                   \   '{
+                   \     "bufnr": ' . bufnr('%') . ',
+                   \     "lnum" : v:val,
+                   \     "col"  : 1,
+                   \     "type" : "M",
+                   \     "text" : b:sig_markers[v:val] . ": " . getline(v:val)
+                   \   }'
+                   \  )
+  call setloclist(0, l:list_map,)|lopen
 endfunction
 " }}}2

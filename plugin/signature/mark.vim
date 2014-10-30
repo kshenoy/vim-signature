@@ -10,7 +10,7 @@ function! signature#mark#Toggle(mark)                                           
 
   if a:mark == "next"
     " Place new mark
-    let l:marks_list = signature#GetMarks('free', 'buf_all')
+    let l:marks_list = signature#mark#GetList('free', 'buf_all')
     if empty(l:marks_list)
       if (!g:SignatureUnconditionallyRecycleMarks)
         " No marks available and mark re-use not in effect
@@ -18,13 +18,13 @@ function! signature#mark#Toggle(mark)                                           
         return
       endif
       " Remove a local mark
-      let l:marks_list = signature#GetMarks('used', 'buf_curr')[0]
+      let l:marks_list = signature#mark#GetList('used', 'buf_curr')[0]
     endif
     call signature#mark#Move(l:marks_list[0])
 
   else
     " Toggle Mark
-    let l:used_marks = filter(signature#GetMarks('used', 'buf_all'), 'v:val[0] ==# a:mark')
+    let l:used_marks = filter(signature#mark#GetList('used', 'buf_all'), 'v:val[0] ==# a:mark')
     if ( len(l:used_marks) > 0 )
       let l:mark_pos = l:used_marks[0][1]
       let l:mark_buf = l:used_marks[0][2]
@@ -66,7 +66,7 @@ function! signature#mark#Remove(...)                                            
   endif
 
   let l:lnum = line("'" . l:mark)
-  call signature#ToggleSign(l:mark, "remove", l:lnum)
+  call signature#sign#Toggle(l:mark, "remove", l:lnum)
   execute 'delmarks ' . l:mark
   call signature#mark#ForceGlobalRemoval(l:mark)
 endfunction
@@ -76,7 +76,7 @@ function! signature#mark#Place(mark)                                            
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
   execute 'normal! m' . a:mark
-  call signature#ToggleSign( a:mark, "place", line('.'))
+  call signature#sign#Toggle( a:mark, "place", line('.'))
 endfunction
 
 
@@ -90,7 +90,7 @@ endfunction
 
 function! signature#mark#ToggleAtLine()                                                                           " {{{2
   " Description: If no mark on current line, add one. If marks are on the current line, remove one.
-  let l:marks_here = filter(signature#GetMarks('used', 'buf_curr'), 'v:val[1] == ' . line('.'))
+  let l:marks_here = filter(signature#mark#GetList('used', 'buf_curr'), 'v:val[1] == ' . line('.'))
   if empty(l:marks_here)
     " Set up for adding a mark
     call signature#mark#Toggle('next')
@@ -106,7 +106,7 @@ function! signature#mark#Purge(mode)                                            
   " Arguments:   mode = 'line' : Delete all marks from current line
   "                     'all'  : Delete all marks used in the buffer
 
-  let l:used_marks = signature#GetMarks('used', 'buf_curr')
+  let l:used_marks = signature#mark#GetList('used', 'buf_curr')
   if (a:mode ==? 'line')
     call filter(l:used_marks, 'v:val[1] == ' . line('.'))
   endif
@@ -125,7 +125,7 @@ function! signature#mark#Purge(mode)                                            
 
   " If there are no marks and markers left, also remove the dummy sign
   if len(b:sig_marks) + len(b:sig_markers) == 0
-    call signature#ToggleSignDummy( 'remove' )
+    call signature#sign#ToggleDummy( 'remove' )
   endif
 endfunction
 " }}}2
@@ -175,11 +175,11 @@ function! s:GotoByPos(dir)                                                      
 
   " Get list of line numbers of lines with marks.
   if a:dir ==? "next"
-    let l:targ = min( sort( keys( b:sig_marks ), "signature#NumericSort" ))
-    let l:mark_lnums = sort( keys( filter( copy( b:sig_marks ), 'v:key > l:lnum')), "signature#NumericSort" )
+    let l:targ = min( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
+    let l:mark_lnums = sort( keys( filter( copy( b:sig_marks ), 'v:key > l:lnum')), "signature#utils#NumericSort" )
   elseif a:dir ==? "prev"
-    let l:targ = max( sort( keys( b:sig_marks ), "signature#NumericSort" ))
-    let l:mark_lnums = reverse( sort( keys( filter( copy( b:sig_marks ), 'v:key < l:lnum')), "signature#NumericSort" ))
+    let l:targ = max( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
+    let l:mark_lnums = reverse( sort( keys( filter( copy( b:sig_marks ), 'v:key < l:lnum')), "signature#utils#NumericSort" ))
   endif
   let l:targ = ( empty( l:mark_lnums ) && b:SignatureWrapJumps ? l:targ : l:mark_lnums[0] )
   let l:mark = strpart( b:sig_marks[l:targ], 0, 1 )
@@ -191,7 +191,7 @@ endfunction
 function! s:GotoByAlpha(dir)                                                                                      " {{{2
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
-  let l:used_marks = signature#GetMarks('used', 'buf_curr')
+  let l:used_marks = signature#mark#GetList('used', 'buf_curr')
   let l:line_marks = filter(copy(l:used_marks), 'v:val[1] == ' . line('.'))
 
   " If there is only one mark in the current file, then return the same
@@ -236,6 +236,56 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Misc                                                                                                             {{{1
 "
+function! signature#mark#GetList(mode, scope)                                                                     " {{{2
+  " Description: Takes two optional arguments - mode/line no. and scope
+  "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
+  "              or are free to be placed in which case, line no. is 0
+  "
+  " Arguments: mode  = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
+  "                    'free'     : Returns list of [ free marks ]
+  "            scope = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
+  "                    'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
+
+  let l:marks_list = []
+  let l:line_tot = line('$')
+  let l:buf_curr = bufnr('%')
+
+  " Add local marks first
+  for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[a-z]"' )
+    let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
+  endfor
+
+  " Add global (uppercase) marks to list
+  for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
+    let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
+    if (a:scope ==? 'buf_curr')
+      " If it is not in use in the current buffer treat it as free
+      if l:buf != l:buf_curr
+        let l:line = 0
+      endif
+    endif
+    let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
+  endfor
+
+  if (a:mode ==? 'used')
+    if (a:scope ==? 'buf_curr')
+      call filter( l:marks_list, '(v:val[2] == l:buf_curr) && (v:val[1] > 0)' )
+    else
+      call filter( l:marks_list, 'v:val[1] > 0' )
+    endif
+  else
+    if (a:scope ==? 'buf_all')
+      call filter( l:marks_list, 'v:val[1] == 0' )
+    else
+      call filter( l:marks_list, '(v:val[1] == 0) || (v:val[2] != l:buf_curr)' )
+    endif
+    call map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
+  endif
+
+  return l:marks_list
+endfunction
+
+
 function! signature#mark#ForceGlobalRemoval(mark)                                                                 " {{{2
   " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
@@ -282,7 +332,7 @@ function! signature#mark#List(scope)                                            
   " Arguments:   scope = buf_curr : List marks from current buffer
   "          ~~~FIXME~~~ buf_all  : List marks from all buffers
 
-  let l:list_map = map(signature#GetMarks('used', a:scope),
+  let l:list_map = map(signature#mark#GetList('used', a:scope),
                    \   '{
                    \     "bufnr": v:val[2],
                    \     "lnum" : v:val[1],
