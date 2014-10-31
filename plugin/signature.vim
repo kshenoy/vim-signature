@@ -115,3 +115,25 @@ function! signature#Toggle()                                                    
     call signature#sign#ToggleDummy('remove')
   endif
 endfunction
+
+
+function! signature#Remove(lnum)                                                                                  " {{{2
+  " Description: Remove marker from specified line number. If not specified, or is 0, removes from current line
+  " Arguments:   lnum - Line no. to delete the mark/marker from. If not specified, removes marker from current line.
+  "                     NOTE: lnum is meaningless for a mark
+
+  let l:char = nr2char(getchar())
+
+  if (l:char =~ '^\d$')
+    let l:lnum = (a:lnum == 0 ? line('.') : a:lnum)
+    let l:char = split(')!@#$%^&*(', '\zs')[l:char]
+    call signature#marker#Remove(lnum, l:char)
+  elseif (l:char =~? '^[a-z]$')
+    call signature#mark#Remove(l:char)
+  endif
+
+  " If there are no marks and markers left, also remove the dummy sign
+  if (len(b:sig_marks) + len(b:sig_markers) == 0)
+    call signature#sign#ToggleDummy('remove')
+  endif
+endfunction

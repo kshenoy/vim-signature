@@ -58,12 +58,12 @@ function! s:CreateMap(key, map_lhs, map_rhs)                                    
 endfunction
 
 function! signature#utils#CreateMaps()                                                                            " {{{2
-  " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with Leader/Input
-  " as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able to identify it.
-  " Eg. the nr2char(getchar()) will fail if the user presses a <BS>
+  " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with
+  " Leader/Input as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able
+  " to identify it. Eg. the nr2char(getchar()) will fail if the user presses a <BS>
   let s:SignatureMapLeader = get(g:SignatureMap, 'Leader', 'm')
   if (s:SignatureMapLeader == "")
-    echoe "Signature: SignatureLeader shouldn't be left blank"
+    echoe "Signature: g:SignatureMap.Leader shouldn't be left blank"
   endif
   call s:CreateMap('Leader'           , s:SignatureMapLeader              , 'Input()'                           )
   call s:CreateMap('PlaceNextMark'    , s:SignatureMapLeader . ","        , 'mark#Toggle("next")'               )
@@ -71,7 +71,7 @@ function! signature#utils#CreateMaps()                                          
   call s:CreateMap('PurgeMarksAtLine' , s:SignatureMapLeader . "-"        , 'mark#Purge("line")'                )
   call s:CreateMap('PurgeMarks'       , s:SignatureMapLeader . "<Space>"  , 'mark#Purge("all")'                 )
   call s:CreateMap('PurgeMarkers'     , s:SignatureMapLeader . "<BS>"     , 'marker#Purge()'                    )
-  call s:CreateMap('DeleteMark'       , "dm"                              , 'mark#Remove()'                     )
+  call s:CreateMap('DeleteMark'       , "dm"                              , 'Remove(v:count)'                   )
   call s:CreateMap('GotoNextLineAlpha', "']"                              , 'mark#Goto("next", "line", "alpha")')
   call s:CreateMap('GotoPrevLineAlpha', "'["                              , 'mark#Goto("prev", "line", "alpha")')
   call s:CreateMap('GotoNextSpotAlpha', "`]"                              , 'mark#Goto("next", "spot", "alpha")')

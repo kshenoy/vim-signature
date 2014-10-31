@@ -56,19 +56,18 @@ function! signature#mark#Toggle(mark)                                           
 endfunction
 
 
-function! signature#mark#Remove(...)                                                                              " {{{2
+function! signature#mark#Remove(mark)                                                                             " {{{2
   " Description: Remove 'mark' and its associated sign. If called without an argument, obtain it from the user
-  " Arguments:   a:1 = [a-z,A-Z]
+  " Arguments:   mark = [a-z,A-Z]
 
-  let l:mark = (a:0 ? a:1 : nr2char(getchar()))
-  if stridx(b:SignatureIncludeMarks, l:mark) == -1
+  if stridx(b:SignatureIncludeMarks, a:mark) == -1
     return
   endif
 
-  let l:lnum = line("'" . l:mark)
-  call signature#sign#Toggle(l:mark, "remove", l:lnum)
-  execute 'delmarks ' . l:mark
-  call signature#mark#ForceGlobalRemoval(l:mark)
+  let l:lnum = line("'" . a:mark)
+  call signature#sign#Toggle(a:mark, "remove", l:lnum)
+  execute 'delmarks ' . a:mark
+  call signature#mark#ForceGlobalRemoval(a:mark)
 endfunction
 
 
