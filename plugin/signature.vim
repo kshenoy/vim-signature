@@ -54,7 +54,8 @@ endif
 
 command! -nargs=0 SignatureToggleSigns call signature#Toggle()
 command! -nargs=0 SignatureRefresh     call signature#sign#Refresh('force')
-command! -nargs=0 SignatureList        call signature#mark#ListLocal('buf_curr')
+command! -nargs=0 SignatureListMarks   call signature#mark#List('buf_curr')
+command! -nargs=? SignatureListMarkers call signature#marker#List(<args>)
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -118,9 +119,10 @@ endfunction
 
 
 function! signature#Remove(lnum)                                                                                  " {{{2
-  " Description: Remove marker from specified line number. If not specified, or is 0, removes from current line
-  " Arguments:   lnum - Line no. to delete the mark/marker from. If not specified, removes marker from current line.
-  "                     NOTE: lnum is meaningless for a mark
+  " Description: Obtain mark or marker from the user and remove it from the specified line number.
+  "              If lnum is not specified for marker, or is 0, removes the marker from current line
+  "              NOTE: lnum is meaningless for a mark
+  " Arguments:   lnum - Line no. to delete the marker from
 
   let l:char = nr2char(getchar())
 

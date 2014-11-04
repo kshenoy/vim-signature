@@ -85,6 +85,5 @@ function! signature#utils#CreateMaps()                                          
   call s:CreateMap('GotoNextMarkerAny', "]="                              , 'marker#Goto("next", "any")'        )
   call s:CreateMap('GotoPrevMarkerAny', "[="                              , 'marker#Goto("prev", "any")'        )
   call s:CreateMap('ListLocalMarks'   , 'm/'                              , 'mark#List("buf_curr")'             )
-  call s:CreateMap('ListLocalMarkers' , 'm?'                              , 'marker#List(v:count)'              )
-  call s:CreateMap('', '0' . get(g:SignatureMap, 'ListLocalMarkers', 'm?'), 'marker#List(")")'                  )
+  call s:CreateMap('ListLocalMarkers' , 'm?'                              , 'marker#List()'                     )
 endfunction
