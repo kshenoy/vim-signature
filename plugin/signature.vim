@@ -98,16 +98,16 @@ function! signature#Toggle()                                                    
     call signature#sign#Refresh()
 
     " Add signs for markers ...
-    for i in keys( b:sig_markers )
-      call signature#sign#Toggle( b:sig_markers[i], "place", i )
+    for i in keys(b:sig_markers)
+      call signature#sign#Place(b:sig_markers[i], i)
     endfor
   else
     " Signature disabled ==> Remove signs
-    for i in keys( b:sig_markers )
+    for i in keys(b:sig_markers)
       let l:id = i * 1000 + bufnr('%')
       silent! execute 'sign unplace ' . l:id
     endfor
-    for i in keys( b:sig_marks )
+    for i in keys(b:sig_marks)
       let l:id = i * 1000 + bufnr('%')
       silent! execute 'sign unplace ' . l:id
     endfor

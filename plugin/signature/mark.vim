@@ -19,27 +19,30 @@ function! signature#mark#Toggle(mark)                                           
       endif
       " Remove a local mark
       let l:marks_list = signature#mark#GetList('used', 'buf_curr')[0]
+      call signature#mark#Remove(l:marks_list[0])
     endif
-    call signature#mark#Move(l:marks_list[0])
+    call signature#mark#Place(l:marks_list[0])
 
   else
     " Toggle Mark
     let l:used_marks = filter(signature#mark#GetList('used', 'buf_all'), 'v:val[0] ==# a:mark')
-    if ( len(l:used_marks) > 0 )
+    if (len(l:used_marks) > 0)
       let l:mark_pos = l:used_marks[0][1]
       let l:mark_buf = l:used_marks[0][2]
 
       if (l:mark_buf == bufnr('%'))
         " If the mark is not in use in current buffer then it's a global ==> Don't worry about deleting it
         if (  (l:mark_pos == line('.'))
-              \ && !g:SignatureForceMarkPlacement
-              \ )
+         \ && !g:SignatureForceMarkPlacement
+         \ )
           " Mark is present on the current line. Remove it and return
           call signature#mark#Remove(a:mark)
           return
         else
-          " Mark is present elsewhere in the current buffer or g:SignatureForceMarkPlacement is set
-          " Remove it but fall-through to place new mark
+          " Mark is present elsewhere in the current buffer ==> Remove it and fall-through to place new mark.
+          " If g:SignatureForceMarkPlacement is set, we remove and re-place it so that the sign string can be true
+          " to the order in which the marks were placed.
+          " For eg. if we place 'a, 'b and then 'a again, the sign string changes from "ab" to "ba"
           " Ask for confirmation before moving mark
           if (g:SignatureDeleteConfirmation)
             let choice = confirm("Mark '" . a:mark . "' has been used elsewhere. Reuse it?", "&Yes\n&No", 1)
@@ -65,7 +68,7 @@ function! signature#mark#Remove(mark)                                           
   endif
 
   let l:lnum = line("'" . a:mark)
-  call signature#sign#Toggle(a:mark, "remove", l:lnum)
+  call signature#sign#Remove(a:mark, l:lnum)
   execute 'delmarks ' . a:mark
   call signature#mark#ForceGlobalRemoval(a:mark)
 endfunction
@@ -74,16 +77,11 @@ endfunction
 function! signature#mark#Place(mark)                                                                              " {{{2
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
+  " If a line is deleted or mark is manipulated using any non-signature method then b:sig_marks can go out of sync
+  " Thus, we forcibly remove signs for the mark present on any line before proceeding
+  call signature#sign#Remove(a:mark, 0)
   execute 'normal! m' . a:mark
-  call signature#sign#Toggle( a:mark, "place", line('.'))
-endfunction
-
-
-function! signature#mark#Move(mark)                                                                               " {{{2
-  " Description: Move a mark by removing and placing again
-  " Arguments:   mark = [a-z,A-Z]
-  call signature#mark#Remove(a:mark)
-  call signature#mark#Place(a:mark)
+  call signature#sign#Place(a:mark, line('.'))
 endfunction
 
 
@@ -110,7 +108,7 @@ function! signature#mark#Purge(mode)                                            
     call filter(l:used_marks, 'v:val[1] == ' . line('.'))
   endif
 
-  if (  !empty( l:used_marks )
+  if (  !empty(l:used_marks)
    \ && g:SignaturePurgeConfirmation
    \ )
     let l:msg = 'Are you sure you want to delete all marks' . (a:mode ==? 'line' ? ' from the current line' : '') . '?'
@@ -121,10 +119,16 @@ function! signature#mark#Purge(mode)                                            
   for i in l:used_marks
     call signature#mark#Remove(i[0])
   endfor
+  " If marks are modified using any non-signature method, b:sig_marks can go out of sync
+  for l:lnum in keys(b:sig_marks)
+    for l:mark in split(b:sig_marks[l:lnum], '\zs')
+      call signature#sign#Remove(l:mark, l:lnum)
+    endfor
+  endfor
 
   " If there are no marks and markers left, also remove the dummy sign
-  if len(b:sig_marks) + len(b:sig_markers) == 0
-    call signature#sign#ToggleDummy( 'remove' )
+  if (len(b:sig_marks) + len(b:sig_markers) == 0)
+    call signature#sign#ToggleDummy('remove')
   endif
 endfunction
 " }}}2
@@ -250,7 +254,7 @@ function! signature#mark#GetList(mode, scope)                                   
   let l:buf_curr = bufnr('%')
 
   " Add local marks first
-  for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[a-z]"' )
+  for i in filter(split(b:SignatureIncludeMarks, '\zs'), 'v:val =~# "[a-z]"')
     let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
   endfor
 

@@ -10,12 +10,13 @@ function! signature#marker#Toggle(marker)                                       
 
   let l:lnum = line('.')
   " If marker is found in on current line, remove it, else place it
-  let l:mode = ( (  !g:SignatureForceMarkerPlacement
-        \        && (get(b:sig_markers, l:lnum, "") =~# escape( a:marker, '$^' ))
-        \        )
-        \      ? "remove" : "place"
-        \      )
-  call signature#sign#Toggle( a:marker, l:mode, l:lnum )
+  if (  (get(b:sig_markers, l:lnum, "") =~# escape(a:marker, '$^'))
+   \ && !g:SignatureForceMarkerPlacement
+   \ )
+    call signature#sign#Remove(a:marker, l:lnum)
+  else
+    call signature#sign#Place(a:marker, l:lnum)
+  endif
 endfunction
 
 
@@ -25,7 +26,7 @@ function! signature#marker#Remove(lnum, marker)                                 
   "              a:2  - Marker to delete. If not specified, obtains input from user
 
   if (get(b:sig_markers, a:lnum, '') =~ a:marker)
-    call signature#sign#Toggle(a:marker, 'remove', a:lnum)
+    call signature#sign#Remove(a:marker, a:lnum)
   endif
 endfunction
 

@@ -1,16 +1,13 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#sign#Toggle(sign, mode, lnum)                                                                 " {{{2
-  " Description: Enable/Disable/Toggle signs for marks/markers on the specified line number, depending on value of mode
+function! signature#sign#Place(sign, lnum)                                                                        " {{{1
+  " Description: Place signs for marks/markers on the specified line number
   " Arguments:
-  "   sign : The mark/marker whose sign is to be placed/removed/toggled
-  "   mode : 'remove'
-  "        : 'place'
+  "   sign : The mark/marker whose sign is to be placed
   "   lnum : Line number on/from which the sign is to be placed/removed
-  "          If mode = "remove" and line number is 0, the 'sign' is removed from all lines
 
-  "echom "DEBUG: sign = " . a:sign . ",  mode = " . a:mode . ",  lnum = " . a:lnum
+  "echom "DEBUG: sign = " . a:sign . ",  lnum = " . a:lnum
 
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
@@ -18,67 +15,96 @@ function! signature#sign#Toggle(sign, mode, lnum)                               
   " FIXME: Highly inefficient. Needs work
   " Place sign only if there are no signs from other plugins (eg. syntastic)
   "let l:present_signs = signature#sign#GetInfo(1)
-  "if b:SignatureDeferPlacement && has_key( l:present_signs, a:lnum ) && l:present_signs[a:lnum]['name'] !~# '^sig_Sign_'
-    "return
+  "if (  b:SignatureDeferPlacement
+  " \ && has_key(l:present_signs, a:lnum)
+  " \ && (l:present_signs[a:lnum]['name'] !~# '^sig_Sign_')
+  " \ )
+  "  return
   "endif
 
-  let l:lnum = a:lnum
-  let l:id   = l:lnum * 1000 + bufnr('%')
-
-  " Toggle sign for markers                         {{{3
   if stridx( b:SignatureIncludeMarkers, a:sign ) >= 0
-
-    if a:mode ==? 'place'
-      let b:sig_markers[l:lnum] = a:sign . get( b:sig_markers, l:lnum, "" )
-    else
-      let b:sig_markers[l:lnum] = substitute( b:sig_markers[l:lnum], "\\C" . escape( a:sign, '$^' ), "", "" )
-
-      " If there are no markers on the line, delete signs on that line
-      if b:sig_markers[l:lnum] == ""
-        call remove( b:sig_markers, l:lnum )
-      endif
-    endif
-
-  " Toggle sign for marks                           {{{3
+    let b:sig_markers[a:lnum] = a:sign . get(b:sig_markers, a:lnum, "")
   else
-    if a:mode ==? "place"
-      let b:sig_marks[l:lnum] = a:sign . get( b:sig_marks, l:lnum, "" )
-    else
-      " If l:lnum == 0, remove from all lines
-      if l:lnum == 0
-        let l:arr = keys( filter( copy(b:sig_marks), 'v:val =~# a:sign' ))
-        if empty(l:arr) | return | endif
-      else
-        let l:arr = [l:lnum]
-      endif
-
-      for l:lnum in l:arr
-        let l:id = l:lnum * 1000 + bufnr('%')
-        " FIXME: Placed guard to avoid triggering issue #53
-        if has_key( b:sig_marks, l:lnum )
-          let b:sig_marks[l:lnum] = substitute( b:sig_marks[l:lnum], "\\C" . a:sign, "", "" )
-          " If there are no marks on the line, delete signs on that line
-          if b:sig_marks[l:lnum] == ""
-            call remove( b:sig_marks, l:lnum )
-          endif
-        endif
-      endfor
-    endif
+    let b:sig_marks[a:lnum] = a:sign . get(b:sig_marks, a:lnum, "")
   endif
   "}}}3
 
+  call signature#sign#RefreshLine(a:lnum)
+endfunction
+
+
+function! signature#sign#Remove(sign, lnum)                                                                       " {{{1
+  " Description: Remove signs for marks/markers from the specified line number
+  " Arguments:
+  "   sign : The mark/marker whose sign is to be placed/removed/toggled
+  "   lnum : Line number from which the sign is to be removed
+  "          If line number is 0, the 'sign' will be removed from all lines
+
+  "echom "DEBUG: sign = " . a:sign . ",  lnum = " . a:lnum
+
+  " If Signature is not enabled, return
+  if !b:sig_enabled | return | endif
+
+  " Remove sign for markers
+  if stridx( b:SignatureIncludeMarkers, a:sign ) >= 0
+    let b:sig_markers[a:lnum] = substitute(b:sig_markers[a:lnum], "\\C" . escape( a:sign, '$^' ), "", "")
+
+    " If there are no markers on the line, delete signs on that line
+    if b:sig_markers[a:lnum] == ""
+      call remove(b:sig_markers, a:lnum)
+    endif
+    call signature#sign#RefreshLine(a:lnum)
+
+  " Remove sign for marks
+  else
+    " If a:lnum == 0, remove from all lines
+    if a:lnum == 0
+      let l:arr = keys(filter(copy(b:sig_marks), 'v:val =~# a:sign'))
+      if empty(l:arr) | return | endif
+    else
+      let l:arr = [a:lnum]
+    endif
+
+    for l:lnum in l:arr
+      let l:id = l:lnum * 1000 + bufnr('%')
+      " FIXME: Placed guard to avoid triggering issue #53
+      if has_key(b:sig_marks, l:lnum)
+        let b:sig_marks[l:lnum] = substitute(b:sig_marks[l:lnum], "\\C" . a:sign, "", "")
+        " If there are no marks on the line, delete signs on that line
+        if b:sig_marks[l:lnum] == ""
+          call remove(b:sig_marks, l:lnum)
+        endif
+      endif
+      call signature#sign#RefreshLine(l:lnum)
+    endfor
+  endif
+endfunction
+
+
+function! signature#sign#RefreshLine(lnum)                                                                        " {{{1
+  " Description: Decides what the sign string should be based on if there are any marks or markers (using b:sig_marks
+  "              and b:sig_markers) on the current line and the value of b:SignaturePrioritizeMarks.
+  " Arguments:
+  "   lnum : Line number for which the sign string is to be modified
+
+  let l:id = a:lnum * 1000 + bufnr('%')
+
   " Place the sign
-  if ( has_key( b:sig_marks, l:lnum ) && ( b:SignaturePrioritizeMarks || !has_key( b:sig_markers, l:lnum )))
-    let l:str = substitute( b:SignatureMarkOrder, "\m", strpart( b:sig_marks[l:lnum], 0, 1 ), "" )
-    let l:str = substitute( l:str,                "\p", strpart( b:sig_marks[l:lnum], 1, 1 ), "" )
+  if ( has_key(b:sig_marks, a:lnum)
+   \ && (  b:SignaturePrioritizeMarks
+   \    || !has_key(b:sig_markers, a:lnum)
+   \    )
+   \ )
+    let l:str = substitute( b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "" )
+    let l:str = substitute( l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "" )
 
     " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
     let l:SignatureMarkTextHL = eval( g:SignatureMarkTextHL )
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
 
-  elseif has_key( b:sig_markers, l:lnum )
-    let l:str = strpart( b:sig_markers[l:lnum], 0, 1 )
+  elseif has_key(b:sig_markers, a:lnum)
+    let l:str = strpart( b:sig_markers[a:lnum], 0, 1 )
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
@@ -90,16 +116,16 @@ function! signature#sign#Toggle(sign, mode, lnum)                               
     execute 'sign unplace ' . l:id
     return
   endif
-  execute 'sign place ' . l:id . ' line=' . l:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
+  execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
 
   " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
-  if len(b:sig_marks) + len(b:sig_markers) == 1
-    call signature#sign#ToggleDummy( 'place' )
+  if (len(b:sig_marks) + len(b:sig_markers) == 1)
+    call signature#sign#ToggleDummy('place')
   endif
 endfunction
 
 
-function! signature#sign#Refresh(...)                                                                             " {{{2
+function! signature#sign#Refresh(...)                                                                             " {{{1
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
   " Arguments: '1' to force a sign refresh
 
@@ -109,7 +135,7 @@ function! signature#sign#Refresh(...)                                           
 
   for i in signature#mark#GetList('free', 'buf_curr')
     " ... remove it
-    call signature#sign#Toggle( i, "remove", 0 )
+    call signature#sign#Remove(i, 0)
   endfor
 
   " Add signs for marks ...
@@ -117,8 +143,8 @@ function! signature#sign#Refresh(...)                                           
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
     if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || a:0
-      call signature#sign#Toggle( j[0], "remove", 0    )
-      call signature#sign#Toggle( j[0], "place" , j[1] )
+      call signature#sign#Remove(j[0], 0   )
+      call signature#sign#Place (j[0], j[1])
     endif
   endfor
 
@@ -127,7 +153,7 @@ function! signature#sign#Refresh(...)                                           
 endfunction
 
 
-function! signature#sign#ToggleDummy(mode)                                                                        " {{{2
+function! signature#sign#ToggleDummy(mode)                                                                        " {{{1
   " Arguments:
   "   mode : 'remove'
   "        : 'place'
@@ -144,8 +170,8 @@ function! signature#sign#ToggleDummy(mode)                                      
 endfunction
 
 
-function! signature#sign#GetInfo(...)                                                                             " {{{2
-  " Description: Returns a dictionary of filenames, each of which is dictionary of line numbers on which signs are placed
+function! signature#sign#GetInfo(...)                                                                             " {{{1
+  " Description: Returns a dic of filenames, each of which is a dic of line numbers on which signs are placed
   " Arguments: filename (optional).
   "            If filename is provided, the return value will contain signs only present in the given file
   " Eg. {

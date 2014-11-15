@@ -1,7 +1,7 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#utils#Init()                                                                                  " {{{2
+function! signature#utils#Init()                                                                                  " {{{1
   " Description: Initialize variables
 
   if !exists('b:sig_marks')
@@ -34,7 +34,7 @@ function! signature#utils#Init()                                                
 endfunction
 
 
-function! signature#utils#Set(var, default)
+function! signature#utils#Set(var, default)                                                                       " {{{1
   if !exists(a:var)
     if type(a:default)
       execute 'let' a:var '=' string(a:default)
@@ -45,19 +45,19 @@ function! signature#utils#Set(var, default)
 endfunction
 
 
-function! signature#utils#NumericSort(x, y)                                                                       " {{{2
+function! signature#utils#NumericSort(x, y)                                                                       " {{{1
   return a:x - a:y
 endfunction
 
 
-function! s:CreateMap(key, map_lhs, map_rhs)                                                                      " {{{2
-  let l:map_lhs = get(g:SignatureMap, a:key, a:map_lhs)
+function! s:CreateMap(key, map_lhs_default, map_rhs)                                                              " {{{1
+  let l:map_lhs = get(g:SignatureMap, a:key, a:map_lhs_default)
   if (l:map_lhs != "")
     silent! execute 'nnoremap <silent> <unique> ' . l:map_lhs . ' ' . ':<C-U>call signature#' . a:map_rhs . '<CR>'
   endif
 endfunction
 
-function! signature#utils#CreateMaps()                                                                            " {{{2
+function! signature#utils#CreateMaps()                                                                            " {{{1
   " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with
   " Leader/Input as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able
   " to identify it. Eg. the nr2char(getchar()) will fail if the user presses a <BS>

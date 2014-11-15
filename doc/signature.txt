@@ -41,7 +41,7 @@ Out of the box, the followings mappings are defined by default
   `[           Jump by alphabetical order to prev mark
   ']           Jump by alphabetical order to start of next line having a mark
   '[           Jump by alphabetical order to start of prev line having a mark
-  '?           Open location list and display local marks
+  m/           Open location list and display marks from current buffer
 
   m[0-9]       Toggle the corresponding marker !@#$%^&*()
   m<S-[0-9]>   Remove all markers of the same type
@@ -49,6 +49,7 @@ Out of the box, the followings mappings are defined by default
   [-           Jump to prev line having a marker of the same type
   ]=           Jump to next line having a marker of any type
   [=           Jump to prev line having a marker of any type
+  m?           Open location list and display markers from current buffer
   m<BS>        Remove all markers
 
 This will allow the use of default behavior of m to set marks and, if
@@ -60,12 +61,19 @@ beginning or end of file is reached.
 ==============================================================================
 3. Commands                                               *signature-commands*
 
-'SignatureToggleSigns'
+SignatureToggleSigns
   Toggle the display of signs. This won't affect the marks or the mappings.
 
-'SignatureRefresh'
+SignatureRefresh
   Force the display of signs in the buffer to refresh. Use this to correct
   the signs if things go awry
+
+SignatureListMarks
+  List all the marks used in the current buffer in the location list
+
+SignatureListMarkers [marker]
+  List all instances of the specified marker used in the current buffer in
+  the location list. If no argument is given, it lists all markers
 
 
 ==============================================================================
@@ -95,7 +103,8 @@ beginning or end of file is reached.
         \ 'GotoPrevMarker'     :  "[-",
         \ 'GotoNextMarkerAny'  :  "]=",
         \ 'GotoPrevMarkerAny'  :  "[=",
-        \ 'ListLocalMarks'     :  "'?"
+        \ 'ListLocalMarks'     :  "m/",
+        \ 'ListLocalMarkers'   :  "m?"
         \ }
 
   By default, it defines the mappings as shown in |signature-mappings|
@@ -142,8 +151,6 @@ beginning or end of file is reached.
     let g:SignatureMap['Leader'] = '<Leader>'
     let g:SignatureMap['Leader'] = '<LocalLeader>'
 
-  Assigning this to <LocalLeader> allows this to be buffer-specific
-
 
                                                       *'g:SignatureWrapJumps'*
   Boolean, Default : 1
@@ -175,12 +182,18 @@ beginning or end of file is reached.
                                                      *'g:SignatureMarkTextHL'*
   String, Default : 'Exception'
 
-  The highlight group used for mark signs.
+  The highlight group used for mark signs. This can be set to a function
+  reference can be assigned to this to allow dynamic highlighting of signs
+  NOTE: The quotes should be a part of the assignment.
+  Eg.   let g:SignatureMarkTextHL = "'Exception'"
 
                                                    *'g:SignatureMarkerTextHL'*
   String, Default : 'WarningMsg'
 
-  The highlight group used for marker signs.
+  The highlight group used for marker signs. This can be set to a function
+  reference can be assigned to this to allow dynamic highlighting of signs
+  NOTE: The quotes should be a part of the assignment.
+  Eg.   let g:SignatureMarkTextHL = "'WarningMsg'"
 
 
                                              *'g:SignatureDeleteConfirmation'*
