@@ -99,16 +99,18 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
+    let l:SignatureMarkLineHL = eval( g:SignatureMarkLineHL )
     let l:SignatureMarkTextHL = eval( g:SignatureMarkTextHL )
-    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   elseif has_key(b:sig_markers, a:lnum)
     let l:str = strpart(b:sig_markers[a:lnum], 0, 1)
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkerTextHL = eval(g:SignatureMarkerTextHL)
-    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL
+    let l:SignatureMarkLineHL = eval( g:SignatureMarkLineHL )
+    let l:SignatureMarkerTextHL = eval( g:SignatureMarkerTextHL )
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   else
     " FIXME: Clean-up. Undefine the sign

@@ -195,6 +195,11 @@ SignatureListMarkers [marker]
   NOTE: The quotes should be a part of the assignment.
   Eg.   let g:SignatureMarkTextHL = "'WarningMsg'"
 
+                                                     *'g:SignatureMarkLineHL'*
+  String, Default : ''
+
+  The highlight group used for hightlighting lines having mark/marker signs.
+
 
                                              *'g:SignatureDeleteConfirmation'*
   Boolean, Default: 0
