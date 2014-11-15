@@ -103,17 +103,13 @@ function! signature#Toggle()                                                    
     endfor
   else
     " Signature disabled ==> Remove signs
-    for i in keys(b:sig_markers)
-      let l:id = i * 1000 + bufnr('%')
-      silent! execute 'sign unplace ' . l:id
+    for l:lnum in keys(b:sig_markers)
+      call signature#sign#Unplace(l:lnum)
     endfor
-    for i in keys(b:sig_marks)
-      let l:id = i * 1000 + bufnr('%')
-      silent! execute 'sign unplace ' . l:id
+    for l:lnum in keys(b:sig_marks)
+      call signature#sign#Unplace(l:lnum)
     endfor
     unlet b:sig_marks
-    " Also remove the dummy sign
-    call signature#sign#ToggleDummy('remove')
   endif
 endfunction
 
@@ -132,10 +128,5 @@ function! signature#Remove(lnum)                                                
     call signature#marker#Remove(lnum, l:char)
   elseif (l:char =~? '^[a-z]$')
     call signature#mark#Remove(l:char)
-  endif
-
-  " If there are no marks and markers left, also remove the dummy sign
-  if (len(b:sig_marks) + len(b:sig_markers) == 0)
-    call signature#sign#ToggleDummy('remove')
   endif
 endfunction

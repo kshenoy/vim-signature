@@ -66,7 +66,6 @@ function! signature#sign#Remove(sign, lnum)                                     
     endif
 
     for l:lnum in l:arr
-      let l:id = l:lnum * 1000 + bufnr('%')
       " FIXME: Placed guard to avoid triggering issue #53
       if has_key(b:sig_marks, l:lnum)
         let b:sig_marks[l:lnum] = substitute(b:sig_marks[l:lnum], "\\C" . a:sign, "", "")
@@ -95,8 +94,8 @@ function! signature#sign#RefreshLine(lnum)                                      
    \    || !has_key(b:sig_markers, a:lnum)
    \    )
    \ )
-    let l:str = substitute( b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "" )
-    let l:str = substitute( l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "" )
+    let l:str = substitute(b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "")
+    let l:str = substitute(l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "")
 
     " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
@@ -104,24 +103,22 @@ function! signature#sign#RefreshLine(lnum)                                      
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL
 
   elseif has_key(b:sig_markers, a:lnum)
-    let l:str = strpart( b:sig_markers[a:lnum], 0, 1 )
+    let l:str = strpart(b:sig_markers[a:lnum], 0, 1)
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkerTextHL = eval( g:SignatureMarkerTextHL )
+    let l:SignatureMarkerTextHL = eval(g:SignatureMarkerTextHL)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL
 
   else
     " FIXME: Clean-up. Undefine the sign
-    execute 'sign unplace ' . l:id
+    call signature#sign#Unplace(a:lnum)
     return
   endif
   execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
 
   " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
-  if (len(b:sig_marks) + len(b:sig_markers) == 1)
-    call signature#sign#ToggleDummy('place')
-  endif
+  call signature#sign#ToggleDummy()
 endfunction
 
 
@@ -142,7 +139,7 @@ function! signature#sign#Refresh(...)                                           
   for j in signature#mark#GetList('used', 'buf_curr')
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
-    if !has_key( b:sig_marks, j[1] ) || b:sig_marks[j[1]] !~# j[0] || a:0
+    if !has_key(b:sig_marks, j[1]) || b:sig_marks[j[1]] !~# j[0] || a:0
       call signature#sign#Remove(j[0], 0   )
       call signature#sign#Place (j[0], j[1])
     endif
@@ -153,18 +150,21 @@ function! signature#sign#Refresh(...)                                           
 endfunction
 
 
-function! signature#sign#ToggleDummy(mode)                                                                        " {{{1
-  " Arguments:
-  "   mode : 'remove'
-  "        : 'place'
+function! signature#sign#Unplace(lnum)                                                                            " {{{1
+  " Description: Remove the sign from the specified line number
+  let l:id = a:lnum * 1000 + bufnr('%')
+  silent! execute 'sign unplace ' . l:id
+  call signature#sign#ToggleDummy()
+endfunction
 
-  if a:mode ==? 'place'
+
+function! signature#sign#ToggleDummy()                                                                            " {{{1
+  " Description: Places a dummy sign to prevent flickering of the gutter when the mark is moved or the line containing
+  "              a mark/marker is deleted and then the delete is undone
+  if (len(b:sig_marks) + len(b:sig_markers) == 1)
     sign define Signature_Dummy
-    " When only 1 sign is present and we delete the line that the sign is on and undo the delete,
-    " ToggleSignDummy('place') is called again. To avoid placing multiple dummy signs we unplace and place it.
-    execute 'sign unplace 666 buffer=' . bufnr('%')
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
-  else
+  elseif (len(b:sig_marks) + len(b:sig_markers) == 0)
     silent! execute 'sign unplace 666 buffer=' . bufnr('%')
   endif
 endfunction

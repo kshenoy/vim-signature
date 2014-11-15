@@ -51,11 +51,6 @@ function! signature#marker#Purge(...)                                           
       call signature#marker#Remove(l:lnum, l:marker)
     endfor
   endfor
-
-  " If there are no marks and markers left, also remove the dummy sign
-  if (len(b:sig_marks) + len(b:sig_markers) == 0)
-    call signature#sign#ToggleDummy('remove')
-  endif
 endfunction
 
 

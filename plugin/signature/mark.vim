@@ -121,15 +121,8 @@ function! signature#mark#Purge(mode)                                            
   endfor
   " If marks are modified using any non-signature method, b:sig_marks can go out of sync
   for l:lnum in keys(b:sig_marks)
-    for l:mark in split(b:sig_marks[l:lnum], '\zs')
-      call signature#sign#Remove(l:mark, l:lnum)
-    endfor
+    call signature#sign#Unplace(l:lnum)
   endfor
-
-  " If there are no marks and markers left, also remove the dummy sign
-  if (len(b:sig_marks) + len(b:sig_markers) == 0)
-    call signature#sign#ToggleDummy('remove')
-  endif
 endfunction
 " }}}2
 
