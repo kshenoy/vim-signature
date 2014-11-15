@@ -182,6 +182,11 @@ beginning or end of file is reached.
 
   The highlight group used for marker signs.
 
+                                                     *'g:SignatureMarkLineHL'*
+  String, Default : ''
+
+  The highlight group used for hightlighting lines having mark/marker signs.
+
 
                                              *'g:SignatureDeleteConfirmation'*
   Boolean, Default: 0
