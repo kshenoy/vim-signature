@@ -23,7 +23,7 @@ call signature#utils#Set('g:SignaturePrioritizeMarks',             1            
 call signature#utils#Set('g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 call signature#utils#Set('g:SignatureIncludeMarkers',              ')!@#$%^&*('                                          )
 call signature#utils#Set('g:SignatureMarkTextHL',                  '"Exception"'                                         )
-call signature#utils#Set('g:SignatureMarkLineHL',                  '""'                                         )
+call signature#utils#Set('g:SignatureMarkLineHL',                  '""'                                                  )
 call signature#utils#Set('g:SignatureMarkerTextHL',                '"WarningMsg"'                                        )
 call signature#utils#Set('g:SignatureWrapJumps',                   1                                                     )
 call signature#utils#Set('g:SignatureMarkOrder',                   "\p\m"                                                )
