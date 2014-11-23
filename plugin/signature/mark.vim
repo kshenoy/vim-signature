@@ -119,10 +119,13 @@ function! signature#mark#Purge(mode)                                            
   for i in l:used_marks
     call signature#mark#Remove(i[0])
   endfor
+
   " If marks are modified using any non-signature method, b:sig_marks can go out of sync
-  for l:lnum in keys(b:sig_marks)
-    call signature#sign#Unplace(l:lnum)
-  endfor
+  if (a:mode ==? 'all')
+    for l:lnum in keys(b:sig_marks)
+      call signature#sign#Unplace(l:lnum)
+    endfor
+  endif
 endfunction
 " }}}2
 
