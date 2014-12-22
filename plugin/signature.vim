@@ -43,13 +43,15 @@ call signature#utils#Set('g:SignatureMap',                         {}           
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Commands, Autocmds and Maps                                                                                      {{{1
 "
-call signature#utils#CreateMaps()
+call signature#utils#Maps('create')
 
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
     autocmd CursorHold * if g:SignaturePeriodicRefresh | call signature#sign#Refresh() | endif
+    autocmd BufEnter,FileType * if (&filetype ==? 'nerdtree') | call signature#utils#Maps('remove') | endif
+    autocmd BufLeave * if (&filetype ==? 'nerdtree') | call signature#utils#Maps('create') | endif
   augroup END
 endif
 
