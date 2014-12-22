@@ -160,13 +160,23 @@ function! signature#sign#Unplace(lnum)                                          
 endfunction
 
 
-function! signature#sign#ToggleDummy()                                                                            " {{{1
+function! signature#sign#ToggleDummy(...)                                                                         " {{{1
   " Description: Places a dummy sign to prevent flickering of the gutter when the mark is moved or the line containing
   "              a mark/marker is deleted and then the delete is undone
-  if (len(b:sig_marks) + len(b:sig_markers) == 1)
+  " Arguments:   a:1 (place/remove) - Force mode
+
+  if (a:0)
+    let l:place  = (a:1 =~# 'place' )
+    let l:remove = (a:1 =~# 'remove')
+  else
+    let l:place  = (len(b:sig_marks) + len(b:sig_markers) == 1)
+    let l:remove = (len(b:sig_marks) + len(b:sig_markers) == 0)
+  endif
+
+  if (l:place)
     sign define Signature_Dummy
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
-  elseif (len(b:sig_marks) + len(b:sig_markers) == 0)
+  elseif (l:remove)
     silent! execute 'sign unplace 666 buffer=' . bufnr('%')
   endif
 endfunction
