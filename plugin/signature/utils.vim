@@ -58,7 +58,7 @@ function! s:Map(mode, key, map_lhs_default, map_rhs)                            
   if (a:mode ==? 'create')
     silent! execute 'nnoremap <silent> <unique> ' . l:map_lhs . ' ' . ':<C-U>call signature#' . a:map_rhs . '<CR>'
   elseif (a:mode ==? 'remove')
-    execute 'nunmap ' . l:map_lhs
+    silent! execute 'nunmap ' . l:map_lhs
   endif
 endfunction
 
