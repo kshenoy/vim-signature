@@ -57,6 +57,9 @@ the line already contains the mark, it'll be unset. The default behavior
 of ]', [', ]` and [` is supported and enhanced by wrapping around when
 beginning or end of file is reached.
 
+]-, [-, ]= and [= will jump to the corresponding marker directly when given a
+count
+
 
 ==============================================================================
 3. Commands                                               *signature-commands*
