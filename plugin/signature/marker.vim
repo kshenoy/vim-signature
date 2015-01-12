@@ -57,20 +57,22 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Navigation                                                                                                       {{{1
 "
-function! signature#marker#Goto( dir, marker_num, type )                                                          " {{{2
+function! signature#marker#Goto( dir, marker_num, count )                                                         " {{{2
   " Description: Jump to next/prev marker by location.
-  " Arguments: dir  = next : Jump forward
-  "                   prev : Jump backward
-  "            type = same : Jump to a marker of the same type
-  "                   any  : Jump to a marker of any type
+  " Arguments: dir    = next  : Jump forward
+  "                     prev  : Jump backward
+  "            marker = same  : Jump to a marker of the same type
+  "                     any   : Jump to a marker of any type
+  "                     [1-9] : Jump to the corresponding marker
 
   let l:lnum = line('.')
-  let l:type = (!has_key(b:sig_markers, l:lnum) ? 'any' : a:type)
 
   let l:marker = ''
-  if (a:marker_num != 0)
-    let l:marker = split(')!@#$%^&*(', '\zs')[a:marker_num]
-  elseif (l:type ==? 'same')
+  if (a:marker_num =~ '\v<[1-9]>')
+    let l:marker = split(b:SignatureIncludeMarkers, '\zs')[a:marker_num]
+  elseif (  (a:marker_num ==? 'same')
+       \ && has_key(b:sig_markers, l:lnum)
+       \ )
     let l:marker = strpart(b:sig_markers[l:lnum], 0, 1)
   endif
 
@@ -82,24 +84,28 @@ function! signature#marker#Goto( dir, marker_num, type )                        
   else
     let l:marker_lnums = sort(keys(b:sig_markers), "signature#utils#NumericSort")
   endif
+
+  if (a:dir ==? 'next')
+    let l:marker_lnums = filter(copy(l:marker_lnums), ' v:val >  l:lnum')
+                     \ + filter(copy(l:marker_lnums), '(v:val <= l:lnum) && b:SignatureWrapJumps')
+  elseif (a:dir ==? 'prev')
+    call reverse(l:marker_lnums)
+    let l:marker_lnums = filter(copy(l:marker_lnums), ' v:val <  l:lnum')
+                     \ + filter(copy(l:marker_lnums), '(v:val >= l:lnum) && b:SignatureWrapJumps')
+  endif
+
   if (len(l:marker_lnums) == 0)
     return
   endif
 
-  if (a:dir ==? 'next')
-    let l:targ = (b:SignatureWrapJumps ? l:marker_lnums[0] : l:lnum)
-    call filter(l:marker_lnums, 'v:val > l:lnum')
-    if (len(l:marker_lnums) > 0)
-      let l:targ = l:marker_lnums[0]
-    endif
-  elseif (a:dir ==? 'prev')
-    let l:targ = (b:SignatureWrapJumps ? l:marker_lnums[-1] : l:lnum)
-    call filter(l:marker_lnums, 'v:val < l:lnum')
-    if (len(l:marker_lnums) > 0)
-      let l:targ = l:marker_lnums[-1]
-    endif
+  let l:count = (a:count == 0 ? 1 : a:count)
+  if (b:SignatureWrapJumps)
+    let l:count = l:count % len(l:marker_lnums)
+  elseif (l:count > len(l:marker_lnums))
+    let l:count = 0
   endif
 
+  let l:targ = l:marker_lnums[l:count - 1]
   execute 'normal! ' . l:targ . 'G'
 endfunction
 

@@ -8,8 +8,8 @@ function! signature#utils#Init()                                                
     " b:sig_marks = { lnum => signs_str }
     let b:sig_marks = {}
   else
-    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are now
-    " greater than the total number of lines in the file.
+    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are
+    " now greater than the total number of lines in the file.
     let l:line_tot = line('$')
     call filter( b:sig_marks, 'v:key <= l:line_tot' )
   endif
@@ -85,10 +85,10 @@ function! signature#utils#Maps(mode)                                            
   call s:Map(a:mode, 'GotoPrevLineByPos', "['"                            , 'mark#Goto("prev", "line", "pos")'    )
   call s:Map(a:mode, 'GotoNextSpotByPos', "]`"                            , 'mark#Goto("next", "spot", "pos")'    )
   call s:Map(a:mode, 'GotoPrevSpotByPos', "[`"                            , 'mark#Goto("prev", "spot", "pos")'    )
-  call s:Map(a:mode, 'GotoNextMarker'   , "]-"                            , 'marker#Goto("next", v:count, "same")')
-  call s:Map(a:mode, 'GotoPrevMarker'   , "[-"                            , 'marker#Goto("prev", v:count, "same")')
-  call s:Map(a:mode, 'GotoNextMarkerAny', "]="                            , 'marker#Goto("next", v:count, "any")' )
-  call s:Map(a:mode, 'GotoPrevMarkerAny', "[="                            , 'marker#Goto("prev", v:count, "any")' )
+  call s:Map(a:mode, 'GotoNextMarker'   , "]-"                            , 'marker#Goto("next", "same", v:count)')
+  call s:Map(a:mode, 'GotoPrevMarker'   , "[-"                            , 'marker#Goto("prev", "same", v:count)')
+  call s:Map(a:mode, 'GotoNextMarkerAny', "]="                            , 'marker#Goto("next", "any",  v:count)')
+  call s:Map(a:mode, 'GotoPrevMarkerAny', "[="                            , 'marker#Goto("prev", "any",  v:count)')
   call s:Map(a:mode, 'ListLocalMarks'   , 'm/'                            , 'mark#List("buf_curr")'               )
   call s:Map(a:mode, 'ListLocalMarkers' , 'm?'                            , 'marker#List()'                       )
 endfunction

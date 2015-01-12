@@ -55,10 +55,16 @@ Out of the box, the followings mappings are defined by default
 This will allow the use of default behavior of m to set marks and, if
 the line already contains the mark, it'll be unset. The default behavior
 of ]', [', ]` and [` is supported and enhanced by wrapping around when
-beginning or end of file is reached.
+beginning or end of file is reached. ]-, [-, ]= and [= also accept a count.
 
-]-, [-, ]= and [= will jump to the corresponding marker directly when given a
-count
+To directly jump to a given marker, the following maps can be used
+>
+  nnoremap [1 :call signature#marker#Goto('prev', 1, v:count)
+  nnoremap ]1 :call signature#marker#Goto('next', 1, v:count)
+  nnoremap [2 :call signature#marker#Goto('prev', 2, v:count)
+  nnoremap ]2 :call signature#marker#Goto('next', 2, v:count)
+<
+etc. These are not defined by default
 
 
 ==============================================================================
@@ -85,7 +91,7 @@ SignatureListMarkers [marker]
                                                             *'g:SignatureMap'*
   Type: Dictionary, Default:
   To set up your own mappings copy the following dictionary and edit it
-
+>
       let g:SignatureMap = {
         \ 'Leader'             :  "m",
         \ 'PlaceNextMark'      :  "m,",
@@ -109,7 +115,7 @@ SignatureListMarkers [marker]
         \ 'ListLocalMarks'     :  "m/",
         \ 'ListLocalMarkers'   :  "m?"
         \ }
-
+<
   By default, it defines the mappings as shown in |signature-mappings|
   To disable a map entirely, specify it as an empty string.
   If a key is not specified, the default value will be picked up.
@@ -151,9 +157,10 @@ SignatureListMarkers [marker]
   Both can't be displayed simultaenously.
 
   To set this to mapleader or maplocalleader
+>
     let g:SignatureMap['Leader'] = '<Leader>'
     let g:SignatureMap['Leader'] = '<LocalLeader>'
-
+<
 
                                                       *'g:SignatureWrapJumps'*
   Boolean, Default : 1
@@ -170,12 +177,12 @@ SignatureListMarkers [marker]
     '\m' indicates the current or latest mark placed on the line
     '\p' indicates the previous mark placed on the line
 
-  For eg.
-    g:SignatureMarkOrder = "\m."  : Display last mark with '.' suffixed
-    g:SignatureMarkOrder = "_\m"  : Display last mark with '_' prefixed
-    g:SignatureMarkOrder = ">"    : Display only a ">" for a line with a mark.
-                                    The mark is not displayed
-    g:SignatureMarkOrder = "\m\p" : Display last two marks placed
+  For eg,
+    `g:SignatureMarkOrder="\m."`  : Display last mark with '.' suffixed
+    `g:SignatureMarkOrder="_\m"`  : Display last mark with '_' prefixed
+    `g:SignatureMarkOrder=">"`    : Display only a ">" for a line with a mark.
+                                  The mark is not displayed
+    `g:SignatureMarkOrder="\m\p"` : Display last two marks placed
 
   Note:
   The signs feature allows only 2 characters to be displayed. This is not and
