@@ -9,11 +9,12 @@ function! signature#marker#Toggle(marker)                                       
   " Arguments: marker [!@#$%^&*()]
 
   let l:lnum = line('.')
-  " If marker is found in on current line, remove it, else place it
+  " If marker is found on current line, remove it, else place it
   if (  (get(b:sig_markers, l:lnum, "") =~# escape(a:marker, '$^'))
    \ && !g:SignatureForceMarkerPlacement
    \ )
     call signature#sign#Remove(a:marker, l:lnum)
+    call signature#sign#ToggleDummy()
   else
     call signature#sign#Place(a:marker, l:lnum)
   endif
@@ -51,6 +52,7 @@ function! signature#marker#Purge(...)                                           
       call signature#marker#Remove(l:lnum, l:marker)
     endfor
   endfor
+  call signature#sign#ToggleDummy()
 endfunction
 
 

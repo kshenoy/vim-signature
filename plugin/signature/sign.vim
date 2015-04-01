@@ -119,8 +119,8 @@ function! signature#sign#RefreshLine(lnum)                                      
   endif
   execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
 
-  " If there is only 1 mark/marker in the file, also place a dummy sign to prevent flickering of the gutter
-  call signature#sign#ToggleDummy()
+  " If there is only 1 mark/marker in the file, place a dummy to prevent flickering of the gutter when it is moved
+  call signature#sign#ToggleDummy('place')
 endfunction
 
 
@@ -156,7 +156,6 @@ function! signature#sign#Unplace(lnum)                                          
   " Description: Remove the sign from the specified line number
   let l:id = a:lnum * 1000 + bufnr('%')
   silent! execute 'sign unplace ' . l:id
-  call signature#sign#ToggleDummy()
 endfunction
 
 

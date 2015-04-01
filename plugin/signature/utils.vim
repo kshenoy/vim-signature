@@ -42,6 +42,7 @@ function! signature#utils#Set(var, default)                                     
       execute 'let' a:var '=' a:default
     endif
   endif
+  return a:var
 endfunction
 
 

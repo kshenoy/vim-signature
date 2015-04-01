@@ -37,6 +37,7 @@ function! signature#mark#Toggle(mark)                                           
          \ )
           " Mark is present on the current line. Remove it and return
           call signature#mark#Remove(a:mark)
+          call signature#sign#ToggleDummy()
           return
         else
           " Mark is present elsewhere in the current buffer ==> Remove it and fall-through to place new mark.
@@ -126,6 +127,7 @@ function! signature#mark#Purge(mode)                                            
       call signature#sign#Unplace(l:lnum)
     endfor
   endif
+  call signature#sign#ToggleDummy()
 endfunction
 " }}}2
 
