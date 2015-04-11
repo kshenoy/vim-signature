@@ -18,7 +18,7 @@ Alphabetical mark traversal and more.
 
 Also supports dynamic highlighting of signs. In the image above the marks are colored according to the state of the line as indicated by gitgutter.
 
-NOTE: The code for dynamic highlighting of marks is not a part of this plugin and must be included separately. Instructions for doing that can be found [here](https://gist.github.com/kshenoy/14f2c4ce7af28b54882b)
+NOTE: This feature is disabled by default
 
 More screenshots [here](http://imgur.com/a/3KQyt)
 

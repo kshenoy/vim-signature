@@ -197,6 +197,20 @@ SignatureListMarkers [marker]
   NOTE: The quotes should be a part of the assignment.
   Eg.   let g:SignatureMarkTextHL = "'Exception'"
 
+
+                                              *'g:SignatureMarkTextHLDynamic'*
+  Boolean, Default: 0
+
+  Highlight signs of marks dynamically based upon state indicated by
+  vim-gitgutter or vim-signify
+
+
+                                                     *'g:SignatureMarkLineHL'*
+  String, Default : ''
+
+  The highlight group used for hightlighting lines having mark signs.
+
+
                                                    *'g:SignatureMarkerTextHL'*
   String, Default : 'WarningMsg'
 
@@ -205,10 +219,18 @@ SignatureListMarkers [marker]
   NOTE: The quotes should be a part of the assignment.
   Eg.   let g:SignatureMarkTextHL = "'WarningMsg'"
 
-                                                     *'g:SignatureMarkLineHL'*
+
+                                            *'g:SignatureMarkerTextHLDynamic'*
+  Boolean, Default: 0
+
+  Highlight signs of markers dynamically based upon state indicated by
+  vim-gitgutter or vim-signify
+
+
+                                                   *'g:SignatureMarkerLineHL'*
   String, Default : ''
 
-  The highlight group used for hightlighting lines having mark/marker signs.
+  The highlight group used for hightlighting lines having marker signs.
 
 
                                              *'g:SignatureDeleteConfirmation'*

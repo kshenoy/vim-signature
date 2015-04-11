@@ -108,9 +108,9 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkLineHL = eval( g:SignatureMarkLineHL )
+    let l:SignatureMarkerLineHL = eval( g:SignatureMarkerLineHL )
     let l:SignatureMarkerTextHL = eval( g:SignatureMarkerTextHL )
-    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkLineHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
     " FIXME: Clean-up. Undefine the sign
@@ -246,4 +246,44 @@ function! signature#sign#GetInfo(...)                                           
   endif
 
   return l:signs_dic
+endfunction
+
+
+function! signature#sign#GetGitGutterHLGroup(lnum)
+  " Description: This returns the highlight group used by vim-gitgutter depending on how the line was edited
+
+  let l:line_state = filter(copy(gitgutter#diff#process_hunks(gitgutter#hunk#hunks())), 'v:val[0] == a:lnum')
+
+  if len(l:line_state) == 0
+    return 'Exception'
+  endif
+
+  if l:line_state[0][1] =~ 'added'
+    return 'GitGutterAdd'
+  elseif l:line_state[0][1] =~ 'modified'
+    return 'GitGutterChange'
+  elseif l:line_state[0][1] =~ 'removed'
+    return 'GitGutterDelete'
+  endif
+endfunction
+
+
+function! signature#sign#GetSignifyHLGroup(lnum)
+  " Description: This returns the highlight group used by vim-signify depending on how the line was edited
+  "              Thanks to @michaelmior
+
+  call sy#sign#get_current_signs()
+
+  if has_key(b:sy.internal, a:lnum)
+    let type = b:sy.internal[a:lnum]['type']
+    if type =~ 'SignifyAdd'
+      return 'DiffAdd'
+    elseif type =~ 'SignifyChange'
+      return 'DiffChange'
+    elseif type =~ 'SignifyDelete'
+      return 'DiffDelete'
+    end
+  else
+    return 'Exception'
+  endif
 endfunction

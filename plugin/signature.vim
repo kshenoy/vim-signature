@@ -1,19 +1,18 @@
-" vim-signature is a plugin to toggle, display and navigate marks.
-"
-" Maintainer:
-" Kartik Shenoy
-"
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
+
+" Description: vim-signature is a plugin to toggle, display and navigate marks.
+"
+" Maintainer: Kartik Shenoy
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Exit if the signs feature is not available or if the app has already been loaded (or "compatible" mode set)
 if !has('signs') || &cp
   finish
 endif
-if exists("g:loaded_Signature")
+if exists('g:loaded_Signature')
   finish
 endif
-let g:loaded_Signature = "3"
+let g:loaded_Signature = 3
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -23,8 +22,11 @@ call signature#utils#Set('g:SignaturePrioritizeMarks',             1            
 call signature#utils#Set('g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 call signature#utils#Set('g:SignatureIncludeMarkers',              ')!@#$%^&*('                                          )
 call signature#utils#Set('g:SignatureMarkTextHL',                  '"Exception"'                                         )
+call signature#utils#Set('g:SignatureMarkTextHLDynamic',           0                                                     )
 call signature#utils#Set('g:SignatureMarkLineHL',                  '""'                                                  )
 call signature#utils#Set('g:SignatureMarkerTextHL',                '"WarningMsg"'                                        )
+call signature#utils#Set('g:SignatureMarkerTextHLDynamic',         0                                                     )
+call signature#utils#Set('g:SignatureMarkerLineHL',                '""'                                                  )
 call signature#utils#Set('g:SignatureWrapJumps',                   1                                                     )
 call signature#utils#Set('g:SignatureMarkOrder',                   "\p\m"                                                )
 call signature#utils#Set('g:SignatureDeleteConfirmation',          0                                                     )
