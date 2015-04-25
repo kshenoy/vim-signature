@@ -137,17 +137,20 @@ endfunction
 "
 function! signature#mark#Goto(dir, loc, mode)                                                                     " {{{2
   " Arguments:
-  "   dir  = next  : Jump forward
-  "          prev  : Jump backward
-  "   loc  = line  : Jump to first column of line with mark
-  "          spot  : Jump to exact column of the mark
-  "   mode = pos   : Jump to next mark by position
-  "          alpha : Jump to next mark by alphabetical order
+  "   dir   = next   : Jump forward
+  "           prev   : Jump backward
+  "   loc   = line   : Jump to first column of line with mark
+  "           spot   : Jump to exact column of the mark
+  "   mode  = pos    : Jump to next mark by position
+  "           alpha  : Jump to next mark by alphabetical order
+  "           global : Jump only to global marks (applies to all buffers and alphabetical order)
 
   let l:mark = ""
   let l:dir  = a:dir
 
-  if a:mode ==? "alpha"
+  if a:mode ==? "global"
+    let l:mark = s:GotoByAlphaGlobal(a:dir)
+  elseif a:mode ==? "alpha"
     let l:mark = s:GotoByAlpha(a:dir)
   elseif a:mode ==? "pos"
     let l:mark = s:GotoByPos(a:dir)
@@ -166,8 +169,8 @@ endfunction
 
 function! s:GotoByPos(dir)                                                                                        " {{{2
   " Description: Jump to next/prev mark by location.
-  " Arguments: dir = next : Jump forward
-  "                  prev : Jump backward
+  " Arguments: dir  = next   : Jump forward
+  "                   prev   : Jump backward
 
   " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
   if empty( b:sig_marks ) | return "" | endif
@@ -201,7 +204,7 @@ function! s:GotoByAlpha(dir)                                                    
   endif
 
   " Since we can place multiple marks on a line, to jump by alphabetical order we need to know what the current mark is.
-  " This information is kept in the b:sig_GotoByAlpha_CurrMark variable. For instance, if we have marks a, b, and c
+  " This information is kept in the b:sig_GotoByAlpha_CurrMark variable. For instance, if we have marks a, b and c
   " on the current line and b:sig_GotoByAlpha_CurrMark has the value 'a' then we jump to 'b' and set the value of
   " the variable to 'b'. Reinvoking this function will thus now jump to 'c'
   if empty(l:line_marks)
@@ -231,40 +234,86 @@ function! s:GotoByAlpha(dir)                                                    
     endif
   endfor
 endfunction
+
+
+function! s:GotoByAlphaGlobal(dir)                                                                                " {{{2
+  " Description: Jump to next/prev Global mark in any buffer by alphabetical order.
+  "              Direction is specified as input argument
+
+  let l:used_marks = signature#mark#GetList('used', 'buf_all', 'global')
+  let l:line_marks = filter(copy(l:used_marks), 'v:val[1] == ' . line('.'))
+
+  " If there is only one mark in the current file, return it
+  if (len(l:used_marks) == 1)
+    return l:used_marks[0][0]
+  endif
+  " If current line does not have a global mark on it then return the first used global mark
+  if empty(l:line_marks)
+    if exists('b:sig_GotoByAlphaGlobal_CurrMark')
+      unlet b:sig_GotoByAlphaGlobal_CurrMark
+    endif
+    return l:used_marks[0][0]
+  endif
+
+  " Since we can place multiple marks on a line, to jump by alphabetical order we need to know what the current mark is.
+  " This information is kept in the b:sig_GotoByAlphaGlobal_CurrMark variable. For instance, if we have marks A, B & C
+  " on the current line and b:sig_GotoByAlphaGlobal_CurrMark has the value 'A' then we jump to 'B' and set the value of
+  " the variable to 'B'. Reinvoking this function will thus now jump to 'C'
+  if (  (len(l:line_marks) == 1)
+   \ || !exists('b:sig_GotoByAlpha_CurrMark')
+   \ || (b:sig_GotoByAlphaGlobal_CurrMark ==? "")
+   \ )
+    let b:sig_GotoByAlphaGlobal_CurrMark = l:line_marks[0][0]
+  endif
+
+  for i in range( 0, len(l:used_marks) - 1 )
+    if l:used_marks[i][0] ==# b:sig_GotoByAlphaGlobal_CurrMark
+      if a:dir ==? "next"
+        if (( i != len(l:used_marks)-1 ) || b:SignatureWrapJumps)
+          let b:sig_GotoByAlphaGlobal_CurrMark = l:used_marks[(i+1)%len(l:used_marks)][0]
+        endif
+      elseif a:dir ==? "prev"
+        if ((i != 0) || b:SignatureWrapJumps)
+          let b:sig_GotoByAlphaGlobal_CurrMark = l:used_marks[i-1][0]
+        endif
+      endif
+      return b:sig_GotoByAlphaGlobal_CurrMark
+    endif
+  endfor
+endfunction
 " }}}2
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Misc                                                                                                             {{{1
 "
-function! signature#mark#GetList(mode, scope)                                                                     " {{{2
+function! signature#mark#GetList(mode, scope, ...)                                                                " {{{2
   " Description: Takes two optional arguments - mode/line no. and scope
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
   "
-  " Arguments: mode  = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
-  "                    'free'     : Returns list of [ free marks ]
-  "            scope = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
-  "                    'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
+  "   Arguments: mode   = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
+  "                       'free'     : Returns list of [ free marks ]
+  "              scope  = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
+  "                       'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
+  "              [type] = 'global'   : Return only global marks
+  "
+  "        NOTE: If type is specified as 'global', it will override and set scope to 'buf_all'.
 
   let l:marks_list = []
   let l:line_tot = line('$')
   let l:buf_curr = bufnr('%')
+  let l:type     = (a:0 ? a:1 : "")
 
   " Add local marks first
-  for i in filter(split(b:SignatureIncludeMarks, '\zs'), 'v:val =~# "[a-z]"')
-    let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
-  endfor
-
+  if (l:type !=? "global")
+    for i in filter(split(b:SignatureIncludeMarks, '\zs'), 'v:val =~# "[a-z]"')
+      let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
+    endfor
+  endif
   " Add global (uppercase) marks to list
   for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
     let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    if (a:scope ==? 'buf_curr')
-      " If it is not in use in the current buffer treat it as free
-      if l:buf != l:buf_curr
-        let l:line = 0
-      endif
-    endif
     let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
   endfor
 
@@ -278,6 +327,7 @@ function! signature#mark#GetList(mode, scope)                                   
     if (a:scope ==? 'buf_all')
       call filter( l:marks_list, 'v:val[1] == 0' )
     else
+      " NOTE: This mode is not being used currently
       call filter( l:marks_list, '(v:val[1] == 0) || (v:val[2] != l:buf_curr)' )
     endif
     call map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
