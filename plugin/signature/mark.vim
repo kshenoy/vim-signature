@@ -393,11 +393,7 @@ function! signature#mark#List(scope)                                            
                    \   }'
                    \  )
 
-  if (a:scope ==? 'buf_curr')
-    call setloclist(0, l:list_map,)|lopen
-  "else
-  "  call setqflist(l:list_map,)|copen
-  endif
+  call setloclist(0, l:list_map,)|lopen
 
   if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
     nnoremap <buffer> <silent> q        :q<CR>

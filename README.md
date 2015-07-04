@@ -62,6 +62,8 @@ Once that's done, out of the box, the followings mappings are defined
   [=           Jump to prev line having a marker of any type
   m?           Open location list and display markers from current buffer
   m<BS>        Remove all markers
+
+  m;           Open location list and display global marks (A-Z)
 ````
 
 This will allow the use of default behavior of m to set marks and, if the line
