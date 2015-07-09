@@ -190,47 +190,77 @@ SignatureListMarkers [marker]
 
 
                                                      *'g:SignatureMarkTextHL'*
-  String, Default : 'Exception'
+  String, Default : "'Exception'"
 
-  The highlight group used for mark signs. This can be set to a function
-  reference can be assigned to this to allow dynamic highlighting of signs
-  NOTE: The quotes should be a part of the assignment.
-  Eg.   let g:SignatureMarkTextHL = "'Exception'"
+  The highlight group used for mark signs. This can be set either to a string
+  or to a |Funcref|.
 
+  If it holds a string, it must be an expression suitable for passing to
+  |eval()|. In the simple case, it can be the name of a highlight group. It can
+  also hold more complicated expressions, in which case the expression `a:lnum`
+  may be helpful. It holds the number of the line where the current mark is to
+  be highlighted.
+
+  If it holds a |Funcref|, then the function will be called with one argument,
+  the line number of the mark to be highlighted. The function should return
+  the name of a highlight group.
+
+  Example of simple string highlight group. Note the two sets of quotation
+  marks:
+>
+    let g:SignatureMarkTextHL = "'Exception'"
+<
+  Example of complex string expression:
+>
+    function Example(lineno)
+    endfunction
+    let g:SignatureMarkTextHL = "Example(a:lnum)"
+<
+  Example of |Funcref|:
+>
+    function Example(lineno)
+      return "Exception"
+    endfunction
+    let g:SignatureMarkTextHL = function("Example")
+<
 
                                               *'g:SignatureMarkTextHLDynamic'*
   Boolean, Default: 0
 
   Highlight signs of marks dynamically based upon state indicated by
-  vim-gitgutter or vim-signify
+  vim-gitgutter or vim-signify. Setting this to `1` prior to plugin
+  initialization overwrites |g:SignatureMarkTextHL|.
 
 
                                                      *'g:SignatureMarkLineHL'*
   String, Default : ''
 
-  The highlight group used for hightlighting lines having mark signs.
+  The highlight group used for hightlighting lines having mark signs. This can
+  be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
 
 
                                                    *'g:SignatureMarkerTextHL'*
-  String, Default : 'WarningMsg'
+  String, Default : "'WarningMsg'"
 
-  The highlight group used for marker signs. This can be set to a function
-  reference can be assigned to this to allow dynamic highlighting of signs
-  NOTE: The quotes should be a part of the assignment.
-  Eg.   let g:SignatureMarkTextHL = "'WarningMsg'"
-
+  The highlight group used for marker signs. This can be a string or a
+  |Funcref|. See |g:SignatureMarkTextHL| for details.
+>
+    let g:SignatureMarkTextHL = "'WarningMsg'"
+<
 
                                             *'g:SignatureMarkerTextHLDynamic'*
   Boolean, Default: 0
 
   Highlight signs of markers dynamically based upon state indicated by
-  vim-gitgutter or vim-signify
+  vim-gitgutter or vim-signify. Setting this to `1` prior to plugin
+  initialization overwrites |g:SignatureMarkerTextHL|.
 
 
                                                    *'g:SignatureMarkerLineHL'*
   String, Default : ''
 
-  The highlight group used for hightlighting lines having marker signs.
+  The highlight group used for hightlighting lines having marker signs. This
+  can be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
 
 
                                              *'g:SignatureDeleteConfirmation'*

@@ -80,6 +80,17 @@ function! signature#sign#Remove(sign, lnum)                                     
 endfunction
 
 
+function! signature#sign#EvaluateHL(expression, lnum)                                                             " {{{1
+  if type(a:expression) == type("")
+    return eval(a:expression)
+  elseif type(a:expression) == type(function("tr"))
+    return a:expression(a:lnum)
+  else
+    return ""
+  endif
+endfunction
+
+
 function! signature#sign#RefreshLine(lnum)                                                                        " {{{1
   " Description: Decides what the sign string should be based on if there are any marks or markers (using b:sig_marks
   "              and b:sig_markers) on the current line and the value of b:SignaturePrioritizeMarks.
@@ -99,8 +110,8 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkLineHL = eval( g:SignatureMarkLineHL )
-    let l:SignatureMarkTextHL = eval( g:SignatureMarkTextHL )
+    let l:SignatureMarkLineHL = signature#sign#EvaluateHL(g:SignatureMarkLineHL, a:lnum)
+    let l:SignatureMarkTextHL = signature#sign#EvaluateHL(g:SignatureMarkTextHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   elseif has_key(b:sig_markers, a:lnum)
@@ -108,8 +119,8 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkerLineHL = eval( g:SignatureMarkerLineHL )
-    let l:SignatureMarkerTextHL = eval( g:SignatureMarkerTextHL )
+    let l:SignatureMarkerLineHL = signature#sign#EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
+    let l:SignatureMarkerTextHL = signature#sign#EvaluateHL(g:SignatureMarkerTextHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
