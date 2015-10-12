@@ -113,7 +113,8 @@ SignatureListMarkers [marker]
         \ 'GotoNextMarkerAny'  :  "]=",
         \ 'GotoPrevMarkerAny'  :  "[=",
         \ 'ListLocalMarks'     :  "m/",
-        \ 'ListLocalMarkers'   :  "m?"
+        \ 'ListLocalMarkers'   :  "m?",
+        \ 'ListGlobalMarks'    :  "m;"
         \ }
 <
   By default, it defines the mappings as shown in |signature-mappings|
