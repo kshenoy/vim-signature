@@ -21,7 +21,7 @@ function! signature#mark#Toggle(mark)                                           
       let l:marks_list = signature#mark#GetList('used', 'buf_curr')[0]
       call signature#mark#Remove(l:marks_list[0])
     endif
-    call signature#mark#Place(l:marks_list[0])
+    call s:Place(l:marks_list[0])
 
   else
     " Toggle Mark
@@ -55,7 +55,7 @@ function! signature#mark#Toggle(mark)                                           
     endif
 
     " Place new mark
-    call signature#mark#Place(a:mark)
+    call s:Place(a:mark)
   endif
 endfunction
 
@@ -71,11 +71,11 @@ function! signature#mark#Remove(mark)                                           
   let l:lnum = line("'" . a:mark)
   call signature#sign#Remove(a:mark, l:lnum)
   execute 'delmarks ' . a:mark
-  call signature#mark#ForceGlobalRemoval(a:mark)
+  call s:ForceGlobalRemoval(a:mark)
 endfunction
 
 
-function! signature#mark#Place(mark)                                                                              " {{{2
+function! s:Place(mark)                                                                              " {{{2
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
   " If a line is deleted or mark is manipulated using any non-signature method then b:sig_marks can go out of sync
@@ -337,7 +337,7 @@ function! signature#mark#GetList(mode, scope, ...)                              
 endfunction
 
 
-function! signature#mark#ForceGlobalRemoval(mark)                                                                 " {{{2
+function! s:ForceGlobalRemoval(mark)                                                                 " {{{2
   " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
 

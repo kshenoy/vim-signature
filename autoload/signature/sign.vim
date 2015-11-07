@@ -14,7 +14,7 @@ function! signature#sign#Place(sign, lnum)                                      
 
   " FIXME: Highly inefficient. Needs work
   " Place sign only if there are no signs from other plugins (eg. syntastic)
-  "let l:present_signs = signature#sign#GetInfo(1)
+  "let l:present_signs = s:GetInfo(1)
   "if (  b:SignatureDeferPlacement
   " \ && has_key(l:present_signs, a:lnum)
   " \ && (l:present_signs[a:lnum]['name'] !~# '^sig_Sign_')
@@ -29,7 +29,7 @@ function! signature#sign#Place(sign, lnum)                                      
   endif
   "}}}3
 
-  call signature#sign#RefreshLine(a:lnum)
+  call s:RefreshLine(a:lnum)
 endfunction
 
 
@@ -53,7 +53,7 @@ function! signature#sign#Remove(sign, lnum)                                     
     if b:sig_markers[a:lnum] == ""
       call remove(b:sig_markers, a:lnum)
     endif
-    call signature#sign#RefreshLine(a:lnum)
+    call s:RefreshLine(a:lnum)
 
   " Remove sign for marks
   else
@@ -74,13 +74,13 @@ function! signature#sign#Remove(sign, lnum)                                     
           call remove(b:sig_marks, l:lnum)
         endif
       endif
-      call signature#sign#RefreshLine(l:lnum)
+      call s:RefreshLine(l:lnum)
     endfor
   endif
 endfunction
 
 
-function! signature#sign#EvaluateHL(expression, lnum)                                                             " {{{1
+function! s:EvaluateHL(expression, lnum)                                                                          " {{{1
   if type(a:expression) == type("")
     return eval(a:expression)
   elseif type(a:expression) == type(function("tr"))
@@ -91,7 +91,7 @@ function! signature#sign#EvaluateHL(expression, lnum)                           
 endfunction
 
 
-function! signature#sign#RefreshLine(lnum)                                                                        " {{{1
+function! s:RefreshLine(lnum)                                                                        " {{{1
   " Description: Decides what the sign string should be based on if there are any marks or markers (using b:sig_marks
   "              and b:sig_markers) on the current line and the value of b:SignaturePrioritizeMarks.
   " Arguments:
@@ -110,8 +110,8 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkLineHL = signature#sign#EvaluateHL(g:SignatureMarkLineHL, a:lnum)
-    let l:SignatureMarkTextHL = signature#sign#EvaluateHL(g:SignatureMarkTextHL, a:lnum)
+    let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum)
+    let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   elseif has_key(b:sig_markers, a:lnum)
@@ -119,8 +119,8 @@ function! signature#sign#RefreshLine(lnum)                                      
 
     " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
     " If it is a string, use it directly
-    let l:SignatureMarkerLineHL = signature#sign#EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
-    let l:SignatureMarkerTextHL = signature#sign#EvaluateHL(g:SignatureMarkerTextHL, a:lnum)
+    let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
+    let l:SignatureMarkerTextHL = s:EvaluateHL(g:SignatureMarkerTextHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
@@ -139,7 +139,7 @@ function! signature#sign#Refresh(...)                                           
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
   " Arguments: '1' to force a sign refresh
 
-  call signature#utils#Init()
+  call s:InitializeVars()
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
@@ -192,7 +192,7 @@ function! signature#sign#ToggleDummy(...)                                       
 endfunction
 
 
-function! signature#sign#GetInfo(...)                                                                             " {{{1
+function! s:GetInfo(...)                                                                             " {{{1
   " Description: Returns a dic of filenames, each of which is a dic of line numbers on which signs are placed
   " Arguments: filename (optional).
   "            If filename is provided, the return value will contain signs only present in the given file
@@ -297,4 +297,37 @@ function! signature#sign#GetSignifyHLGroup(lnum)
   else
     return 'Exception'
   endif
+endfunction
+
+
+function! s:InitializeVars()                                                                                      " {{{1
+  " Description: Initialize variables
+
+  if !exists('b:sig_marks')
+    " b:sig_marks = { lnum => signs_str }
+    let b:sig_marks = {}
+  else
+    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are
+    " now greater than the total number of lines in the file.
+    let l:line_tot = line('$')
+    call filter( b:sig_marks, 'v:key <= l:line_tot' )
+  endif
+
+  if !exists('b:sig_markers')
+    " b:sig_markers = { lnum => marker }
+    let b:sig_markers = {}
+  else
+    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are
+    " now greater than the total number of lines in the file.
+    let l:line_tot = line('$')
+    call filter( b:sig_markers, 'v:key <= l:line_tot' )
+  endif
+
+  call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup)
+  call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    )
+  call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  )
+  call signature#utils#Set('b:SignatureMarkOrder'      , g:SignatureMarkOrder       )
+  call signature#utils#Set('b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks )
+  call signature#utils#Set('b:SignatureDeferPlacement' , g:SignatureDeferPlacement  )
+  call signature#utils#Set('b:SignatureWrapJumps'      , g:SignatureWrapJumps       )
 endfunction

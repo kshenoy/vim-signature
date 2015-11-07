@@ -1,39 +1,6 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#utils#Init()                                                                                  " {{{1
-  " Description: Initialize variables
-
-  if !exists('b:sig_marks')
-    " b:sig_marks = { lnum => signs_str }
-    let b:sig_marks = {}
-  else
-    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are
-    " now greater than the total number of lines in the file.
-    let l:line_tot = line('$')
-    call filter( b:sig_marks, 'v:key <= l:line_tot' )
-  endif
-
-  if !exists('b:sig_markers')
-    " b:sig_markers = { lnum => marker }
-    let b:sig_markers = {}
-  else
-    " Lines can be removed using an external tool. Hence, we need to filter out marks placed on line numbers that are
-    " now greater than the total number of lines in the file.
-    let l:line_tot = line('$')
-    call filter( b:sig_markers, 'v:key <= l:line_tot' )
-  endif
-
-  call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup)
-  call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    )
-  call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  )
-  call signature#utils#Set('b:SignatureMarkOrder'      , g:SignatureMarkOrder       )
-  call signature#utils#Set('b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks )
-  call signature#utils#Set('b:SignatureDeferPlacement' , g:SignatureDeferPlacement  )
-  call signature#utils#Set('b:SignatureWrapJumps'      , g:SignatureWrapJumps       )
-endfunction
-
-
 function! signature#utils#Set(var, default)                                                                       " {{{1
   if !exists(a:var)
     if type(a:default)
@@ -71,13 +38,13 @@ function! signature#utils#Maps(mode)                                            
   if (s:SignatureMapLeader == "")
     echoe "Signature: g:SignatureMap.Leader shouldn't be left blank"
   endif
-  call s:Map(a:mode, 'Leader'           , s:SignatureMapLeader            , 'Input()'                             )
+  call s:Map(a:mode, 'Leader'           , s:SignatureMapLeader            , 'utils#Input()'                       )
   call s:Map(a:mode, 'PlaceNextMark'    , s:SignatureMapLeader . ","      , 'mark#Toggle("next")'                 )
   call s:Map(a:mode, 'ToggleMarkAtLine' , s:SignatureMapLeader . "."      , 'mark#ToggleAtLine()'                 )
   call s:Map(a:mode, 'PurgeMarksAtLine' , s:SignatureMapLeader . "-"      , 'mark#Purge("line")'                  )
   call s:Map(a:mode, 'PurgeMarks'       , s:SignatureMapLeader . "<Space>", 'mark#Purge("all")'                   )
   call s:Map(a:mode, 'PurgeMarkers'     , s:SignatureMapLeader . "<BS>"   , 'marker#Purge()'                      )
-  call s:Map(a:mode, 'DeleteMark'       , "dm"                            , 'Remove(v:count)'                     )
+  call s:Map(a:mode, 'DeleteMark'       , "dm"                            , 'utils#Remove(v:count)'               )
   call s:Map(a:mode, 'GotoNextLineAlpha', "']"                            , 'mark#Goto("next", "line", "alpha")'  )
   call s:Map(a:mode, 'GotoPrevLineAlpha', "'["                            , 'mark#Goto("prev", "line", "alpha")'  )
   call s:Map(a:mode, 'GotoNextSpotAlpha', "`]"                            , 'mark#Goto("next", "spot", "alpha")'  )
@@ -92,4 +59,76 @@ function! signature#utils#Maps(mode)                                            
   call s:Map(a:mode, 'GotoPrevMarkerAny', "[="                            , 'marker#Goto("prev", "any",  v:count)')
   call s:Map(a:mode, 'ListLocalMarks'   , 'm/'                            , 'mark#List("buf_curr")'               )
   call s:Map(a:mode, 'ListLocalMarkers' , 'm?'                            , 'marker#List()'                       )
+endfunction
+
+
+function! signature#utils#Input()                                                                                 " {{{2
+  " Description: Grab input char
+
+  " Obtain input from user ...
+  let l:char = nr2char(getchar())
+
+  " ... if the input is not a number eg. '!' ==> Delete all '!' markers
+  if stridx(b:SignatureIncludeMarkers, l:char) >= 0
+    return signature#marker#Purge(l:char)
+  endif
+
+  " ... but if input is a number, convert it to corresponding marker before proceeding
+  if match( l:char, '\d' ) >= 0
+    let l:char = split(')!@#$%^&*(', '\zs')[l:char]
+  endif
+
+  if stridx(b:SignatureIncludeMarkers, l:char) >= 0
+    return signature#marker#Toggle(l:char)
+  elseif stridx(b:SignatureIncludeMarks, l:char) >= 0
+    return signature#mark#Toggle(l:char)
+  else
+    " l:char is probably one of `'[]<>
+    execute 'normal! m' . l:char
+  endif
+endfunction
+
+
+function! signature#utils#Remove(lnum)                                                                            " {{{2
+  " Description: Obtain mark or marker from the user and remove it from the specified line number.
+  "              If lnum is not specified for marker, or is 0, removes the marker from current line
+  "              NOTE: lnum is meaningless for a mark
+  " Arguments:   lnum - Line no. to delete the marker from
+
+  let l:char = nr2char(getchar())
+
+  if (l:char =~ '^\d$')
+    let l:lnum = (a:lnum == 0 ? line('.') : a:lnum)
+    let l:char = split(')!@#$%^&*(', '\zs')[l:char]
+    call signature#marker#Remove(lnum, l:char)
+  elseif (l:char =~? '^[a-z]$')
+    call signature#mark#Remove(l:char)
+  endif
+endfunction
+
+
+function! signature#utils#Toggle()                                                                                " {{{2
+  " Description: Toggles and refreshes sign display in the buffer.
+
+  let b:sig_enabled = !b:sig_enabled
+
+  if b:sig_enabled
+    " Signature enabled ==> Refresh signs
+    call signature#sign#Refresh()
+
+    " Add signs for markers ...
+    for i in keys(b:sig_markers)
+      call signature#sign#Place(b:sig_markers[i], i)
+    endfor
+  else
+    " Signature disabled ==> Remove signs
+    for l:lnum in keys(b:sig_markers)
+      call signature#sign#Unplace(l:lnum)
+    endfor
+    for l:lnum in keys(b:sig_marks)
+      call signature#sign#Unplace(l:lnum)
+    endfor
+    call signature#sign#ToggleDummy('remove')
+    unlet b:sig_marks
+  endif
 endfunction
