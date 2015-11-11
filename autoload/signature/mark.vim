@@ -327,10 +327,9 @@ function! signature#mark#GetList(mode, scope, ...)                              
     if (a:scope ==? 'buf_all')
       call filter( l:marks_list, 'v:val[1] == 0' )
     else
-      " NOTE: This mode is not being used currently
       call filter( l:marks_list, '(v:val[1] == 0) || (v:val[2] != l:buf_curr)' )
     endif
-    call map( filter( l:marks_list, 'v:val[1] == 0' ), 'v:val[0]' )
+    call map( l:marks_list, 'v:val[0]' )
   endif
 
   return l:marks_list

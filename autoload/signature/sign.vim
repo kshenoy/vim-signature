@@ -158,6 +158,8 @@ function! signature#sign#Refresh(...)                                           
     endif
   endfor
 
+  call signature#sign#ToggleDummy()
+
   " We do not add signs for markers as SignRefresh is executed periodically and we don't have a way to determine if the
   " marker already has a sign or not
 endfunction
