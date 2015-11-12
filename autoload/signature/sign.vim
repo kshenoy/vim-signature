@@ -171,6 +171,12 @@ function! signature#sign#Unplace(lnum)                                          
   silent! execute 'sign unplace ' . l:id
 endfunction
 
+function! s:HasPlacedSigns()                                                                                      " {{{1
+  redir => l:placeList
+  silent exe 'sign place buffer='.bufnr('%')
+  redir END
+  return (l:placeList !~ '---\n$')
+endfunction
 
 function! signature#sign#ToggleDummy(...)                                                                         " {{{1
   " Description: Places a dummy sign to prevent flickering of the gutter when the mark is moved or the line containing
@@ -188,7 +194,7 @@ function! signature#sign#ToggleDummy(...)                                       
   if (l:place)
     sign define Signature_Dummy
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
-  elseif (l:remove)
+  elseif (l:remove && s:HasPlacedSigns())
     silent! execute 'sign unplace 666 buffer=' . bufnr('%')
   endif
 endfunction
