@@ -57,7 +57,7 @@ function! signature#utils#Maps(mode)                                            
   call s:Map(a:mode, 'GotoPrevMarker'   , "[-"                            , 'marker#Goto("prev", "same", v:count)')
   call s:Map(a:mode, 'GotoNextMarkerAny', "]="                            , 'marker#Goto("next", "any",  v:count)')
   call s:Map(a:mode, 'GotoPrevMarkerAny', "[="                            , 'marker#Goto("prev", "any",  v:count)')
-  call s:Map(a:mode, 'ListLocalMarks'   , 'm/'                            , 'mark#List("buf_curr")'               )
+  call s:Map(a:mode, 'ListLocalMarks'   , 'm/'                            , 'mark#List("buf_curr", v:count)'      )
   call s:Map(a:mode, 'ListLocalMarkers' , 'm?'                            , 'marker#List()'                       )
 endfunction
 
