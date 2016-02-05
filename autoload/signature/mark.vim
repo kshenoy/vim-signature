@@ -381,7 +381,7 @@ function! signature#mark#List(scope, ...)                                       
   " Description: Opens and populates location list with marks from current buffer
   " Arguments:   scope     = 'buf_curr' : List marks from current buffer
   "                          'buf_all'  : List marks from all buffers FIXME
-  "              [context] = 0          : Adds context lines around the mark
+  "              [context] = 0          : Adds context around the mark
 
   let l:count = (a:0 ? a:1 : 0)
   let l:list_map = signature#mark#GetList('used', a:scope)
@@ -398,22 +398,25 @@ function! signature#mark#List(scope, ...)                                       
 
   if l:count
     let l:temp_list = []
-    for l:item in l:list_map
+    for i in range(0, len(l:list_map)-1)
       for l:context in range(-l:count, l:count)
-        let l:item_context = copy(l:item)
+        let l:item_context = copy(l:list_map[i])
         if (l:context != 0)
-          let l:item_context['lnum'] = l:item['lnum'] + l:context
-          let l:item_text = getline(l:item_context['lnum'])
-          let l:item_context['text'] = (l:context < 0 ? "-" : "+") . ":" . (l:item_text == "" ? "" : " ") . l:item_text
+          let l:item_context.lnum = l:list_map[i].lnum + l:context
+          let l:item_context.text = (l:context < 0 ? "-" : "+") . ": " . getline(l:item_context.lnum)
         endif
+        let l:item_context.text = substitute(l:item_context.text, '\s\+$', '', '')
         let l:temp_list = add(l:temp_list, l:item_context)
       endfor
-      let l:temp_list = add(l:temp_list, { 'bufnr': '',
-                                         \ 'lnum' : '',
-                                         \ 'col'  : '',
-                                         \ 'type' : '',
-                                         \ 'text' : repeat("=", 117)
-                                         \ })
+      if (i != len(l:list_map)-1)
+        " Removed the text field to avoid wrapping in Location List if window width is less than separator length
+        let l:temp_list = add(l:temp_list, { 'bufnr': '',
+                                           \ 'lnum' : '',
+                                           \ 'col'  : '',
+                                           \ 'type' : '',
+                                           \ 'text' : ''
+                                           \ })
+      endif
     endfor
     let l:list_map = l:temp_list
   endif

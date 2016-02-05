@@ -117,37 +117,59 @@ endfunction
 "
 function! signature#marker#List(...)                                                                              " {{{2
   " Description: Opens and populates location list with markers from current buffer
-  " Argument:    Show all markers in location list. If any particular marker is specified, list only that
+  "              Show all markers in location list if no argument is provided
+  " Argument:    [marker]  = 0-9 or any of !@#$%^&*() : List only the specified markers
+  "              [context] = 0 (default)              : Adds context around marker
 
-  " If a:1 == 0                    ==> No count was specified, list all markers
-  " If a:1 == ')'                  ==> List only the ')' marker
-  " If a:1 == [1-9] or '!@#$%^&*(' ==> List the corresponding marker
-  let l:marker = ''
-  if (a:0 != '')
-    let l:marker = a:1
-    if (l:marker =~ '^\d$')
-      let l:marker = (l:marker == 0 ? '' : split(')!@#$%^&*(', '\zs')[l:marker])
+  let l:marker = (a:0 && (a:1 != "") ? a:1 : ')!@#$%^&*(')
+  let l:count  = (a:0 > 1 ? a:2 : 0)
+
+  if (l:marker =~ '^\d$')
+    if (l:marker >= len(')!@#$%^&*('))
+      echoe "Signature: Marker specified is out-of-bounds"
+      return
     endif
-  endif
-  if (  (l:marker != '')
-   \ && (stridx(b:SignatureIncludeMarkers, l:marker) == -1)
-   \ )
-    return
+    let l:marker = split(')!@#$%^&*(', '\zs')[l:marker]
   endif
 
   let l:list_map = map(
                    \   sort(
-                   \     keys(l:marker != "" ? filter(copy(b:sig_markers), 'v:val == l:marker') : b:sig_markers),
+                   \     keys(filter(copy(b:sig_markers), 'v:val =~ "[" . l:marker . "]"')),
                    \     'signature#utils#NumericSort'
                    \   ),
                    \   '{
                    \     "bufnr": ' . bufnr('%') . ',
                    \     "lnum" : v:val,
-                   \     "col"  : 1,
+                   \     "col"  : "",
                    \     "type" : "M",
                    \     "text" : b:sig_markers[v:val] . ": " . getline(v:val)
                    \   }'
                    \  )
+
+  if l:count
+    let l:temp_list = []
+    for i in range(0, len(l:list_map)-1)
+      for l:context in range(-l:count, l:count)
+        let l:item_context = copy(l:list_map[i])
+        if (l:context != 0)
+          let l:item_context.lnum = l:list_map[i].lnum + l:context
+          let l:item_context.text = (l:context < 0 ? "-" : "+") . ": " . getline(l:item_context.lnum)
+        endif
+        let l:item_context.text = substitute(l:item_context.text, '\s\+$', '', '')
+        let l:temp_list = add(l:temp_list, l:item_context)
+      endfor
+      if (i != len(l:list_map)-1)
+        let l:temp_list = add(l:temp_list, { 'bufnr': '',
+                                           \ 'lnum' : '',
+                                           \ 'col'  : '',
+                                           \ 'type' : '',
+                                           \ 'text' : ''
+                                           \ })
+      endif
+    endfor
+    let l:list_map = l:temp_list
+  endif
+
   call setloclist(0, l:list_map,)|lopen
 endfunction
 " }}}2
