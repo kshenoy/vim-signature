@@ -292,11 +292,12 @@ function! signature#mark#GetList(mode, scope, ...)                              
   "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
   "              or are free to be placed in which case, line no. is 0
   "
-  "   Arguments: mode   = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
-  "                       'free'     : Returns list of [ free marks ]
-  "              scope  = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
-  "                       'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
-  "              [type] = 'global'   : Return only global marks
+  "   Arguments: mode    = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
+  "                        'free'     : Returns list of [ free marks ]
+  "              scope   = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
+  "                        'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
+  "              [type]  = 'global'   : Return only global marks
+  "              [count] = 0          : Return [count] context lines around the mark
   "
   "        NOTE: If type is specified as 'global', it will override and set scope to 'buf_all'.
 
@@ -304,6 +305,7 @@ function! signature#mark#GetList(mode, scope, ...)                              
   let l:line_tot = line('$')
   let l:buf_curr = bufnr('%')
   let l:type     = (a:0 ? a:1 : "")
+  let l:count    = (a:0 > 1 ? a:2 : 0)
 
   " Add local marks first
   if (l:type !=? "global")
@@ -330,6 +332,21 @@ function! signature#mark#GetList(mode, scope, ...)                              
       call filter( l:marks_list, '(v:val[1] == 0) || (v:val[2] != l:buf_curr)' )
     endif
     call map( l:marks_list, 'v:val[0]' )
+  endif
+
+  if l:count
+    let l:temp_list = []
+    for j in l:marks_list
+      for k in range(l:count, 1, -1)
+        let l:temp_list = add(l:temp_list, [j[0], j[1]-k, j[2]])
+      endfor
+      let l:temp_list = add(l:temp_list, j)
+      for k in range(1, l:count)
+        let l:temp_list = add(l:temp_list, [j[0], j[1]+k, j[2]])
+      endfor
+      let l:temp_list = add(l:temp_list, [repeat(":", 75), "", ""])
+    endfor
+    let l:marks_list = l:temp_list
   endif
 
   return l:marks_list
@@ -383,12 +400,13 @@ function! s:ReportNoAvailableMarks()                                            
 endfunction
 
 
-function! signature#mark#List(scope)                                                                              " {{{2
+function! signature#mark#List(scope, ...)                                                                              " {{{2
   " Description: Opens and populates location list with marks from current buffer
   " Arguments:   scope = buf_curr : List marks from current buffer
   "          ~~~FIXME~~~ buf_all  : List marks from all buffers
 
-  let l:list_map = map(signature#mark#GetList('used', a:scope),
+  let l:count = (a:0 ? a:1 : 0)
+  let l:list_map = map(signature#mark#GetList('used', a:scope, '', l:count),
                    \   '{
                    \     "bufnr": v:val[2],
                    \     "lnum" : v:val[1],

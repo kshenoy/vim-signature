@@ -67,5 +67,5 @@ endif
 
 command! -nargs=0 SignatureToggleSigns call signature#utils#Toggle()
 command! -nargs=0 SignatureRefresh     call signature#sign#Refresh('force')
-command! -nargs=0 SignatureListMarks   call signature#mark#List('buf_curr')
+command! -nargs=? SignatureListMarks   call signature#mark#List('buf_curr', <args>)
 command! -nargs=? SignatureListMarkers call signature#marker#List(<args>)
