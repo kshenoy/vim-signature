@@ -75,7 +75,7 @@ function! signature#mark#Remove(mark)                                           
 endfunction
 
 
-function! s:Place(mark)                                                                              " {{{2
+function! s:Place(mark)                                                                                           " {{{2
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
   " If a line is deleted or mark is manipulated using any non-signature method then b:sig_marks can go out of sync
@@ -288,24 +288,16 @@ endfunction
 "" Misc                                                                                                             {{{1
 "
 function! signature#mark#GetList(mode, scope, ...)                                                                " {{{2
-  " Description: Takes two optional arguments - mode/line no. and scope
-  "              If no arguments are specified, returns a list of [mark, line no.] pairs that are in use in the buffer
-  "              or are free to be placed in which case, line no. is 0
-  "
-  "   Arguments: mode    = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
-  "                        'free'     : Returns list of [ free marks ]
-  "              scope   = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
-  "                        'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
-  "              [type]  = 'global'   : Return only global marks
-  "              [count] = 0          : Return [count] context lines around the mark
-  "
-  "        NOTE: If type is specified as 'global', it will override and set scope to 'buf_all'.
+  " Arguments: mode    = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
+  "                      'free'     : Returns list of [ free marks ]
+  "            scope   = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
+  "                      'buf_all'  : Set scope to all buffers i.e used/free marks from all buffers
+  "            [type]  = 'global'   : Return only global marks
 
   let l:marks_list = []
   let l:line_tot = line('$')
   let l:buf_curr = bufnr('%')
   let l:type     = (a:0 ? a:1 : "")
-  let l:count    = (a:0 > 1 ? a:2 : 0)
 
   " Add local marks first
   if (l:type !=? "global")
@@ -334,26 +326,11 @@ function! signature#mark#GetList(mode, scope, ...)                              
     call map( l:marks_list, 'v:val[0]' )
   endif
 
-  if l:count
-    let l:temp_list = []
-    for j in l:marks_list
-      for k in range(l:count, 1, -1)
-        let l:temp_list = add(l:temp_list, [j[0], j[1]-k, j[2]])
-      endfor
-      let l:temp_list = add(l:temp_list, j)
-      for k in range(1, l:count)
-        let l:temp_list = add(l:temp_list, [j[0], j[1]+k, j[2]])
-      endfor
-      let l:temp_list = add(l:temp_list, [repeat(":", 75), "", ""])
-    endfor
-    let l:marks_list = l:temp_list
-  endif
-
   return l:marks_list
 endfunction
 
 
-function! s:ForceGlobalRemoval(mark)                                                                 " {{{2
+function! s:ForceGlobalRemoval(mark)                                                                              " {{{2
   " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
 
@@ -400,13 +377,16 @@ function! s:ReportNoAvailableMarks()                                            
 endfunction
 
 
-function! signature#mark#List(scope, ...)                                                                              " {{{2
+function! signature#mark#List(scope, ...)                                                                         " {{{2
   " Description: Opens and populates location list with marks from current buffer
-  " Arguments:   scope = buf_curr : List marks from current buffer
-  "          ~~~FIXME~~~ buf_all  : List marks from all buffers
+  " Arguments:   scope     = 'buf_curr' : List marks from current buffer
+  "                          'buf_all'  : List marks from all buffers FIXME
+  "              [context] = 0          : Adds context lines around the mark
 
   let l:count = (a:0 ? a:1 : 0)
-  let l:list_map = map(signature#mark#GetList('used', a:scope, '', l:count),
+  let l:list_map = signature#mark#GetList('used', a:scope)
+
+  let l:list_map = map(l:list_map,
                    \   '{
                    \     "bufnr": v:val[2],
                    \     "lnum" : v:val[1],
@@ -415,6 +395,28 @@ function! signature#mark#List(scope, ...)                                       
                    \     "text" : v:val[0] . ": " . getline(v:val[1])
                    \   }'
                    \  )
+
+  if l:count
+    let l:temp_list = []
+    for l:item in l:list_map
+      for l:context in range(-l:count, l:count)
+        let l:item_context = copy(l:item)
+        if (l:context != 0)
+          let l:item_context['lnum'] = l:item['lnum'] + l:context
+          let l:item_text = getline(l:item_context['lnum'])
+          let l:item_context['text'] = (l:context < 0 ? "-" : "+") . ":" . (l:item_text == "" ? "" : " ") . l:item_text
+        endif
+        let l:temp_list = add(l:temp_list, l:item_context)
+      endfor
+      let l:temp_list = add(l:temp_list, { 'bufnr': '',
+                                         \ 'lnum' : '',
+                                         \ 'col'  : '',
+                                         \ 'type' : '',
+                                         \ 'text' : repeat("=", 117)
+                                         \ })
+    endfor
+    let l:list_map = l:temp_list
+  endif
 
   if (a:scope ==? 'buf_curr')
     call setloclist(0, l:list_map,)|lopen
