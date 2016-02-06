@@ -91,7 +91,7 @@ function! s:EvaluateHL(expression, lnum)                                        
 endfunction
 
 
-function! s:RefreshLine(lnum)                                                                        " {{{1
+function! s:RefreshLine(lnum)                                                                                     " {{{1
   " Description: Decides what the sign string should be based on if there are any marks or markers (using b:sig_marks
   "              and b:sig_markers) on the current line and the value of b:SignaturePrioritizeMarks.
   " Arguments:
@@ -131,7 +131,7 @@ function! s:RefreshLine(lnum)                                                   
   execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
 
   " If there is only 1 mark/marker in the file, place a dummy to prevent flickering of the gutter when it is moved
-  call signature#sign#ToggleDummy('place')
+  call signature#sign#ToggleDummy()
 endfunction
 
 
@@ -172,29 +172,25 @@ function! signature#sign#Unplace(lnum)                                          
 endfunction
 
 
-function! signature#sign#ToggleDummy(...)                                                                         " {{{1
+function! signature#sign#ToggleDummy()                                                                            " {{{1
   " Description: Places a dummy sign to prevent flickering of the gutter when the mark is moved or the line containing
   "              a mark/marker is deleted and then the delete is undone
-  " Arguments:   a:1 (place/remove) - Force mode
 
-  if (a:0)
-    let l:place  = (a:1 =~# 'place' )
-    let l:remove = (a:1 =~# 'remove')
-  else
-    let l:place  = (len(b:sig_marks) + len(b:sig_markers) == 1)
-    let l:remove = (len(b:sig_marks) + len(b:sig_markers) == 0)
-  endif
+  let l:place  = (len(b:sig_marks) + len(b:sig_markers) == 1) && !b:sig_DummyExists
+  let l:remove = (len(b:sig_marks) + len(b:sig_markers) == 0) &&  b:sig_DummyExists
 
   if (l:place)
     sign define Signature_Dummy
     execute 'sign place 666 line=1 name=Signature_Dummy buffer=' . bufnr('%')
+    let b:sig_DummyExists = 1
   elseif (l:remove)
     silent! execute 'sign unplace 666 buffer=' . bufnr('%')
+    let b:sig_DummyExists = 0
   endif
 endfunction
 
 
-function! s:GetInfo(...)                                                                             " {{{1
+function! s:GetInfo(...)                                                                                          " {{{1
   " Description: Returns a dic of filenames, each of which is a dic of line numbers on which signs are placed
   " Arguments: filename (optional).
   "            If filename is provided, the return value will contain signs only present in the given file
@@ -325,6 +321,7 @@ function! s:InitializeVars()                                                    
     call filter( b:sig_markers, 'v:key <= l:line_tot' )
   endif
 
+  call signature#utils#Set('b:sig_DummyExists'         , 0                          )
   call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup)
   call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    )
   call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  )

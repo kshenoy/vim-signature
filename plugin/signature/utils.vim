@@ -128,7 +128,7 @@ function! signature#utils#Toggle()                                              
     for l:lnum in keys(b:sig_marks)
       call signature#sign#Unplace(l:lnum)
     endfor
-    call signature#sign#ToggleDummy('remove')
+    call signature#sign#ToggleDummy()
     unlet b:sig_marks
   endif
 endfunction
