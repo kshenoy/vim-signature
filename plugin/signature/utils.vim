@@ -90,9 +90,10 @@ endfunction
 
 
 function! signature#utils#Remove(lnum)                                                                            " {{{2
-  " Description: Obtain mark or marker from the user and remove it from the specified line number.
-  "              If lnum is not specified for marker, or is 0, removes the marker from current line
-  "              NOTE: lnum is meaningless for a mark
+  " Description: Obtain mark or marker from the user and remove it.
+  "              There can be multiple markers of the same type on different lines. If a line no. is provided
+  "              (non-zero), delete the marker from the specified line else delete it from the current line
+  "              NOTE: lnum is meaningless for a mark and will be ignored
   " Arguments:   lnum - Line no. to delete the marker from
 
   let l:char = nr2char(getchar())

@@ -97,7 +97,8 @@ function! s:RefreshLine(lnum)                                                   
   " Arguments:
   "   lnum : Line number for which the sign string is to be modified
 
-  let l:id = a:lnum * 1000 + bufnr('%')
+  let l:id  = a:lnum * 1000 + bufnr('%')
+  let l:str = ""
 
   " Place the sign
   if ( has_key(b:sig_marks, a:lnum)
@@ -124,13 +125,15 @@ function! s:RefreshLine(lnum)                                                   
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
-    " FIXME: Clean-up. Undefine the sign
     call signature#sign#Unplace(a:lnum)
-    return
   endif
-  execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
+
+  if (l:str != "")
+    execute 'sign place ' . l:id . ' line=' . a:lnum . ' name=Signature_' . l:str . ' buffer=' . bufnr('%')
+  endif
 
   " If there is only 1 mark/marker in the file, place a dummy to prevent flickering of the gutter when it is moved
+  " If there are no signs left, remove the dummy
   call signature#sign#ToggleDummy()
 endfunction
 
@@ -167,6 +170,7 @@ endfunction
 
 function! signature#sign#Unplace(lnum)                                                                            " {{{1
   " Description: Remove the sign from the specified line number
+  " FIXME: Clean-up. Undefine the sign
   let l:id = a:lnum * 1000 + bufnr('%')
   silent! execute 'sign unplace ' . l:id
 endfunction
