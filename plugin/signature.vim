@@ -55,13 +55,15 @@ if has('autocmd')
                        \|  call signature#sign#Refresh()
                        \|endif
     autocmd BufEnter,FileType * if (  (&filetype ==? 'nerdtree')
-                                 \ || (&filetype ==? 'netrw')
-                                 \ )
-                              \|  call signature#utils#Maps('remove')
-                              \|endif
-    autocmd BufLeave * if (&filetype ==? 'nerdtree')
-                     \|  call signature#utils#Maps('create')
-                     \| endif
+                             \     || (&filetype ==? 'netrw')
+                             \     )
+                             \|   call signature#utils#Maps('remove')
+                             \| endif
+    autocmd BufLeave * if (  (&filetype ==? 'nerdtree')
+                    \     || (&filetype ==? 'netrw')
+                    \     )
+                    \|   call signature#utils#Maps('create')
+                    \| endif
   augroup END
 endif
 
