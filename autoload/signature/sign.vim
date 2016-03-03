@@ -290,11 +290,11 @@ function! signature#sign#GetSignifyHLGroup(lnum)
   if has_key(b:sy.internal, a:lnum)
     let type = b:sy.internal[a:lnum]['type']
     if type =~ 'SignifyAdd'
-      return 'DiffAdd'
+      return 'SignifySignAdd'
     elseif type =~ 'SignifyChange'
-      return 'DiffChange'
+      return 'SignifySignChange'
     elseif type =~ 'SignifyDelete'
-      return 'DiffDelete'
+      return 'SignifySignDelete'
     end
   else
     return 'Exception'
