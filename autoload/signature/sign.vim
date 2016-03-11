@@ -22,7 +22,7 @@ function! signature#sign#Place(sign, lnum)                                      
   "  return
   "endif
 
-  if stridx( b:SignatureIncludeMarkers, a:sign ) >= 0
+  if (b:SignatureIncludeMarkers =~# a:sign)
     let b:sig_markers[a:lnum] = a:sign . get(b:sig_markers, a:lnum, "")
   else
     let b:sig_marks[a:lnum] = a:sign . get(b:sig_marks, a:lnum, "")
@@ -46,7 +46,7 @@ function! signature#sign#Remove(sign, lnum)                                     
   if !b:sig_enabled | return | endif
 
   " Remove sign for markers
-  if stridx( b:SignatureIncludeMarkers, a:sign ) >= 0
+  if (b:SignatureIncludeMarkers =~# a:sign)
     let b:sig_markers[a:lnum] = substitute(b:sig_markers[a:lnum], "\\C" . escape( a:sign, '$^' ), "", "")
 
     " If there are no markers on the line, delete signs on that line
@@ -82,7 +82,7 @@ endfunction
 
 function! s:EvaluateHL(expression, lnum)                                                                          " {{{1
   if type(a:expression) == type("")
-    return eval(a:expression)
+    return a:expression
   elseif type(a:expression) == type(function("tr"))
     return a:expression(a:lnum)
   else

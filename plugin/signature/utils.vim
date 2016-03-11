@@ -69,7 +69,7 @@ function! signature#utils#Input()                                               
   let l:char = nr2char(getchar())
 
   " ... if the input is not a number eg. '!' ==> Delete all '!' markers
-  if stridx(b:SignatureIncludeMarkers, l:char) >= 0
+  if (b:SignatureIncludeMarkers =~# l:char)
     return signature#marker#Purge(l:char)
   endif
 
@@ -78,9 +78,9 @@ function! signature#utils#Input()                                               
     let l:char = split(')!@#$%^&*(', '\zs')[l:char]
   endif
 
-  if stridx(b:SignatureIncludeMarkers, l:char) >= 0
+  if (b:SignatureIncludeMarkers =~# l:char)
     return signature#marker#Toggle(l:char)
-  elseif stridx(b:SignatureIncludeMarks, l:char) >= 0
+  elseif (b:SignatureIncludeMarks =~# l:char)
     return signature#mark#Toggle(l:char)
   else
     " l:char is probably one of `'[]<>

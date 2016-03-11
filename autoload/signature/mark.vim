@@ -64,7 +64,7 @@ function! signature#mark#Remove(mark)                                           
   " Description: Remove 'mark' and its associated sign. If called without an argument, obtain it from the user
   " Arguments:   mark = [a-z,A-Z]
 
-  if stridx(b:SignatureIncludeMarks, a:mark) == -1
+  if (b:SignatureIncludeMarks !~# a:mark)
     return
   endif
 

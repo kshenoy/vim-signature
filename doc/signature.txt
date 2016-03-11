@@ -162,9 +162,8 @@ SignatureListMarkers [marker] [n]
     `<leader>m!`       will remove all the '!' markers
     `<leader>m<BS>`    will remove all markers
 
-  Note:
-  Currently, either marks or markers can be displayed in front of a line.
-  Both can't be displayed simultaenously.
+  NOTE: Currently, either marks or markers can be displayed in front of a
+  line. Both can't be displayed simultaenously.
 
   To set this to mapleader or maplocalleader
 >
@@ -194,13 +193,12 @@ SignatureListMarkers [marker] [n]
                                   The mark is not displayed
     `g:SignatureMarkOrder="\m\p"` : Display last two marks placed
 
-  Note:
-  The signs feature allows only 2 characters to be displayed. This is not and
-  arbitratry limitation of the plugin.
+  NOTE: The signs feature allows only 2 characters to be displayed. This limit
+  is imposed by vim itself and not by the plugin
 
 
                                                      *'g:SignatureMarkTextHL'*
-  String, Default : "'Exception'"
+  String, Default : "Exception"
 
   The highlight group used for mark signs. This can be set either to a string
   or to a |Funcref|.
@@ -215,16 +213,9 @@ SignatureListMarkers [marker] [n]
   the line number of the mark to be highlighted. The function should return
   the name of a highlight group.
 
-  Example of simple string highlight group. Note the two sets of quotation
-  marks:
+  Example using a string:
 >
-    let g:SignatureMarkTextHL = "'Exception'"
-<
-  Example of complex string expression:
->
-    function Example(lineno)
-    endfunction
-    let g:SignatureMarkTextHL = "Example(a:lnum)"
+    let g:SignatureMarkTextHL = "Exception"
 <
   Example of |Funcref|:
 >
@@ -250,12 +241,12 @@ SignatureListMarkers [marker] [n]
 
 
                                                    *'g:SignatureMarkerTextHL'*
-  String, Default : "'WarningMsg'"
+  String, Default : "WarningMsg"
 
   The highlight group used for marker signs. This can be a string or a
   |Funcref|. See |g:SignatureMarkTextHL| for details.
 >
-    let g:SignatureMarkTextHL = "'WarningMsg'"
+    let g:SignatureMarkTextHL = "WarningMsg"
 <
 
                                             *'g:SignatureMarkerTextHLDynamic'*
