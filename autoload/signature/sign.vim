@@ -291,6 +291,9 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
   " Description: This returns the highlight group used by vim-signify depending on how the line was edited
   "              Thanks to @michaelmior
 
+  if !exists('b:sy')
+    return ""
+  endif
   call sy#sign#get_current_signs()
 
   if has_key(b:sy.internal, a:lnum)
@@ -299,9 +302,9 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
     elseif l:line_state =~ 'SignifyChange' | return 'SignifySignChange'
     elseif l:line_state =~ 'SignifyDelete' | return 'SignifySignDelete'
     end
-  else
-    return ""
   endif
+
+  return ""
 endfunction
 
 
