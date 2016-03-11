@@ -80,16 +80,21 @@ function! signature#sign#Remove(sign, lnum)                                     
 endfunction
 
 
-function! s:EvaluateHL(expression, lnum)                                                                          " {{{1
-  " If expression points to a function, call it and use its output as the highlight group.
-  " If it is a string, use it directly
-  if type(a:expression) == type("")
-    return a:expression
-  elseif type(a:expression) == type(function("tr"))
-    return a:expression(a:lnum)
-  else
-    return ""
+function! s:EvaluateHL(expr, lnum, ...)                                                                     " {{{1
+  " Description: If expr points to a function, call it and use its output as the highlight group.
+  "              If it is a string, use it directly.
+  "              If the optional argument is specified, use it as a fallback. If not, return an empty string
+
+  if type(a:expr) == type("")
+    return a:expr
+  elseif type(a:expr) == type(function("tr"))
+    let l:retval = a:expr(a:lnum)
+    if (l:retval != "")
+      return l:retval
+    endif
   endif
+
+  return (a:0 > 0 ? a:1 : "")
 endfunction
 
 
@@ -111,14 +116,14 @@ function! s:RefreshLine(lnum)                                                   
     let l:str = substitute(b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "")
     let l:str = substitute(l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "")
 
-    let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum)
-    let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum)
+    let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum, "SignatureMarkText")
+    let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum, "SignatureMarkLine")
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   elseif has_key(b:sig_markers, a:lnum)
     let l:str = strpart(b:sig_markers[a:lnum], 0, 1)
-    let l:SignatureMarkerTextHL = s:EvaluateHL(g:SignatureMarkerTextHL, a:lnum)
-    let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
+    let l:SignatureMarkerTextHL = s:EvaluateHL(g:SignatureMarkerTextHL, a:lnum, "SignatureMarkerText")
+    let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum, "SignatureMarkerLine")
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
@@ -259,13 +264,12 @@ function! s:GetInfo(...)                                                        
 endfunction
 
 
-function! signature#sign#GetGitGutterHLGroup(lnum)
+function! signature#sign#GetGitGutterHLGroup(lnum)                                                                " {{{1
   " Description: This returns the highlight group used by vim-gitgutter depending on how the line was edited
 
   let l:line_state = filter(copy(gitgutter#diff#process_hunks(gitgutter#hunk#hunks())), 'v:val[0] == a:lnum')
-
   if len(l:line_state) == 0
-    return 'Exception'
+    return ""
   endif
 
   if     l:line_state[0][1] =~ 'added'            | return 'GitGutterAdd'
@@ -276,7 +280,7 @@ function! signature#sign#GetGitGutterHLGroup(lnum)
 endfunction
 
 
-function! signature#sign#GetSignifyHLGroup(lnum)
+function! signature#sign#GetSignifyHLGroup(lnum)                                                                  " {{{1
   " Description: This returns the highlight group used by vim-signify depending on how the line was edited
   "              Thanks to @michaelmior
 
@@ -289,7 +293,7 @@ function! signature#sign#GetSignifyHLGroup(lnum)
     elseif l:line_state =~ 'SignifyDelete' | return 'SignifySignDelete'
     end
   else
-    return 'Exception'
+    return ""
   endif
 endfunction
 

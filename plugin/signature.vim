@@ -18,30 +18,33 @@ let g:loaded_Signature = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Global variables                                                                                                 {{{1
 "
-call signature#utils#Set('g:SignaturePrioritizeMarks',             1                                                     )
-call signature#utils#Set('g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-call signature#utils#Set('g:SignatureIncludeMarkers',              ')!@#$%^&*('                                          )
-call signature#utils#Set('g:SignatureMarkTextHL',                  "Exception"                                           )
-call signature#utils#Set('g:SignatureMarkTextHLDynamic',           0                                                     )
-call signature#utils#Set('g:SignatureMarkLineHL',                  ""                                                    )
-call signature#utils#Set('g:SignatureMarkerTextHL',                "WarningMsg"                                          )
-call signature#utils#Set('g:SignatureMarkerTextHLDynamic',         0                                                     )
-call signature#utils#Set('g:SignatureMarkerLineHL',                ""                                                    )
-call signature#utils#Set('g:SignatureWrapJumps',                   1                                                     )
-call signature#utils#Set('g:SignatureMarkOrder',                   "\p\m"                                                )
-call signature#utils#Set('g:SignatureDeleteConfirmation',          0                                                     )
-call signature#utils#Set('g:SignaturePurgeConfirmation',           0                                                     )
-call signature#utils#Set('g:SignaturePeriodicRefresh',             1                                                     )
-call signature#utils#Set('g:SignatureEnabledAtStartup',            1                                                     )
-call signature#utils#Set('g:SignatureDeferPlacement',              1                                                     )
-call signature#utils#Set('g:SignatureUnconditionallyRecycleMarks', 0                                                     )
-call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks',     1                                                     )
-call signature#utils#Set('g:SignatureForceRemoveGlobal',           1                                                     )
-call signature#utils#Set('g:SignatureForceMarkPlacement',          0                                                     )
-call signature#utils#Set('g:SignatureForceMarkerPlacement',        0                                                     )
-call signature#utils#Set('g:SignatureMap',                         {}                                                    )
+call signature#utils#Set('g:SignaturePrioritizeMarks',         1                                                     )
+call signature#utils#Set('g:SignatureIncludeMarks',            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+call signature#utils#Set('g:SignatureIncludeMarkers',          ')!@#$%^&*('                                          )
+call signature#utils#Set('g:SignatureMarkTextHL',              "SignatureMarkText"                                   )
+call signature#utils#Set('g:SignatureMarkTextHLDynamic',       1                                                     )
+call signature#utils#Set('g:SignatureMarkLineHL',              "SignatureMarkLine"                                   )
+call signature#utils#Set('g:SignatureMarkerTextHL',            "SignatureMarkerText"                                 )
+call signature#utils#Set('g:SignatureMarkerTextHLDynamic',     0                                                     )
+call signature#utils#Set('g:SignatureMarkerLineHL',            "SignatureMarkerLine"                                 )
+call signature#utils#Set('g:SignatureWrapJumps',               1                                                     )
+call signature#utils#Set('g:SignatureMarkOrder',               "\p\m"                                                )
+call signature#utils#Set('g:SignatureDeleteConfirmation',      0                                                     )
+call signature#utils#Set('g:SignaturePurgeConfirmation',       0                                                     )
+call signature#utils#Set('g:SignaturePeriodicRefresh',         1                                                     )
+call signature#utils#Set('g:SignatureEnabledAtStartup',        1                                                     )
+call signature#utils#Set('g:SignatureDeferPlacement',          1                                                     )
+call signature#utils#Set('g:SignatureRecycleMarks',            0                                                     )
+call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks', 1                                                     )
+call signature#utils#Set('g:SignatureForceRemoveGlobal',       1                                                     )
+call signature#utils#Set('g:SignatureForceMarkPlacement',      0                                                     )
+call signature#utils#Set('g:SignatureForceMarkerPlacement',    0                                                     )
+call signature#utils#Set('g:SignatureMap',                     {}                                                    )
 
-
+highlight link SignatureMarkText   Exception
+highlight link SignatureMarkLine   Normal
+highlight link SignatureMarkerText WarningMsg
+highlight link SignatureMarkerLine Normal
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Commands, Autocmds and Maps                                                                                      {{{1
 "

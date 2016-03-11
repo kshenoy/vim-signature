@@ -12,7 +12,7 @@ function! signature#mark#Toggle(mark)                                           
     " Place new mark
     let l:marks_list = signature#mark#GetList('free', 'buf_all')
     if empty(l:marks_list)
-      if (!g:SignatureUnconditionallyRecycleMarks)
+      if (!g:SignatureRecycleMarks)
         " No marks available and mark re-use not in effect
         call s:ReportNoAvailableMarks()
         return
