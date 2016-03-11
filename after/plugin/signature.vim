@@ -17,18 +17,22 @@ endif
 
 if exists('g:loaded_gitgutter')
   if g:SignatureMarkTextHLDynamic
-    let g:SignatureMarkTextHL = 'signature#sign#GetGitGutterHLGroup(a:lnum)'
+    unlet g:SignatureMarkTextHL
+    let   g:SignatureMarkTextHL = function("signature#sign#GetGitGutterHLGroup")
   endif
   if g:SignatureMarkerTextHLDynamic
-    let g:SignatureMarkerTextHL = 'signature#sign#GetGitGutterHLGroup(a:lnum)'
+    unlet g:SignatureMarkerTextHL
+    let   g:SignatureMarkerTextHL = function("signature#sign#GetGitGutterHLGroup")
   endif
 endif
 
 if exists('g:loaded_signify')
   if g:SignatureMarkTextHLDynamic
-    let g:SignatureMarkTextHL = 'signature#sign#GetSignifyHLGroup(a:lnum)'
+    unlet g:SignatureMarkTextHL
+    let   g:SignatureMarkTextHL = function("signature#sign#GetSignifyHLGroup")
   endif
   if g:SignatureMarkerTextHLDynamic
-    let g:SignatureMarkerTextHL = 'signature#sign#GetSignifyHLGroup(a:lnum)'
+    unlet g:SignatureMarkerTextHL
+    let   g:SignatureMarkerTextHL = function("signature#sign#GetSignifyHLGroup")
   endif
 endif

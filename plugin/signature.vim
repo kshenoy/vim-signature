@@ -12,7 +12,7 @@ endif
 if exists('g:loaded_Signature')
   finish
 endif
-let g:loaded_Signature = 3
+let g:loaded_Signature = 1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

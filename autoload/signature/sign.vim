@@ -81,6 +81,8 @@ endfunction
 
 
 function! s:EvaluateHL(expression, lnum)                                                                          " {{{1
+  " If expression points to a function, call it and use its output as the highlight group.
+  " If it is a string, use it directly
   if type(a:expression) == type("")
     return a:expression
   elseif type(a:expression) == type(function("tr"))
@@ -109,19 +111,14 @@ function! s:RefreshLine(lnum)                                                   
     let l:str = substitute(b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "")
     let l:str = substitute(l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "")
 
-    " If g:SignatureMarkTextHL points to a function, call it and use its output as the highlight group.
-    " If it is a string, use it directly
-    let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum)
     let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum)
+    let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
   elseif has_key(b:sig_markers, a:lnum)
     let l:str = strpart(b:sig_markers[a:lnum], 0, 1)
-
-    " If g:SignatureMarkerTextHL points to a function, call it and use its output as the highlight group.
-    " If it is a string, use it directly
-    let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
     let l:SignatureMarkerTextHL = s:EvaluateHL(g:SignatureMarkerTextHL, a:lnum)
+    let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum)
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else
@@ -271,12 +268,10 @@ function! signature#sign#GetGitGutterHLGroup(lnum)
     return 'Exception'
   endif
 
-  if l:line_state[0][1] =~ 'added'
-    return 'GitGutterAdd'
-  elseif l:line_state[0][1] =~ 'modified'
-    return 'GitGutterChange'
-  elseif l:line_state[0][1] =~ 'removed'
-    return 'GitGutterDelete'
+  if     l:line_state[0][1] =~ 'added'            | return 'GitGutterAdd'
+  elseif l:line_state[0][1] =~ 'modified_removed' | return 'GitGutterChangeDelete'
+  elseif l:line_state[0][1] =~ 'modified'         | return 'GitGutterChange'
+  elseif l:line_state[0][1] =~ 'removed'          | return 'GitGutterDelete'
   endif
 endfunction
 
@@ -288,13 +283,10 @@ function! signature#sign#GetSignifyHLGroup(lnum)
   call sy#sign#get_current_signs()
 
   if has_key(b:sy.internal, a:lnum)
-    let type = b:sy.internal[a:lnum]['type']
-    if type =~ 'SignifyAdd'
-      return 'SignifySignAdd'
-    elseif type =~ 'SignifyChange'
-      return 'SignifySignChange'
-    elseif type =~ 'SignifyDelete'
-      return 'SignifySignDelete'
+    let l:line_state = b:sy.internal[a:lnum]['type']
+    if     l:line_state =~ 'SignifyAdd'    | return 'SignifySignAdd'
+    elseif l:line_state =~ 'SignifyChange' | return 'SignifySignChange'
+    elseif l:line_state =~ 'SignifyDelete' | return 'SignifySignDelete'
     end
   else
     return 'Exception'
