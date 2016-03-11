@@ -198,7 +198,7 @@ SignatureListMarkers [marker] [n]
 
 
                                                      *'g:SignatureMarkTextHL'*
-  String, Default : "Exception"
+  String, Default : 'SignatureMarkText'
 
   The highlight group used for mark signs. This can be set either to a string
   or to a |Funcref|.
@@ -224,6 +224,8 @@ SignatureListMarkers [marker] [n]
     endfunction
     let g:SignatureMarkTextHL = function("Example")
 <
+  By default, this is set to SignatureMarkText which is a highlight group 
+  that is linked to Exception
 
                                               *'g:SignatureMarkTextHLDynamic'*
   Boolean, Default: 0
@@ -234,20 +236,20 @@ SignatureListMarkers [marker] [n]
 
 
                                                      *'g:SignatureMarkLineHL'*
-  String, Default : ''
+  String, Default : 'SignatureMarkLine'
 
-  The highlight group used for hightlighting lines having mark signs. This can
-  be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
+  The highlight group used for hightlighting lines having marks. This can be a
+  string or |Funcref|. SignatureMarkLine links to Normal by default.
+  See |g:SignatureMarkTextHL| for details.
 
 
                                                    *'g:SignatureMarkerTextHL'*
-  String, Default : "WarningMsg"
+  String, Default : 'SignatureMarkerText'
 
-  The highlight group used for marker signs. This can be a string or a
-  |Funcref|. See |g:SignatureMarkTextHL| for details.
->
-    let g:SignatureMarkTextHL = "WarningMsg"
-<
+  The highlight group used for marker signs. This can be a string or |Funcref|. 
+  SignatureMarkText links to WarningMsg by default.
+  See |g:SignatureMarkTextHL| for details.
+
 
                                             *'g:SignatureMarkerTextHLDynamic'*
   Boolean, Default: 0
@@ -260,8 +262,9 @@ SignatureListMarkers [marker] [n]
                                                    *'g:SignatureMarkerLineHL'*
   String, Default : ''
 
-  The highlight group used for hightlighting lines having marker signs. This
-  can be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
+  The highlight group used for hightlighting lines having markers. This can be
+  a string or a |Funcref|. SignatureMarkerLine links to Normal by default.
+  See |g:SignatureMarkTextHL| for details.
 
 
                                              *'g:SignatureDeleteConfirmation'*
