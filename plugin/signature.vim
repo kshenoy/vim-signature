@@ -22,7 +22,7 @@ call signature#utils#Set('g:SignaturePrioritizeMarks',         1                
 call signature#utils#Set('g:SignatureIncludeMarks',            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 call signature#utils#Set('g:SignatureIncludeMarkers',          ')!@#$%^&*('                                          )
 call signature#utils#Set('g:SignatureMarkTextHL',              "SignatureMarkText"                                   )
-call signature#utils#Set('g:SignatureMarkTextHLDynamic',       1                                                     )
+call signature#utils#Set('g:SignatureMarkTextHLDynamic',       0                                                     )
 call signature#utils#Set('g:SignatureMarkLineHL',              "SignatureMarkLine"                                   )
 call signature#utils#Set('g:SignatureMarkerTextHL',            "SignatureMarkerText"                                 )
 call signature#utils#Set('g:SignatureMarkerTextHLDynamic',     0                                                     )
