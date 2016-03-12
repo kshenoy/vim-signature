@@ -171,5 +171,7 @@ function! signature#marker#List(...)                                            
   endif
 
   call setloclist(0, l:list_map,)|lopen
+
+  call signature#utils#MapsLocList()
 endfunction
 " }}}2
