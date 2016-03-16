@@ -275,14 +275,15 @@ function! signature#sign#GetGitGutterHLGroup(lnum)                              
   " Description: This returns the highlight group used by vim-gitgutter depending on how the line was edited
 
   let l:line_state = filter(copy(gitgutter#diff#process_hunks(gitgutter#hunk#hunks())), 'v:val[0] == a:lnum')
+
   if len(l:line_state) == 0
     return ""
   endif
 
-  if     l:line_state[0][1] =~ 'added'            | return 'GitGutterAdd'
-  elseif l:line_state[0][1] =~ 'modified_removed' | return 'GitGutterChangeDelete'
-  elseif l:line_state[0][1] =~ 'modified'         | return 'GitGutterChange'
-  elseif l:line_state[0][1] =~ 'removed'          | return 'GitGutterDelete'
+  if     (l:line_state[0][1]) =~ 'added'            | return 'GitGutterAdd'
+  elseif (l:line_state[0][1]) =~ 'modified_removed' | return 'GitGutterChangeDelete'
+  elseif (l:line_state[0][1]) =~ 'modified'         | return 'GitGutterChange'
+  elseif (l:line_state[0][1]) =~ 'removed'          | return 'GitGutterDelete'
   endif
 endfunction
 

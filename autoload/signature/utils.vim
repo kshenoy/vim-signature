@@ -62,7 +62,7 @@ function! signature#utils#Maps(mode)                                            
 endfunction
 
 
-function! signature#utils#Input()                                                                                 " {{{2
+function! signature#utils#Input()                                                                                 " {{{1
   " Description: Grab input char
 
   " Obtain input from user ...
@@ -89,7 +89,7 @@ function! signature#utils#Input()                                               
 endfunction
 
 
-function! signature#utils#Remove(lnum)                                                                            " {{{2
+function! signature#utils#Remove(lnum)                                                                            " {{{1
   " Description: Obtain mark or marker from the user and remove it.
   "              There can be multiple markers of the same type on different lines. If a line no. is provided
   "              (non-zero), delete the marker from the specified line else delete it from the current line
@@ -108,7 +108,7 @@ function! signature#utils#Remove(lnum)                                          
 endfunction
 
 
-function! signature#utils#Toggle()                                                                                " {{{2
+function! signature#utils#Toggle()                                                                                " {{{1
   " Description: Toggles and refreshes sign display in the buffer.
 
   let b:sig_enabled = !b:sig_enabled
