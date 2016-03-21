@@ -133,3 +133,11 @@ function! signature#utils#Toggle()                                              
     unlet b:sig_marks
   endif
 endfunction
+
+function! signature#utils#MapsLocList()
+  " Description: Defines the helper mappings for the Location List
+  if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
+    nnoremap <buffer> <silent> q        :q<CR>
+    noremap  <buffer> <silent> <ENTER>  <CR>:lcl<CR>
+  endif
+endfunction
