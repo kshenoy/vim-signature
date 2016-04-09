@@ -1,10 +1,7 @@
-" vim: fdm=marker:et:ts=4:sw=2:sts=2
+" vim: fdm=marker:et:ts=4:sw=2:sts=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Place/Remove/Toggle                                                                                              {{{1
-"
-function! signature#mark#Toggle(mark)                                                                             " {{{2
+function! signature#mark#Toggle(mark)                                                                             " {{{1
   " Description: mark = 'next' : Place new mark on current line else toggle specified mark on current line
   " Arguments:   mark [a-z,A-Z]
 
@@ -60,7 +57,7 @@ function! signature#mark#Toggle(mark)                                           
 endfunction
 
 
-function! signature#mark#Remove(mark)                                                                             " {{{2
+function! signature#mark#Remove(mark)                                                                             " {{{1
   " Description: Remove 'mark' and its associated sign. If called without an argument, obtain it from the user
   " Arguments:   mark = [a-z,A-Z]
 
@@ -75,7 +72,7 @@ function! signature#mark#Remove(mark)                                           
 endfunction
 
 
-function! s:Place(mark)                                                                                           " {{{2
+function! s:Place(mark)                                                                                           " {{{1
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
   " If a line is deleted or mark is manipulated using any non-signature method then b:sig_marks can go out of sync
@@ -86,7 +83,7 @@ function! s:Place(mark)                                                         
 endfunction
 
 
-function! signature#mark#ToggleAtLine()                                                                           " {{{2
+function! signature#mark#ToggleAtLine()                                                                           " {{{1
   " Description: If no mark on current line, add one. If marks are on the current line, remove one.
   let l:marks_here = filter(signature#mark#GetList('used', 'buf_curr'), 'v:val[1] == ' . line('.'))
   if empty(l:marks_here)
@@ -99,7 +96,7 @@ function! signature#mark#ToggleAtLine()                                         
 endfunction
 
 
-function! signature#mark#Purge(mode)                                                                              " {{{2
+function! signature#mark#Purge(mode)                                                                              " {{{1
   " Description: Delete all marks from current line
   " Arguments:   mode = 'line' : Delete all marks from current line
   "                     'all'  : Delete all marks used in the buffer
@@ -129,13 +126,9 @@ function! signature#mark#Purge(mode)                                            
   endif
   call signature#sign#ToggleDummy()
 endfunction
-" }}}2
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Navigation                                                                                                       {{{1
-"
-function! signature#mark#Goto(dir, loc, mode)                                                                     " {{{2
+function! signature#mark#Goto(dir, loc, mode)                                                                     " {{{1
   " Arguments:
   "   dir   = next   : Jump forward
   "           prev   : Jump backward
@@ -167,7 +160,7 @@ function! signature#mark#Goto(dir, loc, mode)                                   
 endfunction
 
 
-function! s:GotoByPos(dir)                                                                                        " {{{2
+function! s:GotoByPos(dir)                                                                                        " {{{1
   " Description: Jump to next/prev mark by location.
   " Arguments: dir  = next   : Jump forward
   "                   prev   : Jump backward
@@ -192,7 +185,7 @@ function! s:GotoByPos(dir)                                                      
 endfunction
 
 
-function! s:GotoByAlpha(dir)                                                                                      " {{{2
+function! s:GotoByAlpha(dir)                                                                                      " {{{1
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
   let l:used_marks = signature#mark#GetList('used', 'buf_curr')
@@ -236,7 +229,7 @@ function! s:GotoByAlpha(dir)                                                    
 endfunction
 
 
-function! s:GotoByAlphaGlobal(dir)                                                                                " {{{2
+function! s:GotoByAlphaGlobal(dir)                                                                                " {{{1
   " Description: Jump to next/prev Global mark in any buffer by alphabetical order.
   "              Direction is specified as input argument
 
@@ -281,13 +274,9 @@ function! s:GotoByAlphaGlobal(dir)                                              
     endif
   endfor
 endfunction
-" }}}2
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Misc                                                                                                             {{{1
-"
-function! signature#mark#GetList(mode, scope, ...)                                                                " {{{2
+function! signature#mark#GetList(mode, scope, ...)                                                                " {{{1
   " Arguments: mode    = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
   "                      'free'     : Returns list of [ free marks ]
   "            scope   = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
@@ -330,7 +319,7 @@ function! signature#mark#GetList(mode, scope, ...)                              
 endfunction
 
 
-function! s:ForceGlobalRemoval(mark)                                                                              " {{{2
+function! s:ForceGlobalRemoval(mark)                                                                              " {{{1
   " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
 
@@ -366,7 +355,7 @@ function! s:ForceGlobalRemoval(mark)                                            
 endfunction
 
 
-function! s:ReportNoAvailableMarks()                                                                              " {{{2
+function! s:ReportNoAvailableMarks()                                                                              " {{{1
   if g:SignatureErrorIfNoAvailableMarks
     echoe "Signature: No free marks left."
   else
@@ -377,7 +366,7 @@ function! s:ReportNoAvailableMarks()                                            
 endfunction
 
 
-function! signature#mark#List(scope, ...)                                                                         " {{{2
+function! signature#mark#List(scope, ...)                                                                         " {{{1
   " Description: Opens and populates location list with marks from current buffer
   " Arguments:   scope     = 'buf_curr' : List marks from current buffer
   "                          'buf_all'  : List marks from all buffers FIXME
@@ -426,10 +415,4 @@ function! signature#mark#List(scope, ...)                                       
   "else
   "  call setqflist(l:list_map,)|copen
   endif
-
-  if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
-    nnoremap <buffer> <silent> q        :q<CR>
-    noremap  <buffer> <silent> <ENTER>  <CR>:lcl<CR>
-  endif
 endfunction
-" }}}2

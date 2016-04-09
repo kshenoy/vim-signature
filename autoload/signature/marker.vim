@@ -1,10 +1,7 @@
-" vim: fdm=marker:et:ts=4:sw=2:sts=2
+" vim: fdm=marker:et:ts=4:sw=2:sts=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Place/Remove/Toggle                                                                                              {{{1
-"
-function! signature#marker#Toggle(marker)                                                                         " {{{2
+function! signature#marker#Toggle(marker)                                                                         " {{{1
   " Description: Toggle marker on current line
   " Arguments: marker [!@#$%^&*()]
 
@@ -21,7 +18,7 @@ function! signature#marker#Toggle(marker)                                       
 endfunction
 
 
-function! signature#marker#Remove(lnum, marker)                                                                   " {{{2
+function! signature#marker#Remove(lnum, marker)                                                                   " {{{1
   " Description: Remove marker from specified line number
   " Arguments:   lnum - Line no. to delete marker from. If is 0, removes marker from current line
   "              a:2  - Marker to delete. If not specified, obtains input from user
@@ -32,7 +29,7 @@ function! signature#marker#Remove(lnum, marker)                                 
 endfunction
 
 
-function! signature#marker#Purge(...)                                                                             " {{{2
+function! signature#marker#Purge(...)                                                                             " {{{1
   " Description: If argument is given, removes marker only of the specified type else all markers are removed
 
   if empty(b:sig_markers) | return | endif
@@ -56,10 +53,7 @@ function! signature#marker#Purge(...)                                           
 endfunction
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Navigation                                                                                                       {{{1
-"
-function! signature#marker#Goto( dir, marker_num, count )                                                         " {{{2
+function! signature#marker#Goto( dir, marker_num, count )                                                         " {{{1
   " Description: Jump to next/prev marker by location.
   " Arguments: dir    = next  : Jump forward
   "                     prev  : Jump backward
@@ -112,10 +106,7 @@ function! signature#marker#Goto( dir, marker_num, count )                       
 endfunction
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Misc                                                                                                             {{{1
-"
-function! signature#marker#List(...)                                                                              " {{{2
+function! signature#marker#List(...)                                                                              " {{{1
   " Description: Opens and populates location list with markers from current buffer
   "              Show all markers in location list if no argument is provided
   " Argument:    [marker]  = 0-9 or any of !@#$%^&*() : List only the specified markers
@@ -172,4 +163,3 @@ function! signature#marker#List(...)                                            
 
   call setloclist(0, l:list_map,)|lopen
 endfunction
-" }}}2
