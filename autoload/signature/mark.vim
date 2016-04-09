@@ -367,52 +367,79 @@ endfunction
 
 
 function! signature#mark#List(scope, ...)                                                                         " {{{1
-  " Description: Opens and populates location list with marks from current buffer
-  " Arguments:   scope     = 'buf_curr' : List marks from current buffer
-  "                          'buf_all'  : List marks from all buffers FIXME
-  "              [context] = 0          : Adds context around the mark
+  " Description: Opens and populates location list with marks
+  " Arguments:   scope     = 0 : List local and global marks from current buffer
+  "                          1 : List only global marks from all buffers
+  "              [context] = 0 : Adds context around the mark
 
-  let l:count = (a:0 ? a:1 : 0)
-  let l:list_map = signature#mark#GetList('used', a:scope)
+  let l:list = []
+  let l:buf_curr = bufnr('%')
+  let l:list_sep = {'bufnr': '', 'lnum' : ''}
 
-  let l:list_map = map(l:list_map,
-                   \   '{
-                   \     "bufnr": v:val[2],
-                   \     "lnum" : v:val[1],
-                   \     "col"  : col("' . "'" . '"  . v:val[0]),
-                   \     "type" : "m",
-                   \     "text" : v:val[0] . ": " . getline(v:val[1])
-                   \   }'
-                   \  )
+  let l:SignatureIncludeMarks = (a:scope == 0 ? b:SignatureIncludeMarks : g:SignatureIncludeMarks)
+  for i in split(l:SignatureIncludeMarks, '\zs')
+    let [l:bufnr, l:lnum, l:col, l:off] = getpos( "'" . i )
 
-  if l:count
-    let l:temp_list = []
-    for i in range(0, len(l:list_map)-1)
-      for l:context in range(-l:count, l:count)
-        let l:item_context = copy(l:list_map[i])
-        if (l:context != 0)
-          let l:item_context.lnum = l:list_map[i].lnum + l:context
-          let l:item_context.text = (l:context < 0 ? "-" : "+") . ": " . getline(l:item_context.lnum)
-        endif
-        let l:item_context.text = substitute(l:item_context.text, '\s\+$', '', '')
-        let l:temp_list = add(l:temp_list, l:item_context)
-      endfor
-      if (i != len(l:list_map)-1)
-        " Removed the text field to avoid wrapping in Location List if window width is less than separator length
-        let l:temp_list = add(l:temp_list, { 'bufnr': '',
-                                           \ 'lnum' : '',
-                                           \ 'col'  : '',
-                                           \ 'type' : '',
-                                           \ 'text' : ''
-                                           \ })
+    " Local marks set the buffer no. to 0, replace it with the actual buffer number
+    let l:bufnr = (l:bufnr == 0 ? l:buf_curr : l:bufnr)
+
+    " Check that
+    "   1. Mark is set (lnum > 0)
+    "   2. If buf_all = 0, filter out global marks from other buffers
+    "   3. If buf_all = 1, filter out local marks from current buffer
+    if (  (l:lnum == 0)
+     \ || (  (a:scope == 0)
+     \    && (l:bufnr != l:buf_curr)
+     \    )
+     \ || (  (a:scope == 1)
+     \    && (i       =~# "[a-z]")
+     \    )
+     \ )
+      "echom 'DEBUG: Skipping mark ' . i
+      continue
+    endif
+
+    " If the buffer is not loaded, what's the point of showing empty context?
+    let l:context = (bufloaded(l:bufnr) && a:0 ? a:1 : 0)
+
+    for context_lnum in range(l:lnum - l:context, l:lnum + l:context)
+      let l:text = get(getbufline(l:bufnr, context_lnum), 0, "")
+      if (!bufloaded(l:bufnr))
+        " Buffer is not loaded, hence we won't be able to get the line. Opening the file should fix it
+        let l:text = "~~~ File is not loaded into memory. Open file and rerun to see the line ~~~"
+      elseif (l:text == "")
+        " Line does not exist. Possibly because context_lnum > total no. of lines
+        "echom 'DEBUG: Skipping line=' . context_lnum . ' for mark=' . i . " because line doesn't exist in buffer=" . l:bufnr
+        continue
       endif
-    endfor
-    let l:list_map = l:temp_list
-  endif
 
-  if (a:scope ==? 'buf_curr')
-    call setloclist(0, l:list_map,)|lopen
-  "else
-  "  call setqflist(l:list_map,)|copen
-  endif
+      if     (context_lnum < l:lnum) | let l:text = '-: ' . l:text
+      elseif (context_lnum > l:lnum) | let l:text = '+: ' . l:text
+      else                           | let l:text = i . ': ' . l:text
+      endif
+
+      let l:list = add(l:list,
+        \              { 'text' : l:text,
+        \                'bufnr': l:bufnr,
+        \                'lnum' : context_lnum,
+        \                'col'  : l:col,
+        \                'type' : 'm'
+        \              }
+        \             )
+    endfor
+
+    " Add separator when showing context
+    "if (a:context > 0)
+    "  let l:list = add(l:list, l:list_sep)
+    "endif
+  endfor
+
+  " Remove the redundant separator at the end when showing context
+  "if (  (a:context > 0)
+  " \ && (len(l:list) > 0)
+  " \ )
+  "  call remove(l:list, -1)
+  "endif
+
+  call setloclist(0, l:list) | lopen
 endfunction

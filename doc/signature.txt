@@ -77,20 +77,24 @@ SignatureRefresh
   Force the display of signs in the buffer to refresh. Use this to correct
   the signs if things go awry
 
-SignatureListMarks [n]
+SignatureListBufferMarks [n]
   List all the marks used in the current buffer in the location list
   Accepts an optional argument to provide 'n' lines of context
 
+SignatureListGlobalMarks [n]
+  List only the global marks used in all buffers in the location list
+  Accepts an optional argument to provide 'n' lines of context
+
 SignatureListMarkers [marker] [n]
-  List all instances of the specified marker used in the current buffer in
-  the location list. If no argument is given, it lists all markers
+  List all instances of the specified marker(s) used in the current buffer
+  in the location list. If no argument is given, it lists all markers
   Accepts an optional argument to provide 'n' lines of context
 >
-  :SignatureListMakers          : List all markers
+  :SignatureListMarkers         : List all markers
   :SignatureListMarkers 1       : List only the '!' marker
   :SignatureListMarkers @       : List only the '@' marker
-  :SignatureListMarkers 0, 2    : List only ')' marker with 2 lines of context
-  :SignatureListMarkers '', 2   : List all markers and show 2 lines of context
+  :SignatureListMarkers 0, 2    : List only ) marker with 2 lines of context
+  :SignatureListMarkers '', 2   : List all markers with 2 lines of context
   :SignatureListMarkers '!@', 2 : List only the '!' and '@' markers and show
                                   2 lines of context around them
 <
@@ -118,7 +122,7 @@ SignatureListMarkers [marker] [n]
         \ 'GotoPrevLineByPos'  :  "['",
         \ 'GotoNextSpotByPos'  :  "]`",
         \ 'GotoPrevSpotByPos'  :  "[`",
-        \ 'GotoNextMarker'     :  "[+",
+        \ 'GotoNextMarker'     :  "]-",
         \ 'GotoPrevMarker'     :  "[-",
         \ 'GotoNextMarkerAny'  :  "]=",
         \ 'GotoPrevMarkerAny'  :  "[=",

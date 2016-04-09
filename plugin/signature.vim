@@ -70,7 +70,8 @@ if has('autocmd')
   augroup END
 endif
 
-command! -nargs=0 SignatureToggleSigns call signature#utils#Toggle()
-command! -nargs=0 SignatureRefresh     call signature#sign#Refresh('force')
-command! -nargs=? SignatureListMarks   call signature#mark#List('buf_curr', <args>)
-command! -nargs=? SignatureListMarkers call signature#marker#List(<args>)
+command! -nargs=0 SignatureToggleSigns     call signature#utils#Toggle()
+command! -nargs=0 SignatureRefresh         call signature#sign#Refresh('force')
+command! -nargs=? SignatureListBufferMarks call signature#mark#List(0, <args>)
+command! -nargs=? SignatureListGlobalMarks call signature#mark#List(1, <args>)
+command! -nargs=* SignatureListMarkers     call signature#marker#List(<args>)
