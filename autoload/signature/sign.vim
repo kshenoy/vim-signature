@@ -131,6 +131,7 @@ function! s:RefreshLine(lnum)                                                   
     let l:txt = strpart(b:sig_markers[a:lnum], 0, 1)
     let l:str = l:txt . '_' . l:SignatureMarkerTextHL . '_' . l:SignatureMarkerLineHL
 
+    echom l:SignatureMarkerLineHL
     execute 'sign define Signature_' . l:str . ' text=' . l:txt . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
 
   else

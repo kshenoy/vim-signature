@@ -133,3 +133,25 @@ function! signature#utils#Toggle()                                              
     unlet b:sig_marks
   endif
 endfunction
+
+
+function! signature#utils#SetupHighlightGroups()                                                                  " {{{1
+  " Description: Sets up the highlight groups
+
+  function! CheckAndSetHL(check, what, prefix, set)
+    if (synIDattr(synIDtrans(hlID(a:check)), a:what, a:prefix) == "")
+      let l:color=synIDattr(synIDtrans(hlID(a:set)), a:what, a:prefix)
+      if (l:color != "")
+        execute 'highlight ' . a:check . ' ' . a:prefix . a:what . '=' . l:color
+      endif
+    endif
+  endfunction
+
+  let l:prefix = (has('gui_running') || has('termguicolors') ? 'gui' : 'cterm')
+  call CheckAndSetHL('SignatureMarkText',   'bg', l:prefix, 'SignColumn')
+  call CheckAndSetHL('SignatureMarkText',   'fg', l:prefix, 'Exception' )
+  call CheckAndSetHL('SignatureMarkerText', 'bg', l:prefix, 'SignColumn')
+  call CheckAndSetHL('SignatureMarkerText', 'fg', l:prefix, 'WarningMsg')
+
+  delfunction CheckAndSetHL
+endfunction

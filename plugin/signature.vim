@@ -41,10 +41,7 @@ call signature#utils#Set('g:SignatureForceMarkPlacement',      0                
 call signature#utils#Set('g:SignatureForceMarkerPlacement',    0                                                     )
 call signature#utils#Set('g:SignatureMap',                     {}                                                    )
 
-highlight link SignatureMarkText   Exception
-highlight link SignatureMarkLine   Normal
-highlight link SignatureMarkerText WarningMsg
-highlight link SignatureMarkerLine Normal
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Commands, Autocmds and Maps                                                                                      {{{1
 "
@@ -53,10 +50,19 @@ call signature#utils#Maps('create')
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
+
+    " This needs to be called last once all the colorscheme etc. has been loaded
+    autocmd VimEnter * call signature#utils#SetupHighlightGroups()
+
+    " This is required to remove signs for global marks that were removed when in another window
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
+
     autocmd CursorHold * if g:SignaturePeriodicRefresh
                        \|  call signature#sign#Refresh()
                        \|endif
+
+    " To avoid conflicts with NERDTree. Figure out a cleaner way.
+    " Food for thought: If NERDTree creates buffer specific maps, shouldn't it override Signature's maps?
     autocmd BufEnter,FileType * if (  (&filetype ==? 'nerdtree')
                              \     || (&filetype ==? 'netrw')
                              \     )
