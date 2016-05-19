@@ -141,7 +141,9 @@ function! signature#utils#SetupHighlightGroups()                                
   function! CheckAndSetHL(check, what, prefix, set)
     if (synIDattr(synIDtrans(hlID(a:check)), a:what, a:prefix) == "")
       let l:color=synIDattr(synIDtrans(hlID(a:set)), a:what, a:prefix)
-      if (l:color != "")
+      if (  (l:color != "")
+       \ && (l:color >= 0)
+       \ )
         execute 'highlight ' . a:check . ' ' . a:prefix . a:what . '=' . l:color
       endif
     endif
