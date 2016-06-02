@@ -138,14 +138,17 @@ endfunction
 function! signature#utils#SetupHighlightGroups()                                                                  " {{{1
   " Description: Sets up the highlight groups
 
-  function! CheckAndSetHL(check, what, prefix, set)
-    if (synIDattr(synIDtrans(hlID(a:check)), a:what, a:prefix) == "")
-      let l:color=synIDattr(synIDtrans(hlID(a:set)), a:what, a:prefix)
-      if (  (l:color != "")
-       \ && (l:color >= 0)
-       \ )
-        execute 'highlight ' . a:check . ' ' . a:prefix . a:what . '=' . l:color
-      endif
+  function! CheckAndSetHL(curr_hl, attr, prefix, from_hl)
+    let l:curr_color = synIDattr(synIDtrans(hlID(a:curr_hl)), a:attr, a:prefix)
+    let l:from_color = synIDattr(synIDtrans(hlID(a:from_hl)), a:attr, a:prefix)
+
+    if (  (  (l:curr_color == "")
+     \    || (l:curr_color  < 0)
+     \    )
+     \ && (l:from_color != "")
+     \ && (l:from_color >= 0)
+     \ )
+      execute 'highlight ' . a:curr_hl . ' ' . a:prefix . a:attr . '=' . l:from_color
     endif
   endfunction
 
