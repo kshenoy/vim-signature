@@ -104,7 +104,7 @@ function! s:RefreshLine(lnum)                                                   
   " Arguments:
   "   lnum : Line number for which the sign string is to be modified
 
-  let l:id  = a:lnum * 1000 + bufnr('%')
+  let l:id  = abs(a:lnum * 1000 + bufnr('%'))
   let l:str = ""
 
   " Place the sign
@@ -181,7 +181,7 @@ endfunction
 function! signature#sign#Unplace(lnum)                                                                            " {{{1
   " Description: Remove the sign from the specified line number
   " FIXME: Clean-up. Undefine the sign
-  let l:id = a:lnum * 1000 + bufnr('%')
+  let l:id = abs(a:lnum * 1000 + bufnr('%'))
   silent! execute 'sign unplace ' . l:id
 endfunction
 
