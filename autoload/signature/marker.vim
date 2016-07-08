@@ -69,14 +69,14 @@ function! signature#marker#Goto( dir, marker_num, count )                       
   elseif (  (a:marker_num ==? 'same')
        \ && has_key(b:sig_markers, l:lnum)
        \ )
-    let l:marker = strcharpart(b:sig_markers[l:lnum], 0, 1)
+    let l:marker = strpart(b:sig_markers[l:lnum], 0, 1)
   endif
 
   " Get list of line numbers of lines with markers.
   " If current line has a marker, filter out line numbers of other markers ...
   if (l:marker != '')
     let l:marker_lnums = sort(keys(filter(copy(b:sig_markers),
-          \ 'strcharpart(v:val, 0, 1) == l:marker')), "signature#utils#NumericSort")
+          \ 'strpart(v:val, 0, 1) == l:marker')), "signature#utils#NumericSort")
   else
     let l:marker_lnums = sort(keys(b:sig_markers), "signature#utils#NumericSort")
   endif

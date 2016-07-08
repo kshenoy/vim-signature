@@ -77,7 +77,7 @@ function! signature#utils#Input()                                               
 
   " ... but if input is a number, convert it to corresponding marker before proceeding
   if match(l:in, '\d') >= 0
-    let l:char = strcharpart(b:SignatureIncludeMarkers, l:in, 1)
+    let l:char = strpart(b:SignatureIncludeMarkers, l:in, 1)
   else
     let l:char = l:in
   endif

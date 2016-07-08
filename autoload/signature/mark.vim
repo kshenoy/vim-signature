@@ -179,7 +179,7 @@ function! s:GotoByPos(dir)                                                      
     let l:mark_lnums = reverse(sort(keys(filter(copy(b:sig_marks), 'v:key < l:lnum')), "signature#utils#NumericSort"))
   endif
   let l:targ = (empty(l:mark_lnums) && b:SignatureWrapJumps ? l:targ : l:mark_lnums[0])
-  let l:mark = strcharpart(b:sig_marks[l:targ], 0, 1)
+  let l:mark = strpart(b:sig_marks[l:targ], 0, 1)
 
   return l:mark
 endfunction
