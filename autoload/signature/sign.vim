@@ -80,7 +80,7 @@ function! signature#sign#Remove(sign, lnum)                                     
 endfunction
 
 
-function! s:EvaluateHL(expr, lnum, ...)                                                                     " {{{1
+function! s:EvaluateHL(expr, lnum, ...)                                                                           " {{{1
   " Description: If expr points to a function, call it and use its output as the highlight group.
   "              If it is a string, use it directly.
   "              If the optional argument is specified, use it as a fallback. If not, return an empty string
@@ -115,8 +115,8 @@ function! s:RefreshLine(lnum)                                                   
    \ )
     let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum, "SignatureMarkText")
     let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum, "SignatureMarkLine")
-    let l:str = substitute(b:SignatureMarkOrder, "\m", strpart( b:sig_marks[a:lnum], 0, 1 ), "")
-    let l:str = substitute(l:str,                "\p", strpart( b:sig_marks[a:lnum], 1, 1 ), "")
+    let l:str = substitute(b:SignatureMarkOrder, "\m", strcharpart(b:sig_marks[a:lnum], 0, 1), '')
+    let l:str = substitute(l:str,                "\p", strcharpart(b:sig_marks[a:lnum], 1, 1), '')
 
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
@@ -128,12 +128,10 @@ function! s:RefreshLine(lnum)                                                   
     " This is because if dynamic highlighting of markers is enabled then the sign placed on eg. a modified line should
     " be highlighted differently than the one placed on an unchanged line.
     " In order to support this, I append the name of the TextHL and LineHL group to the name of the sign.
-    let l:txt = strpart(b:sig_markers[a:lnum], 0, 1)
+    let l:txt = strcharpart(b:sig_markers[a:lnum], 0, 1)
     let l:str = l:txt . '_' . l:SignatureMarkerTextHL . '_' . l:SignatureMarkerLineHL
 
-    echom l:SignatureMarkerLineHL
     execute 'sign define Signature_' . l:str . ' text=' . l:txt . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
-
   else
     call signature#sign#Unplace(a:lnum)
   endif
@@ -150,9 +148,9 @@ endfunction
 
 function! signature#sign#Refresh(...)                                                                             " {{{1
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
-  " Arguments: '1' to force a sign refresh
+  " Arguments:   Specify an argument to force a sign refresh
 
-  call s:InitializeVars()
+  call s:InitializeVars(a:0 && a:1)
   " If Signature is not enabled, return
   if !b:sig_enabled | return | endif
 
@@ -310,8 +308,9 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
 endfunction
 
 
-function! s:InitializeVars()                                                                                      " {{{1
+function! s:InitializeVars(...)                                                                                   " {{{1
   " Description: Initialize variables
+  " Arguments:   Specify an argument to re-init
 
   if !exists('b:sig_marks')
     " b:sig_marks = { lnum => signs_str }
@@ -333,12 +332,12 @@ function! s:InitializeVars()                                                    
     call filter( b:sig_markers, 'v:key <= l:line_tot' )
   endif
 
-  call signature#utils#Set('b:sig_DummyExists'         , 0                          )
-  call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup)
-  call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    )
-  call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  )
-  call signature#utils#Set('b:SignatureMarkOrder'      , g:SignatureMarkOrder       )
-  call signature#utils#Set('b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks )
-  call signature#utils#Set('b:SignatureDeferPlacement' , g:SignatureDeferPlacement  )
-  call signature#utils#Set('b:SignatureWrapJumps'      , g:SignatureWrapJumps       )
+  call signature#utils#Set('b:sig_DummyExists'         , 0                          , a:0 && a:1)
+  call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup, a:0 && a:1)
+  call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    , a:0 && a:1)
+  call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  , a:0 && a:1)
+  call signature#utils#Set('b:SignatureMarkOrder'      , g:SignatureMarkOrder       , a:0 && a:1)
+  call signature#utils#Set('b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks , a:0 && a:1)
+  call signature#utils#Set('b:SignatureDeferPlacement' , g:SignatureDeferPlacement  , a:0 && a:1)
+  call signature#utils#Set('b:SignatureWrapJumps'      , g:SignatureWrapJumps       , a:0 && a:1)
 endfunction

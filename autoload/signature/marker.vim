@@ -59,24 +59,24 @@ function! signature#marker#Goto( dir, marker_num, count )                       
   "                     prev  : Jump backward
   "            marker = same  : Jump to a marker of the same type
   "                     any   : Jump to a marker of any type
-  "                     [1-9] : Jump to the corresponding marker
+  "                     [0-9] : Jump to the corresponding marker
 
   let l:lnum = line('.')
 
   let l:marker = ''
-  if (a:marker_num =~ '\v<[1-9]>')
+  if (a:marker_num =~ '\v<[0-9]>')
     let l:marker = split(b:SignatureIncludeMarkers, '\zs')[a:marker_num]
   elseif (  (a:marker_num ==? 'same')
        \ && has_key(b:sig_markers, l:lnum)
        \ )
-    let l:marker = strpart(b:sig_markers[l:lnum], 0, 1)
+    let l:marker = strcharpart(b:sig_markers[l:lnum], 0, 1)
   endif
 
   " Get list of line numbers of lines with markers.
   " If current line has a marker, filter out line numbers of other markers ...
   if (l:marker != '')
     let l:marker_lnums = sort(keys(filter(copy(b:sig_markers),
-          \ 'strpart(v:val, 0, 1) == l:marker')), "signature#utils#NumericSort")
+          \ 'strcharpart(v:val, 0, 1) == l:marker')), "signature#utils#NumericSort")
   else
     let l:marker_lnums = sort(keys(b:sig_markers), "signature#utils#NumericSort")
   endif
@@ -109,19 +109,23 @@ endfunction
 function! signature#marker#List(...)                                                                              " {{{1
   " Description: Opens and populates location list with markers from current buffer
   "              Show all markers in location list if no argument is provided
-  " Argument:    [markers] = 0-9 or any of !@#$%^&*() : List only the specified markers
-  "              [context] = 0 (default)              : Adds context around marker
+  " Argument:    [markers] = 0-9 or any of the specified symbols : List only the specified markers
+  "              [context] = 0 (default)                         : Adds context around marker
   "              To show all markers with 1 line of context call using arguments ("", 1)
 
   let l:markers = (a:0 && (a:1 != "") ? a:1 : b:SignatureIncludeMarkers)
   let l:context = (a:0 > 1 ? a:2 : 0)
 
   if (l:markers =~ '^\d$')
-    if (l:markers >= len(')!@#$%^&*('))
+    if (  (  (l:markers == 0)
+     \    && (len(b:SignatureIncludeMarkers) != 10)
+     \    )
+     \ || (l:markers > len(b:SignatureIncludeMarkers))
+     \ )
       echoe "Signature: No corresponding marker exists for " . l:markers
       return
     endif
-    let l:markers = split(')!@#$%^&*(', '\zs')[l:markers]
+    let l:markers = split(b:SignatureIncludeMarkers, '\zs')[l:markers]
   endif
 
   let l:lines_tot = line('$')

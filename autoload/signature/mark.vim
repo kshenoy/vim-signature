@@ -166,20 +166,20 @@ function! s:GotoByPos(dir)                                                      
   "                   prev   : Jump backward
 
   " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
-  if empty( b:sig_marks ) | return "" | endif
+  if empty(b:sig_marks) | return "" | endif
 
   let l:lnum = line('.')
 
   " Get list of line numbers of lines with marks.
   if a:dir ==? "next"
-    let l:targ = min( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
-    let l:mark_lnums = sort( keys( filter( copy( b:sig_marks ), 'v:key > l:lnum')), "signature#utils#NumericSort" )
+    let l:targ = min(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
+    let l:mark_lnums = sort(keys(filter(copy(b:sig_marks), 'v:key > l:lnum')), "signature#utils#NumericSort")
   elseif a:dir ==? "prev"
-    let l:targ = max( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
-    let l:mark_lnums = reverse( sort( keys( filter( copy( b:sig_marks ), 'v:key < l:lnum')), "signature#utils#NumericSort" ))
+    let l:targ = max(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
+    let l:mark_lnums = reverse(sort(keys(filter(copy(b:sig_marks), 'v:key < l:lnum')), "signature#utils#NumericSort"))
   endif
-  let l:targ = ( empty( l:mark_lnums ) && b:SignatureWrapJumps ? l:targ : l:mark_lnums[0] )
-  let l:mark = strpart( b:sig_marks[l:targ], 0, 1 )
+  let l:targ = (empty(l:mark_lnums) && b:SignatureWrapJumps ? l:targ : l:mark_lnums[0])
+  let l:mark = strcharpart(b:sig_marks[l:targ], 0, 1)
 
   return l:mark
 endfunction

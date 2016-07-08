@@ -145,9 +145,25 @@ SignatureListMarkers [marker] [n]
 
 
                                                  *'g:SignatureIncludeMarkers'*
-  String, Default : '!@#$%^&*()'
+  String, Default : ')!@#$%^&*('
 
-  Specify the markers that can be used by the plugin.
+  Specify the symbols that can be used by the plugin to be placed by 0-9.
+  Note that there's a 1:1 correspondence between the symbols and 0-9.
+  This string must be at most 10 chars long. Extra char will be ignored.
+  Also, this string must not include any alphabetical characters `[a-zA-Z]`
+  However, it can contain spaces to indicate blanks. Eg.
+    `m0` will place `)` by default
+    `m1` will place `!` by default
+    `m2` will place `@` by default etc.
+
+  If set to `')!'`, `m0` and `m1` will behave as described above but `m[2-9]` will
+  not be handled by this plugin.
+
+  If set to `' !'` (note the space before !), only `m1` will have any affect
+  while `m[0,2-9]` will not have any affect
+
+  An example of a use case is for keyboards with alternate layouts wherein
+  the symbols associated with 0-9 could be different than the default.
   'b:SignatureIncludeMarkers' can be specified separately for each buffer
 
 

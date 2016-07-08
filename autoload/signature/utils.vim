@@ -1,12 +1,14 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#utils#Set(var, default)                                                                       " {{{1
-  if !exists(a:var)
-    if type(a:default)
-      execute 'let' a:var '=' string(a:default)
+function! signature#utils#Set(var, value, ...)                                                                  " {{{1
+  " Description: Assign value to var if var is unset or if an optional 3rd arg is provided to force
+
+  if (!exists(a:var) || a:0 && a:1)
+    if type(a:value)
+      execute 'let' a:var '=' string(a:value)
     else
-      execute 'let' a:var '=' a:default
+      execute 'let' a:var '=' a:value
     endif
   endif
   return a:var
@@ -66,25 +68,29 @@ function! signature#utils#Input()                                               
   " Description: Grab input char
 
   " Obtain input from user ...
-  let l:char = nr2char(getchar())
+  let l:in = nr2char(getchar())
 
   " ... if the input is not a number eg. '!' ==> Delete all '!' markers
-  if (b:SignatureIncludeMarkers =~# l:char)
-    return signature#marker#Purge(l:char)
+  if (b:SignatureIncludeMarkers =~# l:in)
+    return signature#marker#Purge(l:in)
   endif
 
   " ... but if input is a number, convert it to corresponding marker before proceeding
-  if match( l:char, '\d' ) >= 0
-    let l:char = split(')!@#$%^&*(', '\zs')[l:char]
+  if match(l:in, '\d') >= 0
+    let l:char = strcharpart(b:SignatureIncludeMarkers, l:in, 1)
+  else
+    let l:char = l:in
   endif
 
-  if (b:SignatureIncludeMarkers =~# l:char)
+  if (  (b:SignatureIncludeMarkers =~# l:char)
+   \ && (l:char != ' ')
+   \ )
     return signature#marker#Toggle(l:char)
   elseif (b:SignatureIncludeMarks =~# l:char)
     return signature#mark#Toggle(l:char)
   else
-    " l:char is probably one of `'[]<>
-    execute 'normal! m' . l:char
+    " l:char is probably one of `'[]<> or a space from the gap in b:SignatureIncludeMarkers
+    execute 'normal! m' . l:in
   endif
 endfunction
 
@@ -100,7 +106,7 @@ function! signature#utils#Remove(lnum)                                          
 
   if (l:char =~ '^\d$')
     let l:lnum = (a:lnum == 0 ? line('.') : a:lnum)
-    let l:char = split(')!@#$%^&*(', '\zs')[l:char]
+    let l:char = split(b:SignatureIncludeMarkers, '\zs')[l:char]
     call signature#marker#Remove(lnum, l:char)
   elseif (l:char =~? '^[a-z]$')
     call signature#mark#Remove(l:char)
