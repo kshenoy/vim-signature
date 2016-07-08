@@ -60,19 +60,6 @@ if has('autocmd')
     autocmd CursorHold * if g:SignaturePeriodicRefresh
                        \|  call signature#sign#Refresh()
                        \|endif
-
-    " To avoid conflicts with NERDTree. Figure out a cleaner way.
-    " Food for thought: If NERDTree creates buffer specific maps, shouldn't it override Signature's maps?
-    autocmd BufEnter,FileType * if (  (&filetype ==? 'nerdtree')
-                             \     || (&filetype ==? 'netrw')
-                             \     )
-                             \|   call signature#utils#Maps('remove')
-                             \| endif
-    autocmd BufLeave * if (  (&filetype ==? 'nerdtree')
-                    \     || (&filetype ==? 'netrw')
-                    \     )
-                    \|   call signature#utils#Maps('create')
-                    \| endif
   augroup END
 endif
 

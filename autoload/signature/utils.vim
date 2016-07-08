@@ -36,16 +36,16 @@ function! signature#utils#Maps(mode)                                            
   " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with
   " Leader/Input as if the user chooses to use some weird key like <BS> or <CR> for any of these 3, we need to be able
   " to identify it. Eg. the nr2char(getchar()) will fail if the user presses a <BS>
-  let s:SignatureMapLeader = get(g:SignatureMap, 'Leader', 'm')
-  if (s:SignatureMapLeader == "")
+  let l:SignatureMapLeader = get(g:SignatureMap, 'Leader', 'm')
+  if (l:SignatureMapLeader == "")
     echoe "Signature: g:SignatureMap.Leader shouldn't be left blank"
   endif
-  call s:Map(a:mode, 'Leader'           , s:SignatureMapLeader            , 'utils#Input()'                       )
-  call s:Map(a:mode, 'PlaceNextMark'    , s:SignatureMapLeader . ","      , 'mark#Toggle("next")'                 )
-  call s:Map(a:mode, 'ToggleMarkAtLine' , s:SignatureMapLeader . "."      , 'mark#ToggleAtLine()'                 )
-  call s:Map(a:mode, 'PurgeMarksAtLine' , s:SignatureMapLeader . "-"      , 'mark#Purge("line")'                  )
-  call s:Map(a:mode, 'PurgeMarks'       , s:SignatureMapLeader . "<Space>", 'mark#Purge("all")'                   )
-  call s:Map(a:mode, 'PurgeMarkers'     , s:SignatureMapLeader . "<BS>"   , 'marker#Purge()'                      )
+  call s:Map(a:mode, 'Leader'           , l:SignatureMapLeader            , 'utils#Input()'                       )
+  call s:Map(a:mode, 'PlaceNextMark'    , l:SignatureMapLeader . ","      , 'mark#Toggle("next")'                 )
+  call s:Map(a:mode, 'ToggleMarkAtLine' , l:SignatureMapLeader . "."      , 'mark#ToggleAtLine()'                 )
+  call s:Map(a:mode, 'PurgeMarksAtLine' , l:SignatureMapLeader . "-"      , 'mark#Purge("line")'                  )
+  call s:Map(a:mode, 'PurgeMarks'       , l:SignatureMapLeader . "<Space>", 'mark#Purge("all")'                   )
+  call s:Map(a:mode, 'PurgeMarkers'     , l:SignatureMapLeader . "<BS>"   , 'marker#Purge()'                      )
   call s:Map(a:mode, 'DeleteMark'       , "dm"                            , 'utils#Remove(v:count)'               )
   call s:Map(a:mode, 'GotoNextLineAlpha', "']"                            , 'mark#Goto("next", "line", "alpha")'  )
   call s:Map(a:mode, 'GotoPrevLineAlpha', "'["                            , 'mark#Goto("prev", "line", "alpha")'  )
