@@ -1,4 +1,3 @@
-## Changelog
 #### 2016-07-08:
 Signature used to have a mapping conflict with NERDTree as both try to map the `m` key.  
 To get around this, I used to delete maps whenever I detected someone entering the NERDTree pane and recreate the maps upon exit.  
