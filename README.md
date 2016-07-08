@@ -1,3 +1,9 @@
+#### 2016-07-08:
+Signature used to have a mapping conflict with NERDTree as both try to map the `m` key.  
+To get around this, I used to delete maps whenever I detected someone entering the NERDTree pane and recreate the maps upon exit.  
+However, this had a lot of issues and as of [cfa6452](https://github.com/kshenoy/vim-signature/commit/cfa64525305dbb8cec7eefc16e4ea460f007cd33) I've decided to remove any code that was intended to work around this since it wasn't working anyways. Refer to the discussion [here](https://github.com/kshenoy/vim-signature/issues/3#issuecomment-222565292) for more details.  
+Sorry for any inconvenience. If anyone has any ideas or suggestions please let me know.  
+
 # vim-signature
 vim-signature is a plugin to place, toggle and display marks.
 
