@@ -20,7 +20,7 @@ let g:loaded_Signature = 1
 "
 call signature#utils#Set('g:SignaturePrioritizeMarks',         1                                                     )
 call signature#utils#Set('g:SignatureIncludeMarks',            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-call signature#utils#Set('g:SignatureIncludeMarkers',          '0123456789'                                          )
+call signature#utils#Set('g:SignatureIncludeMarkers',          ')!@#$%^&*('                                          )
 call signature#utils#Set('g:SignatureMarkTextHL',              "SignatureMarkText"                                   )
 call signature#utils#Set('g:SignatureMarkTextHLDynamic',       0                                                     )
 call signature#utils#Set('g:SignatureMarkLineHL',              "SignatureMarkLine"                                   )
