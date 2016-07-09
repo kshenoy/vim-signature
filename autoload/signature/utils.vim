@@ -67,6 +67,11 @@ endfunction
 function! signature#utils#Input()                                                                                 " {{{1
   " Description: Grab input char
 
+  if &ft ==# "netrw"
+    " Workaround for #104
+    return
+  endif
+
   " Obtain input from user ...
   let l:in = nr2char(getchar())
 
