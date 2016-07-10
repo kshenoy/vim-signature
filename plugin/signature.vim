@@ -58,10 +58,6 @@ if has('autocmd')
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
 
     autocmd CursorHold * if (g:SignaturePeriodicRefresh) | call signature#sign#Refresh() | endif
-
-    " Workaround for #104
-    autocmd BufEnter,FileType * if (&filetype ==? 'netrw') | call signature#utils#Maps('remove') | endif
-    autocmd BufLeave          * if (&filetype ==? 'netrw') | call signature#utils#Maps('create') | endif
   augroup END
 endif
 
