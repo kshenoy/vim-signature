@@ -52,7 +52,7 @@ if has('autocmd')
     autocmd!
 
     " This needs to be called last once all the colorscheme etc. has been loaded
-    autocmd VimEnter * call signature#utils#SetupHighlightGroups()
+    autocmd ColorScheme * call signature#utils#SetupHighlightGroups()
 
     " This is required to remove signs for global marks that were removed when in another window
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
