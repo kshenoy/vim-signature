@@ -294,7 +294,7 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
   if !exists('b:sy')
     return ""
   endif
-  call sy#sign#get_current_signs()
+  call sy#sign#get_current_signs(b:sy)
 
   if has_key(b:sy.internal, a:lnum)
     let l:line_state = b:sy.internal[a:lnum]['type']
