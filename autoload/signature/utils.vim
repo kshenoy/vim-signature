@@ -147,27 +147,27 @@ endfunction
 function! signature#utils#SetupHighlightGroups()                                                                  " {{{1
   " Description: Sets up the highlight groups
 
-  function! CheckAndSetHL(curr_hl, attr, prefix, from_hl)
+  function! CheckAndSetHL(curr_hl, prefix, attr, targ_color)
     let l:curr_color = synIDattr(synIDtrans(hlID(a:curr_hl)), a:attr, a:prefix)
-    let l:from_color = synIDattr(synIDtrans(hlID(a:from_hl)), a:attr, a:prefix)
-
-    " echom "DEBUG: HL=" . a:curr_hl . " (" . a:prefix . a:attr . ") Curr=" . l:curr_color . ", From=" . l:from_color
 
     if (  (  (l:curr_color == "")
      \    || (l:curr_color  < 0)
      \    )
-     \ && (l:from_color != "")
-     \ && (l:from_color >= 0)
+     \ && (a:targ_color != "")
+     \ && (a:targ_color >= 0)
      \ )
-      execute 'highlight ' . a:curr_hl . ' ' . a:prefix . a:attr . '=' . l:from_color
+      " echom "DEBUG: HL=" . a:curr_hl . " (" . a:prefix . a:attr . ") Curr=" . l:curr_color . ", To=" . a:targ_color
+      execute 'highlight ' . a:curr_hl . ' ' . a:prefix . a:attr . '=' . a:targ_color
     endif
   endfunction
 
-  let l:prefix = (has('gui_running') || has('termguicolors') ? 'gui' : 'cterm')
-  call CheckAndSetHL('SignatureMarkText',   'bg', l:prefix, 'SignColumn')
-  call CheckAndSetHL('SignatureMarkText',   'fg', l:prefix, 'Exception' )
-  call CheckAndSetHL('SignatureMarkerText', 'bg', l:prefix, 'SignColumn')
-  call CheckAndSetHL('SignatureMarkerText', 'fg', l:prefix, 'WarningMsg')
+  let l:prefix = (has('gui_running') || (has('termguicolors') && &termguicolors) ? 'gui' : 'cterm')
+  let l:sign_col_color = synIDattr(synIDtrans(hlID('SignColumn')), 'bg', l:prefix)
+
+  call CheckAndSetHL('SignatureMarkText',   l:prefix, 'fg', 'Red')
+  call CheckAndSetHL('SignatureMarkText',   l:prefix, 'bg', l:sign_col_color)
+  call CheckAndSetHL('SignatureMarkerText', l:prefix, 'fg', 'Green')
+  call CheckAndSetHL('SignatureMarkerText', l:prefix, 'bg', l:sign_col_color)
 
   delfunction CheckAndSetHL
 endfunction
