@@ -1,7 +1,7 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#utils#Set(var, value, ...)                                                                  " {{{1
+function! signature#utils#Set(var, value, ...)                                                                    " {{{1
   " Description: Assign value to var if var is unset or if an optional 3rd arg is provided to force
 
   if (!exists(a:var) || a:0 && a:1)
@@ -152,6 +152,8 @@ function! signature#utils#SetupHighlightGroups()                                
   function! CheckAndSetHL(curr_hl, attr, prefix, from_hl)
     let l:curr_color = synIDattr(synIDtrans(hlID(a:curr_hl)), a:attr, a:prefix)
     let l:from_color = synIDattr(synIDtrans(hlID(a:from_hl)), a:attr, a:prefix)
+
+    " echom "DEBUG: HL=" . a:curr_hl . " (" . a:prefix . a:attr . ") Curr=" . l:curr_color . ", From=" . l:from_color
 
     if (  (  (l:curr_color == "")
      \    || (l:curr_color  < 0)
