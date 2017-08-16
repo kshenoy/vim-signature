@@ -61,7 +61,7 @@ function! signature#mark#Remove(mark)                                           
   " Description: Remove 'mark' and its associated sign. If called without an argument, obtain it from the user
   " Arguments:   mark = [a-z,A-Z]
 
-  if (b:SignatureIncludeMarks !~# a:mark)
+  if !signature#utils#IsValidMark(a:mark)
     return
   endif
 

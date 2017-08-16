@@ -22,7 +22,7 @@ function! signature#sign#Place(sign, lnum)                                      
   "  return
   "endif
 
-  if (b:SignatureIncludeMarkers =~# a:sign)
+  if signature#utils#IsValidMarker(a:sign)
     let b:sig_markers[a:lnum] = a:sign . get(b:sig_markers, a:lnum, "")
   else
     let b:sig_marks[a:lnum] = a:sign . get(b:sig_marks, a:lnum, "")
@@ -46,7 +46,7 @@ function! signature#sign#Remove(sign, lnum)                                     
   if !b:sig_enabled | return | endif
 
   " Remove sign for markers
-  if (b:SignatureIncludeMarkers =~# a:sign)
+  if signature#utils#IsValidMarker(a:sign)
     let b:sig_markers[a:lnum] = substitute(b:sig_markers[a:lnum], "\\C" . escape( a:sign, '$^' ), "", "")
 
     " If there are no markers on the line, delete signs on that line
@@ -160,12 +160,16 @@ function! signature#sign#Refresh(...)                                           
   endfor
 
   " Add signs for marks ...
-  for j in signature#mark#GetList('used', 'buf_curr')
+  for [l:mark, l:lnum, _] in signature#mark#GetList('used', 'buf_curr')
     " ... if mark is not present in our b:sig_marks list or if it is present but at the wrong line,
     " remove the old sign and add a new one
-    if !has_key(b:sig_marks, j[1]) || b:sig_marks[j[1]] !~# j[0] || a:0
-      call signature#sign#Remove(j[0], 0   )
-      call signature#sign#Place (j[0], j[1])
+    if (  !has_key(b:sig_marks, l:lnum)
+     \ || (b:sig_marks[l:lnum] !~# l:mark)
+     \ || (l:lnum != signature#sign#GetMarkSignLine(l:mark))
+     \ || a:0
+     \ )
+      call signature#sign#Remove(l:mark, 0)
+      call signature#sign#Place (l:mark, l:lnum)
     endif
   endfor
 
@@ -305,6 +309,24 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
   endif
 
   return ""
+endfunction
+
+
+function! signature#sign#GetMarkSignLine(mark)                                                                    " {{{1
+  if !signature#utils#IsValidMark(a:mark)
+    echoe "Signature: Invalid mark " . a:mark
+    return
+  endif
+
+  let l:sign_info=filter(split(execute('sign place'), '\n'),
+                       \ 'v:val =~ "\\vSignature_(.?' . a:mark . '|' . a:mark . '.?)$"')
+
+  if (len(l:sign_info) != 1)
+    echoe "Signature: Expected single match, found " . len(l:sign_info)
+    return
+  endif
+
+  return matchstr(l:sign_info[0], '\v(line\=)@<=\d+')
 endfunction
 
 

@@ -76,7 +76,7 @@ function! signature#utils#Input()                                               
   let l:in = nr2char(getchar())
 
   " ... if the input is not a number eg. '!' ==> Delete all '!' markers
-  if (b:SignatureIncludeMarkers =~# l:in)
+  if signature#utils#IsValidMarker(l:in)
     return signature#marker#Purge(l:in)
   endif
 
@@ -87,11 +87,9 @@ function! signature#utils#Input()                                               
     let l:char = l:in
   endif
 
-  if (  (b:SignatureIncludeMarkers =~# l:char)
-   \ && (l:char != ' ')
-   \ )
+  if signature#utils#IsValidMarker(l:char)
     return signature#marker#Toggle(l:char)
-  elseif (b:SignatureIncludeMarks =~# l:char)
+  elseif signature#utils#IsValidMark(l:char)
     return signature#mark#Toggle(l:char)
   else
     " l:char is probably one of `'[]<> or a space from the gap in b:SignatureIncludeMarkers
@@ -172,4 +170,16 @@ function! signature#utils#SetupHighlightGroups()                                
   call CheckAndSetHL('SignatureMarkerText', 'fg', l:prefix, 'WarningMsg')
 
   delfunction CheckAndSetHL
+endfunction
+
+
+function! signature#utils#IsValidMark(mark)                                                                       " {{{1
+  return (b:SignatureIncludeMarks =~# a:mark)
+endfunction
+
+
+function! signature#utils#IsValidMarker(marker)                                                                   " {{{1
+  return (  (b:SignatureIncludeMarkers =~# a:marker)
+         \ && (a:marker != ' ')
+         \ )
 endfunction
