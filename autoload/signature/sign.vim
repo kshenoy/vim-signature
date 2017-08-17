@@ -169,7 +169,6 @@ function! signature#sign#Refresh(...)                                           
     " remove the old sign and add a new one
     if (  !has_key(b:sig_marks, l:lnum)
      \ || (b:sig_marks[l:lnum] !~# l:mark)
-   " \ || (l:lnum != signature#sign#GetMarkSignLine(l:mark))
      \ || a:0
      \ )
       call signature#sign#Remove(l:mark, 0)
