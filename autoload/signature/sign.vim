@@ -319,7 +319,7 @@ function! signature#sign#GetMarkSignLine(mark)                                  
   endif
 
   let l:sign_info=filter(split(execute('sign place'), '\n'),
-                       \ 'v:val =~ "\\vSignature_(.?' . a:mark . '|' . a:mark . '.?)$"')
+                       \ 'v:val =~# "\\vSignature_(.?' . a:mark . '|' . a:mark . '.?)$"')
 
   if (len(l:sign_info) != 1)
     echoe "Signature: Expected single match, found " . len(l:sign_info)
