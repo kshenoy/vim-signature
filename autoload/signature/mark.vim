@@ -1,10 +1,7 @@
-" vim: fdm=marker:et:ts=4:sw=2:sts=2
+" vim: fdm=marker:et:ts=4:sw=2:sts=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Place/Remove/Toggle                                                                                              {{{1
-"
-function! signature#mark#Toggle(mark)                                                                             " {{{2
+function! signature#mark#Toggle(mark)                                                                             " {{{1
   " Description: mark = 'next' : Place new mark on current line else toggle specified mark on current line
   " Arguments:   mark [a-z,A-Z]
 
@@ -12,7 +9,7 @@ function! signature#mark#Toggle(mark)                                           
     " Place new mark
     let l:marks_list = signature#mark#GetList('free', 'buf_all')
     if empty(l:marks_list)
-      if (!g:SignatureUnconditionallyRecycleMarks)
+      if (!g:SignatureRecycleMarks)
         " No marks available and mark re-use not in effect
         call s:ReportNoAvailableMarks()
         return
@@ -60,11 +57,11 @@ function! signature#mark#Toggle(mark)                                           
 endfunction
 
 
-function! signature#mark#Remove(mark)                                                                             " {{{2
+function! signature#mark#Remove(mark)                                                                             " {{{1
   " Description: Remove 'mark' and its associated sign. If called without an argument, obtain it from the user
   " Arguments:   mark = [a-z,A-Z]
 
-  if stridx(b:SignatureIncludeMarks, a:mark) == -1
+  if !signature#utils#IsValidMark(a:mark)
     return
   endif
 
@@ -75,7 +72,7 @@ function! signature#mark#Remove(mark)                                           
 endfunction
 
 
-function! s:Place(mark)                                                                                           " {{{2
+function! s:Place(mark)                                                                                           " {{{1
   " Description: Place new mark at current cursor position
   " Arguments:   mark = [a-z,A-Z]
   " If a line is deleted or mark is manipulated using any non-signature method then b:sig_marks can go out of sync
@@ -86,7 +83,7 @@ function! s:Place(mark)                                                         
 endfunction
 
 
-function! signature#mark#ToggleAtLine()                                                                           " {{{2
+function! signature#mark#ToggleAtLine()                                                                           " {{{1
   " Description: If no mark on current line, add one. If marks are on the current line, remove one.
   let l:marks_here = filter(signature#mark#GetList('used', 'buf_curr'), 'v:val[1] == ' . line('.'))
   if empty(l:marks_here)
@@ -99,7 +96,7 @@ function! signature#mark#ToggleAtLine()                                         
 endfunction
 
 
-function! signature#mark#Purge(mode)                                                                              " {{{2
+function! signature#mark#Purge(mode)                                                                              " {{{1
   " Description: Delete all marks from current line
   " Arguments:   mode = 'line' : Delete all marks from current line
   "                     'all'  : Delete all marks used in the buffer
@@ -129,13 +126,9 @@ function! signature#mark#Purge(mode)                                            
   endif
   call signature#sign#ToggleDummy()
 endfunction
-" }}}2
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Navigation                                                                                                       {{{1
-"
-function! signature#mark#Goto(dir, loc, mode)                                                                     " {{{2
+function! signature#mark#Goto(dir, loc, mode)                                                                     " {{{1
   " Arguments:
   "   dir   = next   : Jump forward
   "           prev   : Jump backward
@@ -167,32 +160,34 @@ function! signature#mark#Goto(dir, loc, mode)                                   
 endfunction
 
 
-function! s:GotoByPos(dir)                                                                                        " {{{2
+function! s:GotoByPos(dir)                                                                                        " {{{1
   " Description: Jump to next/prev mark by location.
   " Arguments: dir  = next   : Jump forward
   "                   prev   : Jump backward
 
   " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
-  if empty( b:sig_marks ) | return "" | endif
+  if empty(b:sig_marks) | return "" | endif
 
   let l:lnum = line('.')
 
   " Get list of line numbers of lines with marks.
   if a:dir ==? "next"
-    let l:targ = min( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
-    let l:mark_lnums = sort( keys( filter( copy( b:sig_marks ), 'v:key > l:lnum')), "signature#utils#NumericSort" )
+    let l:targ = min(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
+    let l:mark_lnums = sort(keys(filter(copy(b:sig_marks), 'v:key > l:lnum')), "signature#utils#NumericSort")
   elseif a:dir ==? "prev"
-    let l:targ = max( sort( keys( b:sig_marks ), "signature#utils#NumericSort" ))
-    let l:mark_lnums = reverse( sort( keys( filter( copy( b:sig_marks ), 'v:key < l:lnum')), "signature#utils#NumericSort" ))
+    let l:targ = max(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
+    let l:mark_lnums = reverse(sort(keys(filter(copy(b:sig_marks), 'v:key < l:lnum')), "signature#utils#NumericSort"))
   endif
-  let l:targ = ( empty( l:mark_lnums ) && b:SignatureWrapJumps ? l:targ : l:mark_lnums[0] )
-  let l:mark = strpart( b:sig_marks[l:targ], 0, 1 )
 
+  let l:targ = (empty(l:mark_lnums) ? (b:SignatureWrapJumps ? l:targ : "") : l:mark_lnums[0])
+  if empty(l:targ) | return "" | endif
+
+  let l:mark = strpart(b:sig_marks[l:targ], 0, 1)
   return l:mark
 endfunction
 
 
-function! s:GotoByAlpha(dir)                                                                                      " {{{2
+function! s:GotoByAlpha(dir)                                                                                      " {{{1
   " Description: Jump to next/prev mark by alphabetical order. Direction specified as input argument
 
   let l:used_marks = signature#mark#GetList('used', 'buf_curr')
@@ -236,7 +231,7 @@ function! s:GotoByAlpha(dir)                                                    
 endfunction
 
 
-function! s:GotoByAlphaGlobal(dir)                                                                                " {{{2
+function! s:GotoByAlphaGlobal(dir)                                                                                " {{{1
   " Description: Jump to next/prev Global mark in any buffer by alphabetical order.
   "              Direction is specified as input argument
 
@@ -281,13 +276,9 @@ function! s:GotoByAlphaGlobal(dir)                                              
     endif
   endfor
 endfunction
-" }}}2
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Misc                                                                                                             {{{1
-"
-function! signature#mark#GetList(mode, scope, ...)                                                                " {{{2
+function! signature#mark#GetList(mode, scope, ...)                                                                " {{{1
   " Arguments: mode    = 'used'     : Returns list of [ [used marks, line no., buf no.] ]
   "                      'free'     : Returns list of [ free marks ]
   "            scope   = 'buf_curr' : Limits scope to current buffer i.e used/free marks in current buffer
@@ -330,7 +321,7 @@ function! signature#mark#GetList(mode, scope, ...)                              
 endfunction
 
 
-function! s:ForceGlobalRemoval(mark)                                                                              " {{{2
+function! s:ForceGlobalRemoval(mark)                                                                              " {{{1
   " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
 
@@ -366,7 +357,7 @@ function! s:ForceGlobalRemoval(mark)                                            
 endfunction
 
 
-function! s:ReportNoAvailableMarks()                                                                              " {{{2
+function! s:ReportNoAvailableMarks()                                                                              " {{{1
   if g:SignatureErrorIfNoAvailableMarks
     echoe "Signature: No free marks left."
   else
@@ -377,59 +368,80 @@ function! s:ReportNoAvailableMarks()                                            
 endfunction
 
 
-function! signature#mark#List(scope, ...)                                                                         " {{{2
-  " Description: Opens and populates location list with marks from current buffer
-  " Arguments:   scope     = 'buf_curr' : List marks from current buffer
-  "                          'buf_all'  : List marks from all buffers FIXME
-  "              [context] = 0          : Adds context around the mark
+function! signature#mark#List(scope, ...)                                                                         " {{{1
+  " Description: Opens and populates location list with marks
+  " Arguments:   scope     = 0 : List local and global marks from current buffer
+  "                          1 : List only global marks from all buffers
+  "              [context] = 0 : Adds context around the mark
 
-  let l:count = (a:0 ? a:1 : 0)
-  let l:list_map = signature#mark#GetList('used', a:scope)
+  let l:list = []
+  let l:buf_curr = bufnr('%')
+  let l:list_sep = {'bufnr': '', 'lnum' : ''}
 
-  let l:list_map = map(l:list_map,
-                   \   '{
-                   \     "bufnr": v:val[2],
-                   \     "lnum" : v:val[1],
-                   \     "col"  : col("' . "'" . '"  . v:val[0]),
-                   \     "type" : "m",
-                   \     "text" : v:val[0] . ": " . getline(v:val[1])
-                   \   }'
-                   \  )
+  let l:SignatureIncludeMarks = (a:scope == 0 ? b:SignatureIncludeMarks : g:SignatureIncludeMarks)
+  for i in split(l:SignatureIncludeMarks, '\zs')
+    let [l:bufnr, l:lnum, l:col, l:off] = getpos( "'" . i )
 
-  if l:count
-    let l:temp_list = []
-    for i in range(0, len(l:list_map)-1)
-      for l:context in range(-l:count, l:count)
-        let l:item_context = copy(l:list_map[i])
-        if (l:context != 0)
-          let l:item_context.lnum = l:list_map[i].lnum + l:context
-          let l:item_context.text = (l:context < 0 ? "-" : "+") . ": " . getline(l:item_context.lnum)
-        endif
-        let l:item_context.text = substitute(l:item_context.text, '\s\+$', '', '')
-        let l:temp_list = add(l:temp_list, l:item_context)
-      endfor
-      if (i != len(l:list_map)-1)
-        " Removed the text field to avoid wrapping in Location List if window width is less than separator length
-        let l:temp_list = add(l:temp_list, { 'bufnr': '',
-                                           \ 'lnum' : '',
-                                           \ 'col'  : '',
-                                           \ 'type' : '',
-                                           \ 'text' : ''
-                                           \ })
+    " Local marks set the buffer no. to 0, replace it with the actual buffer number
+    let l:bufnr = (l:bufnr == 0 ? l:buf_curr : l:bufnr)
+
+    " Check that
+    "   1. Mark is set (lnum > 0)
+    "   2. If buf_all = 0, filter out global marks from other buffers
+    "   3. If buf_all = 1, filter out local marks from current buffer
+    if (  (l:lnum == 0)
+     \ || (  (a:scope == 0)
+     \    && (l:bufnr != l:buf_curr)
+     \    )
+     \ || (  (a:scope == 1)
+     \    && (i       =~# "[a-z]")
+     \    )
+     \ )
+      "echom 'DEBUG: Skipping mark ' . i
+      continue
+    endif
+
+    " If the buffer is not loaded, what's the point of showing empty context?
+    let l:context = (bufloaded(l:bufnr) && a:0 ? a:1 : 0)
+
+    for context_lnum in range(l:lnum - l:context, l:lnum + l:context)
+      let l:text = get(getbufline(l:bufnr, context_lnum), 0, "")
+      if (!bufloaded(l:bufnr))
+        " Buffer is not loaded, hence we won't be able to get the line. Opening the file should fix it
+        let l:text = "~~~ File is not loaded into memory. Open file and rerun to see the line ~~~"
+      elseif (l:text == "")
+        " Line does not exist. Possibly because context_lnum > total no. of lines
+        "echom 'DEBUG: Skipping line=' . context_lnum . ' for mark=' . i . " because line doesn't exist in buffer=" . l:bufnr
+        continue
       endif
+
+      if     (context_lnum < l:lnum) | let l:text = '-: ' . l:text
+      elseif (context_lnum > l:lnum) | let l:text = '+: ' . l:text
+      else                           | let l:text = i . ': ' . l:text
+      endif
+
+      let l:list = add(l:list,
+        \              { 'text' : l:text,
+        \                'bufnr': l:bufnr,
+        \                'lnum' : context_lnum,
+        \                'col'  : l:col,
+        \                'type' : 'm'
+        \              }
+        \             )
     endfor
-    let l:list_map = l:temp_list
-  endif
 
-  if (a:scope ==? 'buf_curr')
-    call setloclist(0, l:list_map,)|lopen
-  "else
-  "  call setqflist(l:list_map,)|copen
-  endif
+    " Add separator when showing context
+    "if (a:context > 0)
+    "  let l:list = add(l:list, l:list_sep)
+    "endif
+  endfor
 
-  if !exists("g:signature_set_location_list_convenience_maps") || g:signature_set_location_list_convenience_maps
-    nnoremap <buffer> <silent> q        :q<CR>
-    noremap  <buffer> <silent> <ENTER>  <CR>:lcl<CR>
-  endif
+  " Remove the redundant separator at the end when showing context
+  "if (  (a:context > 0)
+  " \ && (len(l:list) > 0)
+  " \ )
+  "  call remove(l:list, -1)
+  "endif
+
+  call setloclist(0, l:list) | lopen
 endfunction
-" }}}2
