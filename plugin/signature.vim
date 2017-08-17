@@ -12,34 +12,34 @@ endif
 if exists('g:loaded_Signature')
   finish
 endif
-let g:loaded_Signature = 3
+let g:loaded_Signature = 1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "" Global variables                                                                                                 {{{1
 "
-call signature#utils#Set('g:SignaturePrioritizeMarks',             1                                                     )
-call signature#utils#Set('g:SignatureIncludeMarks',                'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-call signature#utils#Set('g:SignatureIncludeMarkers',              ')!@#$%^&*('                                          )
-call signature#utils#Set('g:SignatureMarkTextHL',                  '"Exception"'                                         )
-call signature#utils#Set('g:SignatureMarkTextHLDynamic',           0                                                     )
-call signature#utils#Set('g:SignatureMarkLineHL',                  '""'                                                  )
-call signature#utils#Set('g:SignatureMarkerTextHL',                '"WarningMsg"'                                        )
-call signature#utils#Set('g:SignatureMarkerTextHLDynamic',         0                                                     )
-call signature#utils#Set('g:SignatureMarkerLineHL',                '""'                                                  )
-call signature#utils#Set('g:SignatureWrapJumps',                   1                                                     )
-call signature#utils#Set('g:SignatureMarkOrder',                   "\p\m"                                                )
-call signature#utils#Set('g:SignatureDeleteConfirmation',          0                                                     )
-call signature#utils#Set('g:SignaturePurgeConfirmation',           0                                                     )
-call signature#utils#Set('g:SignaturePeriodicRefresh',             1                                                     )
-call signature#utils#Set('g:SignatureEnabledAtStartup',            1                                                     )
-call signature#utils#Set('g:SignatureDeferPlacement',              1                                                     )
-call signature#utils#Set('g:SignatureUnconditionallyRecycleMarks', 0                                                     )
-call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks',     1                                                     )
-call signature#utils#Set('g:SignatureForceRemoveGlobal',           1                                                     )
-call signature#utils#Set('g:SignatureForceMarkPlacement',          0                                                     )
-call signature#utils#Set('g:SignatureForceMarkerPlacement',        0                                                     )
-call signature#utils#Set('g:SignatureMap',                         {}                                                    )
+call signature#utils#Set('g:SignaturePrioritizeMarks',         1                                                     )
+call signature#utils#Set('g:SignatureIncludeMarks',            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+call signature#utils#Set('g:SignatureIncludeMarkers',          ')!@#$%^&*('                                          )
+call signature#utils#Set('g:SignatureMarkTextHL',              "SignatureMarkText"                                   )
+call signature#utils#Set('g:SignatureMarkTextHLDynamic',       0                                                     )
+call signature#utils#Set('g:SignatureMarkLineHL',              "SignatureMarkLine"                                   )
+call signature#utils#Set('g:SignatureMarkerTextHL',            "SignatureMarkerText"                                 )
+call signature#utils#Set('g:SignatureMarkerTextHLDynamic',     0                                                     )
+call signature#utils#Set('g:SignatureMarkerLineHL',            "SignatureMarkerLine"                                 )
+call signature#utils#Set('g:SignatureWrapJumps',               1                                                     )
+call signature#utils#Set('g:SignatureMarkOrder',               "\p\m"                                                )
+call signature#utils#Set('g:SignatureDeleteConfirmation',      0                                                     )
+call signature#utils#Set('g:SignaturePurgeConfirmation',       0                                                     )
+call signature#utils#Set('g:SignaturePeriodicRefresh',         1                                                     )
+call signature#utils#Set('g:SignatureEnabledAtStartup',        1                                                     )
+call signature#utils#Set('g:SignatureDeferPlacement',          1                                                     )
+call signature#utils#Set('g:SignatureRecycleMarks',            0                                                     )
+call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks', 1                                                     )
+call signature#utils#Set('g:SignatureForceRemoveGlobal',       1                                                     )
+call signature#utils#Set('g:SignatureForceMarkPlacement',      0                                                     )
+call signature#utils#Set('g:SignatureForceMarkerPlacement',    0                                                     )
+call signature#utils#Set('g:SignatureMap',                     {}                                                    )
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -50,22 +50,20 @@ call signature#utils#Maps('create')
 if has('autocmd')
   augroup sig_autocmds
     autocmd!
+
+    " This needs to be called upon loading a colorscheme
+    " VimEnter is kind of a backup if no colorscheme is explicitly loaded and the default is used
+    autocmd VimEnter,ColorScheme * call signature#utils#SetupHighlightGroups()
+
+    " This is required to remove signs for global marks that were removed when in another window
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
-    autocmd CursorHold * if g:SignaturePeriodicRefresh
-                       \|  call signature#sign#Refresh()
-                       \|endif
-    autocmd BufEnter,FileType * if (  (&filetype ==? 'nerdtree')
-                                 \ || (&filetype ==? 'netrw')
-                                 \ )
-                              \|  call signature#utils#Maps('remove')
-                              \|endif
-    autocmd BufLeave * if (&filetype ==? 'nerdtree')
-                     \|  call signature#utils#Maps('create')
-                     \| endif
+
+    autocmd CursorHold * if (g:SignaturePeriodicRefresh) | call signature#sign#Refresh() | endif
   augroup END
 endif
 
-command! -nargs=0 SignatureToggleSigns call signature#utils#Toggle()
-command! -nargs=0 SignatureRefresh     call signature#sign#Refresh('force')
-command! -nargs=? SignatureListMarks   call signature#mark#List('buf_curr', <args>)
-command! -nargs=? SignatureListMarkers call signature#marker#List(<args>)
+command! -nargs=0 SignatureToggleSigns     call signature#utils#Toggle()
+command! -nargs=0 SignatureRefresh         call signature#sign#Refresh(1)
+command! -nargs=? SignatureListBufferMarks call signature#mark#List(0, <args>)
+command! -nargs=? SignatureListGlobalMarks call signature#mark#List(1, <args>)
+command! -nargs=* SignatureListMarkers     call signature#marker#List(<args>)
