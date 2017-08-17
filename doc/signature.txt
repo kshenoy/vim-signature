@@ -9,19 +9,18 @@
 
 
 ==============================================================================
-1. Contents                                   *signature-contents* *signature*
+Contents                                                           *Signature*
 
-  1. Contents         |signature-contents|
-  2. Mappings         |signature-mappings|
-  3. Commands         |signature-commands|
-  4. Customization    |signature-customization|
-  5. Contributing     |signature-contributing|
-  6. Credits          |signature-credits|
-  7. License          |signature-license|
+  1. Mappings         |SignatureMappings|
+  2. Commands         |SignatureCommands|
+  3. Customization    |SignatureCustomization|
+  4. Contributing     |SignatureContributing|
+  5. Credits          |SignatureCredits|
+  6. License          |SignatureLicense|
 
 
 ==============================================================================
-2. Mappings                                               *signature-mappings*
+1. Mappings                                                *SignatureMappings*
 
 Out of the box, the followings mappings are defined by default
 
@@ -68,37 +67,41 @@ etc. These are not defined by default
 
 
 ==============================================================================
-3. Commands                                               *signature-commands*
+2. Commands                                                *SignatureCommands*
 
-SignatureToggleSigns
+*:SignatureToggleSigns*
   Toggle the display of signs. This won't affect the marks or the mappings.
 
-SignatureRefresh
+*:SignatureRefresh*
   Force the display of signs in the buffer to refresh. Use this to correct
   the signs if things go awry
 
-SignatureListMarks [n]
+*:SignatureListBufferMarks* [n]
   List all the marks used in the current buffer in the location list
   Accepts an optional argument to provide 'n' lines of context
 
-SignatureListMarkers [marker] [n]
-  List all instances of the specified marker used in the current buffer in
-  the location list. If no argument is given, it lists all markers
+*:SignatureListGlobalMarks* [n]
+  List only the global marks used in all buffers in the location list
+  Accepts an optional argument to provide 'n' lines of context
+
+*:SignatureListMarkers* [marker] [n]
+  List all instances of the specified marker(s) used in the current buffer
+  in the location list. If no argument is given, it lists all markers
   Accepts an optional argument to provide 'n' lines of context
 >
-  :SignatureListMakers          : List all markers
+  :SignatureListMarkers         : List all markers
   :SignatureListMarkers 1       : List only the '!' marker
   :SignatureListMarkers @       : List only the '@' marker
-  :SignatureListMarkers 0, 2    : List only ')' marker with 2 lines of context
-  :SignatureListMarkers '', 2   : List all markers and show 2 lines of context
+  :SignatureListMarkers 0, 2    : List only ) marker with 2 lines of context
+  :SignatureListMarkers '', 2   : List all markers with 2 lines of context
   :SignatureListMarkers '!@', 2 : List only the '!' and '@' markers and show
                                   2 lines of context around them
 <
 
 ==============================================================================
-4. Customization                                     *signature-customization*
+3. Customization                                      *SignatureCustomization*
 
-                                                            *'g:SignatureMap'*
+  *g:SignatureMap*
   Type: Dictionary, Default:
   To set up your own mappings copy the following dictionary and edit it
 >
@@ -118,7 +121,7 @@ SignatureListMarkers [marker] [n]
         \ 'GotoPrevLineByPos'  :  "['",
         \ 'GotoNextSpotByPos'  :  "]`",
         \ 'GotoPrevSpotByPos'  :  "[`",
-        \ 'GotoNextMarker'     :  "[+",
+        \ 'GotoNextMarker'     :  "]-",
         \ 'GotoPrevMarker'     :  "[-",
         \ 'GotoNextMarkerAny'  :  "]=",
         \ 'GotoPrevMarkerAny'  :  "[=",
@@ -132,7 +135,7 @@ SignatureListMarkers [marker] [n]
   These same characters will be used to invoke the shortcuts.
 
 
-                                                   *'g:SignatureIncludeMarks'*
+  *g:SignatureIncludeMarks*
   String, Default : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
   Specify the marks that can be controlled by this plugin.
@@ -140,14 +143,30 @@ SignatureListMarkers [marker] [n]
   'b:SignatureIncludeMarks' can be set separately for buffer-specific marks.
 
 
-                                                 *'g:SignatureIncludeMarkers'*
-  String, Default : '!@#$%^&*()'
+  *g:SignatureIncludeMarkers*
+  String, Default : ')!@#$%^&*('
 
-  Specify the markers that can be used by the plugin.
+  Specify the symbols that can be used by the plugin to be placed by 0-9.
+  Note that there's a 1:1 correspondence between the symbols and 0-9.
+  This string must be at most 10 chars long. Extra char will be ignored.
+  Also, this string must not include any alphabetical characters `[a-zA-Z]`
+  However, it can contain spaces to indicate blanks. Eg.
+    `m0` will place `)` by default
+    `m1` will place `!` by default
+    `m2` will place `@` by default etc.
+
+  If set to `')!'`, `m0` and `m1` will behave as described above but `m[2-9]` will
+  not be handled by this plugin.
+
+  If set to `' !'` (note the space before !), only `m1` will have any affect
+  while `m[0,2-9]` will not have any affect
+
+  An example of a use case is for keyboards with alternate layouts wherein
+  the symbols associated with 0-9 could be different than the default.
   'b:SignatureIncludeMarkers' can be specified separately for each buffer
 
 
-                               *g:SignatureMap['Leader']* *'SignatureMapLeader'*
+  *g:SignatureMap['Leader']*
   String, Default: 'm'
 
   Set the key used to toggle marks and markers.
@@ -162,24 +181,23 @@ SignatureListMarkers [marker] [n]
     `<leader>m!`       will remove all the '!' markers
     `<leader>m<BS>`    will remove all markers
 
-  Note:
-  Currently, either marks or markers can be displayed in front of a line.
-  Both can't be displayed simultaenously.
+  NOTE: Currently, either marks or markers can be displayed in front of a
+  line. Both can't be displayed simultaenously.
 
   To set this to mapleader or maplocalleader
->
-    let g:SignatureMap['Leader'] = '<Leader>'
-    let g:SignatureMap['Leader'] = '<LocalLeader>'
-<
 
-                                                      *'g:SignatureWrapJumps'*
+    `let g:SignatureMap['Leader'] = '<Leader>'`
+    `let g:SignatureMap['Leader'] = '<LocalLeader>'`
+
+
+  *g:SignatureWrapJumps*
   Boolean, Default : 1
 
   Specify if jumping to marks should wrap-around.
-  'b:SignatureWrapJumps' can be set to specify buffer-specific settings.
+  b:SignatureWrapJumps can be set to specify buffer-specific settings.
 
 
-                                                      *'g:SignatureMarkOrder'*
+  *g:SignatureMarkOrder*
   String, Default : "\p\m"
 
   Signature allows you to display upto marks in front of a line. This controls
@@ -194,13 +212,12 @@ SignatureListMarkers [marker] [n]
                                   The mark is not displayed
     `g:SignatureMarkOrder="\m\p"` : Display last two marks placed
 
-  Note:
-  The signs feature allows only 2 characters to be displayed. This is not and
-  arbitratry limitation of the plugin.
+  NOTE: The signs feature allows only 2 characters to be displayed. This limit
+  is imposed by vim itself and not by the plugin
 
 
-                                                     *'g:SignatureMarkTextHL'*
-  String, Default : "'Exception'"
+  *g:SignatureMarkTextHL*
+  String, Default : 'SignatureMarkText'
 
   The highlight group used for mark signs. This can be set either to a string
   or to a |Funcref|.
@@ -215,50 +232,45 @@ SignatureListMarkers [marker] [n]
   the line number of the mark to be highlighted. The function should return
   the name of a highlight group.
 
-  Example of simple string highlight group. Note the two sets of quotation
-  marks:
->
-    let g:SignatureMarkTextHL = "'Exception'"
-<
-  Example of complex string expression:
->
-    function Example(lineno)
-    endfunction
-    let g:SignatureMarkTextHL = "Example(a:lnum)"
-<
-  Example of |Funcref|:
->
-    function Example(lineno)
-      return "Exception"
-    endfunction
-    let g:SignatureMarkTextHL = function("Example")
-<
+  Example using a string:
+    `let g:SignatureMarkTextHL = "Exception"`
 
-                                              *'g:SignatureMarkTextHLDynamic'*
+  Example of |Funcref|:
+    `function Example(lineno)`
+      `return "Exception"`
+    `endfunction`
+    `let g:SignatureMarkTextHL = function("Example")`
+
+  By default, this is set to SignatureMarkText which is a highlight group 
+  that is linked to Exception
+
+  *g:SignatureMarkTextHLDynamic*
   Boolean, Default: 0
 
   Highlight signs of marks dynamically based upon state indicated by
-  vim-gitgutter or vim-signify. Setting this to `1` prior to plugin
-  initialization overwrites |g:SignatureMarkTextHL|.
+  vim-gitgutter. Setting this to `1` prior to plugin initialization overwrites 
+  |g:SignatureMarkTextHL|.
+
+  vim-signify is not supported at the moment. For details, refer
+  https://github.com/kshenoy/vim-signature/issues/93#issuecomment-195672354
+
+  *g:SignatureMarkLineHL*
+  String, Default : 'SignatureMarkLine'
+
+  The highlight group used for hightlighting lines having marks. This can be a
+  string or |Funcref|. SignatureMarkLine links to Normal by default.
+  See |g:SignatureMarkTextHL| for details.
 
 
-                                                     *'g:SignatureMarkLineHL'*
-  String, Default : ''
+  *g:SignatureMarkerTextHL*
+  String, Default : 'SignatureMarkerText'
 
-  The highlight group used for hightlighting lines having mark signs. This can
-  be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
+  The highlight group used for marker signs. This can be a string or |Funcref|. 
+  SignatureMarkText links to WarningMsg by default.
+  See |g:SignatureMarkTextHL| for details.
 
 
-                                                   *'g:SignatureMarkerTextHL'*
-  String, Default : "'WarningMsg'"
-
-  The highlight group used for marker signs. This can be a string or a
-  |Funcref|. See |g:SignatureMarkTextHL| for details.
->
-    let g:SignatureMarkTextHL = "'WarningMsg'"
-<
-
-                                            *'g:SignatureMarkerTextHLDynamic'*
+  *g:SignatureMarkerTextHLDynamic*
   Boolean, Default: 0
 
   Highlight signs of markers dynamically based upon state indicated by
@@ -266,28 +278,29 @@ SignatureListMarkers [marker] [n]
   initialization overwrites |g:SignatureMarkerTextHL|.
 
 
-                                                   *'g:SignatureMarkerLineHL'*
+  *g:SignatureMarkerLineHL*
   String, Default : ''
 
-  The highlight group used for hightlighting lines having marker signs. This
-  can be a string or a |Funcref|. See |g:SignatureMarkTextHL| for details.
+  The highlight group used for hightlighting lines having markers. This can be
+  a string or a |Funcref|. SignatureMarkerLine links to Normal by default.
+  See |g:SignatureMarkTextHL| for details.
 
 
-                                             *'g:SignatureDeleteConfirmation'*
+  *g:SignatureDeleteConfirmation*
   Boolean, Default: 0
 
   An option for the more clumsy-fingered of us. Asks for confirmation before
   moving/replacing/overwriting any marks
 
 
-                                              *'g:SignaturePurgeConfirmation'*
+  *g:SignaturePurgeConfirmation*
   Boolean, Default: 0
 
   Similar to g:SignatureDeleteConfirmation. Asks for confirmation before
   deleting all marks/markers
 
 
-                                                *'g:SignaturePeriodicRefresh'*
+  *g:SignaturePeriodicRefresh*
   Boolean, Default: 1
 
   Enable the display to refresh periodically. Generally a good thing to have.
@@ -297,21 +310,21 @@ SignatureListMarkers [marker] [n]
     `set updatetime = 100`
 
 
-                                                *'g:SignaturePrioritizeMarks'*
+  *g:SignaturePrioritizeMarks*
   Boolean, Default: 1
 
   When a line has both marks and markers, display the sign for marks. If set
   to 0, it will display the sign for markers instead
 
 
-                                               *'g:SignatureEnabledAtStartup'*
+  *g:SignatureEnabledAtStartup*
   Boolean, Default: 1
 
   Control if the signs should be shown by default. If set to 0, the signs
   won't be visible until `:SignatureToggleSigns` has been called
 
 
-                                                 *'g:SignatureDeferPlacement'*
+  *g:SignatureDeferPlacement*
   Boolean, Default: 1
 
   NOTE: Not supported currently. Code was highly inefficient.
@@ -320,7 +333,7 @@ SignatureListMarkers [marker] [n]
   overwrite any signs that are already present.
 
 
-                                    *'g:SignatureUnconditionallyRecycleMarks'*
+  *g:SignatureUnconditionallyRecycleMarks*
   Boolean, Default: 0
 
   Controls behavior when trying to place next available mark and all marks
@@ -330,34 +343,34 @@ SignatureListMarkers [marker] [n]
   existing location and applied to the current line.
 
 
-                                        *'g:SignatureErrorIfNoAvailableMarks'*
+  *g:SignatureErrorIfNoAvailableMarks*
   Boolean, Default: 1
 
   Controls behavior when unable to place a new mark. If set to 1, then an
   error is raised. If set to 0, then just a warning message.
 
 
-                                              *'g:SignatureForceRemoveGlobal'*
+  *g:SignatureForceRemoveGlobal*
   Boolean, Default: 1
 
   Vim's handling of global marks is a bit iffy. This option forces the removal
   of global marks by deleting it from the .viminfo file.
 
 
-                                             *'g:SignatureForceMarkPlacement'*
+  *g:SignatureForceMarkPlacement*
   Boolean, Default: 0
 
   When set to 1, will always place marks instead of toggling them
 
 
-                                           *'g:SignatureForceMarkerPlacement'*
+  *g:SignatureForceMarkerPlacement*
   Boolean, Default: 0
 
   When set to 1, will always place markers instead of toggling them
 
 
 ==============================================================================
-5. Contributing                                       *signature-contributing*
+4. Contributing                                        *SignatureContributing*
 
   Please post any issues and all your suggestions on Github
     https://github.com/kshenoy/vim-signature
@@ -367,7 +380,7 @@ SignatureListMarkers [marker] [n]
 
 
 ==============================================================================
-6. Credits                                                 *signature-credits*
+5. Credits                                                  *SignatureCredits*
 
 A great thanks to these guys for providing the idea and inspiration to develop
 Signature
@@ -383,7 +396,7 @@ without whose detailed guide this plugin would not have seen the light of day.
 
 
 ==============================================================================
-7. License                                                 *signature-license*
+6. License                                                  *SignatureLicense*
 
 Signature is MIT/X11 licensed
 
