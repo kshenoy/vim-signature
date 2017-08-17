@@ -24,8 +24,10 @@ function! signature#sign#Place(sign, lnum)                                      
 
   if signature#utils#IsValidMarker(a:sign)
     let b:sig_markers[a:lnum] = a:sign . get(b:sig_markers, a:lnum, "")
-  else
+  elseif signature#utils#IsValidMark(a:sign)
     let b:sig_marks[a:lnum] = a:sign . get(b:sig_marks, a:lnum, "")
+  else
+    echoerr "Unexpected sign found: " . a:sign
   endif
   "}}}3
 
@@ -38,7 +40,8 @@ function! signature#sign#Remove(sign, lnum)                                     
   " Arguments:
   "   sign : The mark/marker whose sign is to be placed/removed/toggled
   "   lnum : Line number from which the sign is to be removed
-  "          If line number is 0, the 'sign' will be removed from all lines
+  "          If sign is a marker and lnum is 0, the sign will be removed from all lines
+  "          If sign is a mark   and lnum is 0, the lnum will be found and the sign will be removed from that line
 
   "echom "DEBUG: sign = " . a:sign . ",  lnum = " . a:lnum
 
@@ -57,13 +60,14 @@ function! signature#sign#Remove(sign, lnum)                                     
 
   " Remove sign for marks
   else
-    " If a:lnum == 0, remove from all lines
+    " For marks, if a:lnum == 0, find out the line where the mark was placed
     if a:lnum == 0
       let l:arr = keys(filter(copy(b:sig_marks), 'v:val =~# a:sign'))
       if empty(l:arr) | return | endif
     else
       let l:arr = [a:lnum]
     endif
+    call assert_true(len(l:arr) == 1, "Multiple marks found where one was expected")
 
     for l:lnum in l:arr
       " FIXME: Placed guard to avoid triggering issue #53
@@ -165,7 +169,7 @@ function! signature#sign#Refresh(...)                                           
     " remove the old sign and add a new one
     if (  !has_key(b:sig_marks, l:lnum)
      \ || (b:sig_marks[l:lnum] !~# l:mark)
-     \ || (l:lnum != signature#sign#GetMarkSignLine(l:mark))
+   " \ || (l:lnum != signature#sign#GetMarkSignLine(l:mark))
      \ || a:0
      \ )
       call signature#sign#Remove(l:mark, 0)
