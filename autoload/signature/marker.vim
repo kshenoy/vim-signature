@@ -1,10 +1,7 @@
-" vim: fdm=marker:et:ts=4:sw=2:sts=2
+" vim: fdm=marker:et:ts=4:sw=2:sts=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Place/Remove/Toggle                                                                                              {{{1
-"
-function! signature#marker#Toggle(marker)                                                                         " {{{2
+function! signature#marker#Toggle(marker)                                                                         " {{{1
   " Description: Toggle marker on current line
   " Arguments: marker [!@#$%^&*()]
 
@@ -21,7 +18,7 @@ function! signature#marker#Toggle(marker)                                       
 endfunction
 
 
-function! signature#marker#Remove(lnum, marker)                                                                   " {{{2
+function! signature#marker#Remove(lnum, marker)                                                                   " {{{1
   " Description: Remove marker from specified line number
   " Arguments:   lnum - Line no. to delete marker from. If is 0, removes marker from current line
   "              a:2  - Marker to delete. If not specified, obtains input from user
@@ -32,7 +29,7 @@ function! signature#marker#Remove(lnum, marker)                                 
 endfunction
 
 
-function! signature#marker#Purge(...)                                                                             " {{{2
+function! signature#marker#Purge(...)                                                                             " {{{1
   " Description: If argument is given, removes marker only of the specified type else all markers are removed
 
   if empty(b:sig_markers) | return | endif
@@ -56,21 +53,18 @@ function! signature#marker#Purge(...)                                           
 endfunction
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Navigation                                                                                                       {{{1
-"
-function! signature#marker#Goto( dir, marker_num, count )                                                         " {{{2
+function! signature#marker#Goto( dir, marker_num, count )                                                         " {{{1
   " Description: Jump to next/prev marker by location.
   " Arguments: dir    = next  : Jump forward
   "                     prev  : Jump backward
   "            marker = same  : Jump to a marker of the same type
   "                     any   : Jump to a marker of any type
-  "                     [1-9] : Jump to the corresponding marker
+  "                     [0-9] : Jump to the corresponding marker
 
   let l:lnum = line('.')
 
   let l:marker = ''
-  if (a:marker_num =~ '\v<[1-9]>')
+  if (a:marker_num =~ '\v<[0-9]>')
     let l:marker = split(b:SignatureIncludeMarkers, '\zs')[a:marker_num]
   elseif (  (a:marker_num ==? 'same')
        \ && has_key(b:sig_markers, l:lnum)
@@ -112,64 +106,69 @@ function! signature#marker#Goto( dir, marker_num, count )                       
 endfunction
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Misc                                                                                                             {{{1
-"
-function! signature#marker#List(...)                                                                              " {{{2
+function! signature#marker#List(...)                                                                              " {{{1
   " Description: Opens and populates location list with markers from current buffer
   "              Show all markers in location list if no argument is provided
-  " Argument:    [marker]  = 0-9 or any of !@#$%^&*() : List only the specified markers
-  "              [context] = 0 (default)              : Adds context around marker
+  " Argument:    [markers] = 0-9 or any of the specified symbols : List only the specified markers
+  "              [context] = 0 (default)                         : Adds context around marker
+  "              To show all markers with 1 line of context call using arguments ("", 1)
 
-  let l:marker = (a:0 && (a:1 != "") ? a:1 : ')!@#$%^&*(')
-  let l:count  = (a:0 > 1 ? a:2 : 0)
+  let l:markers = (a:0 && (a:1 != "") ? a:1 : b:SignatureIncludeMarkers)
+  let l:context = (a:0 > 1 ? a:2 : 0)
 
-  if (l:marker =~ '^\d$')
-    if (l:marker >= len(')!@#$%^&*('))
-      echoe "Signature: Marker specified is out-of-bounds"
+  if (l:markers =~ '^\d$')
+    if (  (  (l:markers == 0)
+     \    && (len(b:SignatureIncludeMarkers) != 10)
+     \    )
+     \ || (l:markers > len(b:SignatureIncludeMarkers))
+     \ )
+      echoe "Signature: No corresponding marker exists for " . l:markers
       return
     endif
-    let l:marker = split(')!@#$%^&*(', '\zs')[l:marker]
+    let l:markers = split(b:SignatureIncludeMarkers, '\zs')[l:markers]
   endif
 
-  let l:list_map = map(
-                   \   sort(
-                   \     keys(filter(copy(b:sig_markers), 'v:val =~ "[" . l:marker . "]"')),
-                   \     'signature#utils#NumericSort'
-                   \   ),
-                   \   '{
-                   \     "bufnr": ' . bufnr('%') . ',
-                   \     "lnum" : v:val,
-                   \     "col"  : "",
-                   \     "type" : "M",
-                   \     "text" : b:sig_markers[v:val] . ": " . getline(v:val)
-                   \   }'
-                   \  )
+  let l:lines_tot = line('$')
+  let l:buf_curr  = bufnr('%')
+  let l:list_sep  = {'bufnr': '', 'lnum' : ''}
+  let l:list      = []
 
-  if l:count
-    let l:temp_list = []
-    for i in range(0, len(l:list_map)-1)
-      for l:context in range(-l:count, l:count)
-        let l:item_context = copy(l:list_map[i])
-        if (l:context != 0)
-          let l:item_context.lnum = l:list_map[i].lnum + l:context
-          let l:item_context.text = (l:context < 0 ? "-" : "+") . ": " . getline(l:item_context.lnum)
-        endif
-        let l:item_context.text = substitute(l:item_context.text, '\s\+$', '', '')
-        let l:temp_list = add(l:temp_list, l:item_context)
-      endfor
-      if (i != len(l:list_map)-1)
-        let l:temp_list = add(l:temp_list, { 'bufnr': '',
-                                           \ 'lnum' : '',
-                                           \ 'col'  : '',
-                                           \ 'type' : '',
-                                           \ 'text' : ''
-                                           \ })
+  " Markers not specified in b:SignatureIncludeMarkers won't be present in b:sig_markers and hence get filtered out
+  for l:lnum in sort(keys(filter(copy(b:sig_markers), 'v:val =~ "[" . l:markers . "]"')))
+
+    for context_lnum in range(l:lnum - l:context, l:lnum + l:context)
+      if (  (context_lnum < 1)
+       \ || (context_lnum > lines_tot)
+       \ )
+        continue
       endif
-    endfor
-    let l:list_map = l:temp_list
-  endif
 
-  call setloclist(0, l:list_map,)|lopen
+      if     (context_lnum < l:lnum) | let l:text = '-' . ": " . getline(context_lnum)
+      elseif (context_lnum > l:lnum) | let l:text = '+' . ": " . getline(context_lnum)
+      else                           | let l:text = b:sig_markers[l:lnum] . ": " . getline(context_lnum)
+      endif
+
+      let l:list = add(l:list,
+        \              { 'text' : l:text,
+        \                'bufnr': l:buf_curr,
+        \                'lnum' : context_lnum,
+        \                'type' : 'M'
+        \              }
+        \             )
+    endfor
+
+    " Add separator when showing context
+    "if (a:context > 0)
+    "  let l:list = add(l:list, l:list_sep)
+    "endif
+  endfor
+
+  " Remove the redundant separator at the end when showing context
+  "if (  (a:context > 0)
+  " \ && (len(l:list) > 0)
+  " \ )
+  "  call remove(l:list, -1)
+  "endif
+
+  call setloclist(0, l:list,) | lopen
 endfunction
-" }}}2
