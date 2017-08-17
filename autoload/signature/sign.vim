@@ -315,22 +315,22 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
 endfunction
 
 
-function! signature#sign#GetMarkSignLine(mark)                                                                    " {{{1
-  if !signature#utils#IsValidMark(a:mark)
-    echoe "Signature: Invalid mark " . a:mark
-    return
-  endif
+" function! signature#sign#GetMarkSignLine(mark)                                                                    " {{{1
+"   if !signature#utils#IsValidMark(a:mark)
+"     echoe "Signature: Invalid mark " . a:mark
+"     return
+"   endif
 
-  let l:sign_info=filter(split(execute('sign place'), '\n'),
-                       \ 'v:val =~ "\\vSignature_(.?' . a:mark . '|' . a:mark . '.?)$"')
+"   let l:sign_info=filter(split(execute('sign place'), '\n'),
+"                        \ 'v:val =~ "\\vSignature_(.?' . a:mark . '|' . a:mark . '.?)$"')
 
-  if (len(l:sign_info) != 1)
-    echoe "Signature: Expected single match, found " . len(l:sign_info)
-    return
-  endif
+"   if (len(l:sign_info) != 1)
+"     echoe "Signature: Expected single match, found " . len(l:sign_info)
+"     return
+"   endif
 
-  return matchstr(l:sign_info[0], '\v(line\=)@<=\d+')
-endfunction
+"   return matchstr(l:sign_info[0], '\v(line\=)@<=\d+')
+" endfunction
 
 
 function! s:InitializeVars(...)                                                                                   " {{{1
