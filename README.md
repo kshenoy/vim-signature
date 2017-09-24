@@ -1,3 +1,6 @@
+#### 2017-09-23:
+Changed the default value of `g:SignatureForceRemoveGlobal` to 0 since using `:wviminfo!`/`:wshada!` is a very heavy hammer and because it goes against a \*vim default.  
+
 #### 2016-07-08:
 Signature used to have a mapping conflict with NERDTree as both try to map the `m` key.  
 To get around this, I used to delete maps whenever I detected someone entering the NERDTree pane and recreate the maps upon exit.  

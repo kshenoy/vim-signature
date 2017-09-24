@@ -241,14 +241,14 @@ etc. These are not defined by default
     `endfunction`
     `let g:SignatureMarkTextHL = function("Example")`
 
-  By default, this is set to SignatureMarkText which is a highlight group 
+  By default, this is set to SignatureMarkText which is a highlight group
   that is linked to Exception
 
   *g:SignatureMarkTextHLDynamic*
   Boolean, Default: 0
 
   Highlight signs of marks dynamically based upon state indicated by
-  vim-gitgutter. Setting this to `1` prior to plugin initialization overwrites 
+  vim-gitgutter. Setting this to `1` prior to plugin initialization overwrites
   |g:SignatureMarkTextHL|.
 
   vim-signify is not supported at the moment. For details, refer
@@ -265,7 +265,7 @@ etc. These are not defined by default
   *g:SignatureMarkerTextHL*
   String, Default : 'SignatureMarkerText'
 
-  The highlight group used for marker signs. This can be a string or |Funcref|. 
+  The highlight group used for marker signs. This can be a string or |Funcref|.
   SignatureMarkText links to WarningMsg by default.
   See |g:SignatureMarkTextHL| for details.
 
@@ -351,10 +351,14 @@ etc. These are not defined by default
 
 
   *g:SignatureForceRemoveGlobal*
-  Boolean, Default: 1
+  Boolean, Default: 0
 
   Vim's handling of global marks is a bit iffy. This option forces the removal
-  of global marks by deleting it from the .viminfo file.
+  of global marks by deleting it from the viminfo (or neovim's shada) file.
+
+  Note that this is a very heavy hammer since it affects other things too.
+  Refer 'viminfo' or 'shada' for more information on features that could be
+  affected.
 
 
   *g:SignatureForceMarkPlacement*

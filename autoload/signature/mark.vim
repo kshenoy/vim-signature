@@ -322,7 +322,7 @@ endfunction
 
 
 function! s:ForceGlobalRemoval(mark)                                                                              " {{{1
-  " Description: Edit .viminfo file to forcibly delete Global mark since vim's handling is iffy
+  " Description: Edit viminfo/shada file to forcibly delete Global mark since vim's handling is iffy
   " Arguments:   mark - The mark to delete
 
   if (  (a:mark !~# '[A-Z]')
@@ -331,29 +331,11 @@ function! s:ForceGlobalRemoval(mark)                                            
     return
   endif
 
-  " See if custom .viminfo location is specified. If not, try to piece it together
-  if (&viminfo =~ ',n')
-    let l:filename = expand(substitute(&viminfo, '^.*,n', '', ''))
+  if has('nvim')
+    wshada!
   else
-    let l:filename = expand($HOME . '/' . (has('unix') ? '.' : '_') . 'viminfo')
+    wviminfo!
   endif
-
-  if (!filewritable(l:filename))
-    echohl WarningMsg
-    echomsg "Signature: Unable to read/write .viminfo ('" . l:filename . "')"
-    echohl None
-    return
-  endif
-
-  let l:lines = readfile(l:filename, 'b')
-  call filter(l:lines, 'v:val !~ "^''' . a:mark. '"')
-  if has('win32')
-    " for some reason writefile(_viminfo) only works after editing directly
-    execute "noautocmd split " . l:filename
-    noautocmd write
-    noautocmd bdelete
-  endif
-  call writefile(l:lines, l:filename, 'b')
 endfunction
 
 

@@ -36,7 +36,7 @@ call signature#utils#Set('g:SignatureEnabledAtStartup',        1                
 call signature#utils#Set('g:SignatureDeferPlacement',          1                                                     )
 call signature#utils#Set('g:SignatureRecycleMarks',            0                                                     )
 call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks', 1                                                     )
-call signature#utils#Set('g:SignatureForceRemoveGlobal',       1                                                     )
+call signature#utils#Set('g:SignatureForceRemoveGlobal',       0                                                     )
 call signature#utils#Set('g:SignatureForceMarkPlacement',      0                                                     )
 call signature#utils#Set('g:SignatureForceMarkerPlacement',    0                                                     )
 call signature#utils#Set('g:SignatureMap',                     {}                                                    )
