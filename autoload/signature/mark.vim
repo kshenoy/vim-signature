@@ -146,7 +146,7 @@ function! signature#mark#Goto(dir, loc, mode)                                   
   elseif a:mode ==? "alpha"
     let l:mark = s:GotoByAlpha(a:dir)
   elseif a:mode ==? "pos"
-    let l:mark = s:GotoByPos(a:dir)
+    return s:GotoByPos(a:dir, a:loc)
   endif
 
   " NOTE: If l:mark is an empty string then no movement will be made
@@ -160,30 +160,33 @@ function! signature#mark#Goto(dir, loc, mode)                                   
 endfunction
 
 
-function! s:GotoByPos(dir)                                                                                        " {{{1
+function! s:GotoByPos(dir, pos)                                                                                   " {{{1
   " Description: Jump to next/prev mark by location.
-  " Arguments: dir  = next   : Jump forward
-  "                   prev   : Jump backward
+  " Arguments:
+  "   dir = next : Jump forward
+  "         prev : Jump backward
+  "   loc = line : Jump to first column of line with mark
+  "         spot : Jump to exact column of the mark
 
   " We need at least one mark to be present. If not, then return an empty string so that no movement will be made
   if empty(b:sig_marks) | return "" | endif
 
   let l:lnum = line('.')
 
-  " Get list of line numbers of lines with marks.
-  if a:dir ==? "next"
-    let l:targ = min(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
-    let l:mark_lnums = sort(keys(filter(copy(b:sig_marks), 'v:key > l:lnum')), "signature#utils#NumericSort")
-  elseif a:dir ==? "prev"
-    let l:targ = max(sort(keys(b:sig_marks), "signature#utils#NumericSort"))
-    let l:mark_lnums = reverse(sort(keys(filter(copy(b:sig_marks), 'v:key < l:lnum')), "signature#utils#NumericSort"))
+  execute "normal! " . (a:dir ==? "next" ? "]" : "[") . (a:pos ==? "line" ? "'" : "`")
+
+  " If the cursor moved then we're done. We're also done if there's only 1 mark since we can't move anymore.
+  " If we have more than 1 mark and yet we haven't moved then we've probably reached the first/last mark. In this case,
+  " return if b:SignatureWrapJumps is not set.
+  if (  (l:lnum != line('.'))
+   \ || (len(b:sig_marks) < 2)
+   \ || (b:SignatureWrapJumps == 0)
+   \ )
+    return
   endif
 
-  let l:targ = (empty(l:mark_lnums) ? (b:SignatureWrapJumps ? l:targ : "") : l:mark_lnums[0])
-  if empty(l:targ) | return "" | endif
-
-  let l:mark = strpart(b:sig_marks[l:targ], 0, 1)
-  return l:mark
+  " However, if there are multiple marks and the cursor hasn't moved ==> We've reached the first/lsat mark in the file
+  execute "normal! " . (a:dir ==? "next" ? "gg]" : "G[") . (a:pos ==? "line" ? "'" : "`")
 endfunction
 
 
