@@ -154,9 +154,11 @@ function! signature#sign#Refresh(...)                                           
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
   " Arguments:   Specify an argument to force a sign refresh
 
-  call s:InitializeVars(a:0 && a:1)
   " If Signature is not enabled, return
-  if !b:sig_enabled | return | endif
+  if !get(b:, 'sig_enabled', g:SignatureEnabledAtStartup) | return | endif
+
+  let l:force = a:0 && a:1
+  call s:InitializeVars(l:force)
 
   for i in signature#mark#GetList('free', 'buf_curr')
     " ... remove it
@@ -333,9 +335,9 @@ endfunction
 " endfunction
 
 
-function! s:InitializeVars(...)                                                                                   " {{{1
+function! s:InitializeVars(force)                                                                                 " {{{1
   " Description: Initialize variables
-  " Arguments:   Specify an argument to re-init
+  " Arguments:   Specify an argument to re-init. Force re-init if specified
 
   if !exists('b:sig_marks')
     " b:sig_marks = { lnum => signs_str }
@@ -357,12 +359,23 @@ function! s:InitializeVars(...)                                                 
     call filter( b:sig_markers, 'v:key <= l:line_tot' )
   endif
 
-  call signature#utils#Set('b:sig_DummyExists'         , 0                          , a:0 && a:1)
-  call signature#utils#Set('b:sig_enabled'             , g:SignatureEnabledAtStartup, a:0 && a:1)
-  call signature#utils#Set('b:SignatureIncludeMarks'   , g:SignatureIncludeMarks    , a:0 && a:1)
-  call signature#utils#Set('b:SignatureIncludeMarkers' , g:SignatureIncludeMarkers  , a:0 && a:1)
-  call signature#utils#Set('b:SignatureMarkOrder'      , g:SignatureMarkOrder       , a:0 && a:1)
-  call signature#utils#Set('b:SignaturePrioritizeMarks', g:SignaturePrioritizeMarks , a:0 && a:1)
-  call signature#utils#Set('b:SignatureDeferPlacement' , g:SignatureDeferPlacement  , a:0 && a:1)
-  call signature#utils#Set('b:SignatureWrapJumps'      , g:SignatureWrapJumps       , a:0 && a:1)
+  if a:force
+    let b:sig_DummyExists          = 0
+    let b:sig_enabled              = g:SignatureEnabledAtStartup
+    let b:SignatureIncludeMarks    = g:SignatureIncludeMarks
+    let b:SignatureIncludeMarkers  = g:SignatureIncludeMarkers
+    let b:SignatureMarkOrder       = g:SignatureMarkOrder
+    let b:SignaturePrioritizeMarks = g:SignaturePrioritizeMarks
+    let b:SignatureDeferPlacement  = g:SignatureDeferPlacement
+    let b:SignatureWrapJumps       = g:SignatureWrapJumps
+  else
+    let b:sig_DummyExists          = get(b:, 'sig_DummyExists',          0                          )
+    let b:sig_enabled              = get(b:, 'sig_enabled',              g:SignatureEnabledAtStartup)
+    let b:SignatureIncludeMarks    = get(b:, 'SignatureIncludeMarks',    g:SignatureIncludeMarks    )
+    let b:SignatureIncludeMarkers  = get(b:, 'SignatureIncludeMarkers',  g:SignatureIncludeMarkers  )
+    let b:SignatureMarkOrder       = get(b:, 'SignatureMarkOrder',       g:SignatureMarkOrder       )
+    let b:SignaturePrioritizeMarks = get(b:, 'SignaturePrioritizeMarks', g:SignaturePrioritizeMarks )
+    let b:SignatureDeferPlacement  = get(b:, 'SignatureDeferPlacement',  g:SignatureDeferPlacement  )
+    let b:SignatureWrapJumps       = get(b:, 'SignatureWrapJumps',       g:SignatureWrapJumps       )
+  endif
 endfunction
