@@ -55,7 +55,7 @@ endfunction
 
 let s:SignatureMapLeader = get(g:SignatureMap, 'Leader', 'm')
 if (s:SignatureMapLeader == "")
-  echoe "Signature: g:SignatureMap.Leader shouldn't be left blank"
+  echoe "Signature: SignatureMapLeader shouldn't be left blank"
 endif
 
 " We create separate mappings for PlaceNextMark, mark#Purge('all') and PurgeMarkers instead of combining it with
