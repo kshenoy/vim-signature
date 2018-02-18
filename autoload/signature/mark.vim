@@ -290,16 +290,14 @@ function! signature#mark#GetList(mode, scope, ...)                              
   let l:buf_curr = bufnr('%')
   let l:type     = (a:0 ? a:1 : "")
 
-  " Add local marks first
-  if (l:type !=? "global")
-    for i in filter(split(b:SignatureIncludeMarks, '\zs'), 'v:val =~# "[a-z]"')
+  " Respect order specified in g:SignatureIncludeMarks
+  for i in split(b:SignatureIncludeMarks)
+    if (i =~# "[A-Z]")
+      let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
+      let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
+    elseif (l:type !=? "global")
       let l:marks_list = add(l:marks_list, [i, line("'" .i), l:buf_curr])
-    endfor
-  endif
-  " Add global (uppercase) marks to list
-  for i in filter( split( b:SignatureIncludeMarks, '\zs' ), 'v:val =~# "[A-Z]"' )
-    let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
-    let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
+    endif
   endfor
 
   if (a:mode ==? 'used')
