@@ -291,7 +291,7 @@ function! signature#mark#GetList(mode, scope, ...)                              
   let l:type     = (a:0 ? a:1 : "")
 
   " Respect order specified in g:SignatureIncludeMarks
-  for i in split(b:SignatureIncludeMarks)
+  for i in split(b:SignatureIncludeMarks, '\zs')
     if (i =~# "[A-Z]")
       let [ l:buf, l:line, l:col, l:off ] = getpos( "'" . i )
       let l:marks_list = add(l:marks_list, [i, l:line, l:buf])
