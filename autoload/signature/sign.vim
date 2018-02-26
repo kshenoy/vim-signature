@@ -284,7 +284,8 @@ endfunction
 function! signature#sign#GetGitGutterHLGroup(lnum)                                                                " {{{1
   " Description: This returns the highlight group used by vim-gitgutter depending on how the line was edited
 
-  let l:line_state = filter(copy(gitgutter#diff#process_hunks(gitgutter#hunk#hunks())), 'v:val[0] == a:lnum')
+  let l:current_bufnr = bufnr('%')
+  let l:line_state = filter(copy(gitgutter#diff#process_hunks(l:current_bufnr, gitgutter#hunk#hunks(l:current_bufnr))), 'v:val[0] == a:lnum')
 
   if len(l:line_state) == 0
     return ""
