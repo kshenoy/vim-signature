@@ -111,7 +111,7 @@ function! signature#mark#Purge(mode)                                            
    \ )
     let l:msg = 'Are you sure you want to delete all marks' . (a:mode ==? 'line' ? ' from the current line' : '') . '?'
     let l:ans = confirm(l:msg . ' This cannot be undone.', "&Yes\n&No", 1)
-    if (l:ans == 2) | return | endif
+    if (l:ans != 1) | return | endif
   endif
 
   for i in l:used_marks
