@@ -1,7 +1,7 @@
 " vim: fdm=marker:et:ts=4:sw=2:sts=2
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! signature#sign#Place(sign, lnum)                                                                        " {{{1
+function! signature#sign#Place(sign, lnum)                                                                         "{{{1
   " Description: Place signs for marks/markers on the specified line number
   " Arguments:
   "   sign : The mark/marker whose sign is to be placed
@@ -35,7 +35,7 @@ function! signature#sign#Place(sign, lnum)                                      
 endfunction
 
 
-function! signature#sign#Remove(sign, lnum)                                                                       " {{{1
+function! signature#sign#Remove(sign, lnum)                                                                        "{{{1
   " Description: Remove signs for marks/markers from the specified line number
   " Arguments:
   "   sign : The mark/marker whose sign is to be placed/removed/toggled
@@ -88,7 +88,7 @@ function! signature#sign#Remove(sign, lnum)                                     
 endfunction
 
 
-function! s:EvaluateHL(expr, lnum, ...)                                                                           " {{{1
+function! s:EvaluateHL(expr, lnum, ...)                                                                            "{{{1
   " Description: If expr points to a function, call it and use its output as the highlight group.
   "              If it is a string, use it directly.
   "              If the optional argument is specified, use it as a fallback. If not, return an empty string
@@ -106,7 +106,7 @@ function! s:EvaluateHL(expr, lnum, ...)                                         
 endfunction
 
 
-function! s:RefreshLine(lnum)                                                                                     " {{{1
+function! s:RefreshLine(lnum)                                                                                      "{{{1
   " Description: Decides what the sign string should be based on if there are any marks or markers (using b:sig_marks
   "              and b:sig_markers) on the current line and the value of b:SignaturePrioritizeMarks.
   " Arguments:
@@ -154,7 +154,7 @@ function! s:RefreshLine(lnum)                                                   
 endfunction
 
 
-function! signature#sign#Refresh(...)                                                                             " {{{1
+function! signature#sign#Refresh(...)                                                                              "{{{1
   " Description: Add signs for new marks/markers and remove signs for deleted marks/markers
   " Arguments:   Specify an argument to force a sign refresh
 
@@ -187,7 +187,7 @@ function! signature#sign#Refresh(...)                                           
 endfunction
 
 
-function! signature#sign#Unplace(lnum)                                                                            " {{{1
+function! signature#sign#Unplace(lnum)                                                                             "{{{1
   " Description: Remove the sign from the specified line number
   " FIXME: Clean-up. Undefine the sign
   let l:id = abs(a:lnum * 1000 + bufnr('%'))
@@ -195,12 +195,14 @@ function! signature#sign#Unplace(lnum)                                          
 endfunction
 
 
-function! signature#sign#ToggleDummy()                                                                            " {{{1
+function! signature#sign#ToggleDummy(...)                                                                          "{{{1
   " Description: Places a dummy sign to prevent flickering of the gutter when the mark is moved or the line containing
   "              a mark/marker is deleted and then the delete is undone
+  " Arguments: (optional) 0 : force remove
+  "                       1 : force place
 
-  let l:place  = (len(b:sig_marks) + len(b:sig_markers) == 1) && !b:sig_DummyExists
-  let l:remove = (len(b:sig_marks) + len(b:sig_markers) == 0) &&  b:sig_DummyExists
+  let l:place  = a:0 ?  a:1 : (len(b:sig_marks) + len(b:sig_markers) == 1) && !b:sig_DummyExists
+  let l:remove = a:0 ? !a:1 : (len(b:sig_marks) + len(b:sig_markers) == 0) &&  b:sig_DummyExists
 
   if (l:place)
     sign define Signature_Dummy
@@ -213,7 +215,7 @@ function! signature#sign#ToggleDummy()                                          
 endfunction
 
 
-function! s:GetInfo(...)                                                                                          " {{{1
+function! s:GetInfo(...)                                                                                           "{{{1
   " Description: Returns a dic of filenames, each of which is a dic of line numbers on which signs are placed
   " Arguments: filename (optional).
   "            If filename is provided, the return value will contain signs only present in the given file
@@ -281,7 +283,7 @@ function! s:GetInfo(...)                                                        
 endfunction
 
 
-function! signature#sign#GetGitGutterHLGroup(lnum)                                                                " {{{1
+function! signature#sign#GetGitGutterHLGroup(lnum)                                                                 "{{{1
   " Description: This returns the highlight group used by vim-gitgutter depending on how the line was edited
 
   let l:current_bufnr = bufnr('%')
@@ -299,7 +301,7 @@ function! signature#sign#GetGitGutterHLGroup(lnum)                              
 endfunction
 
 
-function! signature#sign#GetSignifyHLGroup(lnum)                                                                  " {{{1
+function! signature#sign#GetSignifyHLGroup(lnum)                                                                   "{{{1
   " Description: This returns the highlight group used by vim-signify depending on how the line was edited
   "              Thanks to @michaelmior
 
@@ -320,7 +322,7 @@ function! signature#sign#GetSignifyHLGroup(lnum)                                
 endfunction
 
 
-" function! signature#sign#GetMarkSignLine(mark)                                                                    " {{{1
+" function! signature#sign#GetMarkSignLine(mark)                                                                   "{{{1
 "   if !signature#utils#IsValidMark(a:mark)
 "     echoe "Signature: Invalid mark " . a:mark
 "     return
@@ -338,7 +340,7 @@ endfunction
 " endfunction
 
 
-function! s:InitializeVars(...)                                                                                   " {{{1
+function! s:InitializeVars(...)                                                                                    "{{{1
   " Description: Initialize variables
   " Arguments:   Specify an argument to re-init
 
