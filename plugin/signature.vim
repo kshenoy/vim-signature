@@ -39,6 +39,7 @@ call signature#utils#Set('g:SignatureErrorIfNoAvailableMarks', 1                
 call signature#utils#Set('g:SignatureForceRemoveGlobal',       0                                                     )
 call signature#utils#Set('g:SignatureForceMarkPlacement',      0                                                     )
 call signature#utils#Set('g:SignatureForceMarkerPlacement',    0                                                     )
+call signature#utils#Set('g:SignatureGutterAlwaysOn',          0                                                     )
 call signature#utils#Set('g:SignatureMap',                     {}                                                    )
 
 
