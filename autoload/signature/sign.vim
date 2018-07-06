@@ -123,8 +123,8 @@ function! s:RefreshLine(lnum)                                                   
    \ )
     let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum, "SignatureMarkText")
     let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum, "SignatureMarkLine")
-    let l:str = substitute(b:SignatureMarkOrder, "\m", strpart(b:sig_marks[a:lnum], 0, 1), '')
-    let l:str = substitute(l:str,                "\p", strpart(b:sig_marks[a:lnum], 1, 1), '')
+    let l:str = substitute(b:SignatureMarkOrder, "\m", signature#utils#GetChar(b:sig_marks[a:lnum], 0), '')
+    let l:str = substitute(l:str,                "\p", signature#utils#GetChar(b:sig_marks[a:lnum], 1), '')
 
     execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
 
@@ -136,7 +136,7 @@ function! s:RefreshLine(lnum)                                                   
     " This is because if dynamic highlighting of markers is enabled then the sign placed on eg. a modified line should
     " be highlighted differently than the one placed on an unchanged line.
     " In order to support this, I append the name of the TextHL and LineHL group to the name of the sign.
-    let l:txt = strpart(b:sig_markers[a:lnum], 0, 1)
+    let l:txt = signature#utils#GetChar(b:sig_markers[a:lnum], 0)
     let l:str = l:txt . '_' . l:SignatureMarkerTextHL . '_' . l:SignatureMarkerLineHL
 
     execute 'sign define Signature_' . l:str . ' text=' . l:txt . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
