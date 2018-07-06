@@ -182,7 +182,7 @@ function! s:GotoByPos(dir)                                                      
   let l:targ = (empty(l:mark_lnums) ? (b:SignatureWrapJumps ? l:targ : "") : l:mark_lnums[0])
   if empty(l:targ) | return "" | endif
 
-  let l:mark = strpart(b:sig_marks[l:targ], 0, 1)
+  let l:mark = signature#utils#GetChar(b:sig_marks[l:targ], 0)
   return l:mark
 endfunction
 
