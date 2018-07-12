@@ -157,6 +157,13 @@ function! signature#marker#List(...)                                            
         \             )
     endfor
 
+    " For split display mutiple markers
+    let l:list = add(l:list,
+      \              { 'text' : '------------------------------------------------------'
+      \              }
+      \             )
+
+
     " Add separator when showing context
     "if (a:context > 0)
     "  let l:list = add(l:list, l:list_sep)
