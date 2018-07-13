@@ -373,6 +373,13 @@ etc. These are not defined by default
   When set to 1, will always place markers instead of toggling them
 
 
+  *g:SignatureGutterAlwaysOn*
+  Boolean, Default: 0
+
+  When set to 1, will always display the gutter irrespective of whether there
+  are currently any marks to show or not.
+
+
 ==============================================================================
 4. Contributing                                        *SignatureContributing*
 

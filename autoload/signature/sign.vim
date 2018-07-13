@@ -201,8 +201,8 @@ function! signature#sign#ToggleDummy(...)                                       
   " Arguments: (optional) 0 : force remove
   "                       1 : force place
 
-  let l:place  = a:0 ?  a:1 : (len(b:sig_marks) + len(b:sig_markers) == 1) && !b:sig_DummyExists
-  let l:remove = a:0 ? !a:1 : (len(b:sig_marks) + len(b:sig_markers) == 0) &&  b:sig_DummyExists
+  let l:place  = a:0 ?  a:1 : (g:SignatureGutterAlwaysOn ? 1 : len(b:sig_marks) + len(b:sig_markers) == 1) && !b:sig_DummyExists
+  let l:remove = a:0 ? !a:1 : (g:SignatureGutterAlwaysOn ? 0 : len(b:sig_marks) + len(b:sig_markers) == 0) &&  b:sig_DummyExists
 
   if (l:place)
     sign define Signature_Dummy
