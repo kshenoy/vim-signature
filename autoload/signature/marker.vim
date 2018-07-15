@@ -158,17 +158,26 @@ function! signature#marker#List(...)                                            
     endfor
 
     " Add separator when showing context
-    "if (a:context > 0)
-    "  let l:list = add(l:list, l:list_sep)
-    "endif
+    if (l:lnum > 0)
+      let l:list = add(l:list, l:list_sep)
+    endif
   endfor
 
   " Remove the redundant separator at the end when showing context
-  "if (  (a:context > 0)
-  " \ && (len(l:list) > 0)
-  " \ )
-  "  call remove(l:list, -1)
-  "endif
+  if (  (l:lnum > 0)
+   \ && (len(l:list) > 0)
+   \ )
+    call remove(l:list, -1)
+  endif
 
   call setloclist(0, l:list,) | lopen
+
+  if (l:context >= l:lnum)
+    let l:num = l:lnum-1
+    if (l:num != 0)
+      execute "lne" l:num
+    endif
+  else
+    execute "lne" l:context
+  endif
 endfunction
