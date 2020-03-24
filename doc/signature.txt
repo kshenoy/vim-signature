@@ -166,6 +166,14 @@ etc. These are not defined by default
   'b:SignatureIncludeMarkers' can be specified separately for each buffer
 
 
+  *g:SignatureDisplaySplMarks*
+  String, Default : '' (empty string to maintain old behavior)
+
+  Specify the internal marks to be displayed by this plugin.
+  eg. `let g:SignatureDisplaySplMarks='[]<>"^.(){}'`
+  'b:SignatureDisplaySplMarks' can be set separately for buffer-specific marks.
+
+
   *g:SignatureMap['Leader']*
   String, Default: 'm'
 

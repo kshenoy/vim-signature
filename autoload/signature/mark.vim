@@ -358,7 +358,10 @@ function! signature#mark#List(scope, ...)                                       
   let l:buf_curr = bufnr('%')
   let l:list_sep = {'bufnr': '', 'lnum' : ''}
 
-  let l:SignatureIncludeMarks = (a:scope == 0 ? b:SignatureIncludeMarks : g:SignatureIncludeMarks)
+  let l:SignatureIncludeMarks  = (a:scope == 0 ? b:SignatureIncludeMarks : g:SignatureIncludeMarks)
+  let l:SignatureIncludeMarks .= (a:scope == 0) && exists('b:SignatureDisplaySplMarks') ? b:SignatureDisplaySplMarks
+                               \                                                        : g:SignatureDisplaySplMarks
+
   for i in split(l:SignatureIncludeMarks, '\zs')
     let [l:bufnr, l:lnum, l:col, l:off] = getpos( "'" . i )
 

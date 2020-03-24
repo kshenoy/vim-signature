@@ -16,11 +16,12 @@ let g:loaded_Signature = 1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Global variables                                                                                                 {{{1
+"" Global variables
 "
 call signature#utils#Set('g:SignaturePrioritizeMarks',         1                                                     )
 call signature#utils#Set('g:SignatureIncludeMarks',            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 call signature#utils#Set('g:SignatureIncludeMarkers',          ')!@#$%^&*('                                          )
+call signature#utils#Set('g:SignatureDisplaySplMarks',         ''                                                    )
 call signature#utils#Set('g:SignatureMarkTextHL',              "SignatureMarkText"                                   )
 call signature#utils#Set('g:SignatureMarkTextHLDynamic',       0                                                     )
 call signature#utils#Set('g:SignatureMarkLineHL',              "SignatureMarkLine"                                   )
@@ -43,7 +44,7 @@ call signature#utils#Set('g:SignatureMap',                     {}               
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Commands, Autocmds and Maps                                                                                      {{{1
+"" Commands, Autocmds and Maps
 "
 call signature#utils#Maps('create')
 
