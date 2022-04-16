@@ -187,6 +187,40 @@ function! signature#sign#Refresh(...)                                           
 endfunction
 
 
+function! signature#sign#TextChangedRefresh()                                                                      "{{{1
+  " Description: Move marks/markers when text above them is changed
+  "              Note that this will not remove or readd (upon undo) marks/markers
+  "              It does readd them when an undo is performed above their old position, though
+
+  " If Signature is not enabled, return
+  if !b:sig_enabled | return | endif
+
+  " Prevent creating lots of undo sequences while in insert mode
+  if mode() != 'n' | return | endif
+
+  " Prevent not allowing undoing to before opening
+  if undotree()['seq_cur'] == 0 | return | endif
+
+  let l:lazyredraw=&lazyredraw
+  set lazyredraw
+  let l:old_cur_pos=getpos('.')
+  silent earlier
+  let l:earlier_cur_line=getpos('.')[1]
+  silent later
+  let l:later_cur_line=getpos('.')[1]
+  call setpos('.', l:old_cur_pos)
+  let &lazyredraw=l:lazyredraw
+  let l:modified_line=min([l:earlier_cur_line, l:later_cur_line])
+  " Remove and re-add signs for marks below the uppermost modified line ...
+  for [l:mark, l:lnum, _] in signature#mark#GetList('used', 'buf_curr')
+    if l:lnum >= l:modified_line
+      call signature#sign#Remove(l:mark, 0)
+      call signature#sign#Place (l:mark, l:lnum)
+    endif
+  endfor
+endfunction
+
+
 function! signature#sign#Unplace(lnum)                                                                             "{{{1
   " Description: Remove the sign from the specified line number
   " FIXME: Clean-up. Undefine the sign
