@@ -310,6 +310,13 @@ etc. These are not defined by default
     `set updatetime = 100`
 
 
+  *g:SignatureTextChangedRefresh*
+  Boolean, Default: 1
+
+  Enable the display to refresh upon changes. Generally a good thing to have.
+  This makes use of the TextChanged(I) autocmd events.
+
+
   *g:SignaturePrioritizeMarks*
   Boolean, Default: 1
 

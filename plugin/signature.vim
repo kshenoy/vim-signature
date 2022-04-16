@@ -32,6 +32,7 @@ call signature#utils#Set('g:SignatureMarkOrder',               "\p\m"           
 call signature#utils#Set('g:SignatureDeleteConfirmation',      0                                                     )
 call signature#utils#Set('g:SignaturePurgeConfirmation',       0                                                     )
 call signature#utils#Set('g:SignaturePeriodicRefresh',         1                                                     )
+call signature#utils#Set('g:SignatureTextChangedRefresh',      1                                                     )
 call signature#utils#Set('g:SignatureEnabledAtStartup',        1                                                     )
 call signature#utils#Set('g:SignatureDeferPlacement',          1                                                     )
 call signature#utils#Set('g:SignatureRecycleMarks',            0                                                     )
@@ -59,6 +60,8 @@ if has('autocmd')
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
 
     autocmd CursorHold * if (g:SignaturePeriodicRefresh) | call signature#sign#Refresh() | endif
+    autocmd TextChanged * if (g:SignatureTextChangedRefresh) | call signature#sign#TextChangedRefresh() | endif
+    autocmd TextChangedI * if (g:SignatureTextChangedRefresh) | call signature#sign#TextChangedRefresh() | endif
   augroup END
 endif
 
