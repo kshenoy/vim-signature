@@ -123,14 +123,16 @@ function! s:RefreshLine(lnum)                                                   
    \ )
     let l:SignatureMarkTextHL = s:EvaluateHL(g:SignatureMarkTextHL, a:lnum, "SignatureMarkText")
     let l:SignatureMarkLineHL = s:EvaluateHL(g:SignatureMarkLineHL, a:lnum, "SignatureMarkLine")
+    let l:SignatureMarkCulHL = s:EvaluateHL(g:SignatureMarkCulHL, a:lnum, "SignatureMarkCul")
     let l:str = substitute(b:SignatureMarkOrder, "\m", signature#utils#GetChar(b:sig_marks[a:lnum], 0), '')
     let l:str = substitute(l:str,                "\p", signature#utils#GetChar(b:sig_marks[a:lnum], 1), '')
 
-    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:str . ' texthl=' . l:SignatureMarkTextHL . ' linehl=' . l:SignatureMarkLineHL ' culhl=' . l:SignatureMarkCulHL
 
   elseif has_key(b:sig_markers, a:lnum)
     let l:SignatureMarkerTextHL = s:EvaluateHL(g:SignatureMarkerTextHL, a:lnum, "SignatureMarkerText")
     let l:SignatureMarkerLineHL = s:EvaluateHL(g:SignatureMarkerLineHL, a:lnum, "SignatureMarkerLine")
+    let l:SignatureMarkerCulHL = s:EvaluateHL(g:SignatureMarkerCulHL, a:lnum, "SignatureMarkerCul")
 
     " Since the same marker can be placed on multiple lines, we can't use the same sign for all of them.
     " This is because if dynamic highlighting of markers is enabled then the sign placed on eg. a modified line should
@@ -139,7 +141,7 @@ function! s:RefreshLine(lnum)                                                   
     let l:txt = signature#utils#GetChar(b:sig_markers[a:lnum], 0)
     let l:str = l:txt . '_' . l:SignatureMarkerTextHL . '_' . l:SignatureMarkerLineHL
 
-    execute 'sign define Signature_' . l:str . ' text=' . l:txt . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL
+    execute 'sign define Signature_' . l:str . ' text=' . l:txt . ' texthl=' . l:SignatureMarkerTextHL . ' linehl=' . l:SignatureMarkerLineHL ' culhl=' . l:SignatureMarkerCulHL
   else
     call signature#sign#Unplace(a:lnum)
   endif
