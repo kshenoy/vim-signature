@@ -56,6 +56,19 @@ the line already contains the mark, it'll be unset. The default behavior
 of ]', [', ]` and [` is supported and enhanced by wrapping around when
 beginning or end of file is reached. ]-, [-, ]= and [= also accept a count.
 
+Non-recursive mappings to `m`, such as `noremap x m`, automatically use
+Signature's mark/marker handler in Normal mode when |maplist()| and |mapset()|
+are available and Signature owns the `m` mapping. No vimrc changes are needed:
+`xa` creates mark 'a', and repeating `xa` on the same line removes it and its
+sign, just like `ma`. Mapping attributes and other modes are preserved.
+Buffer-local mappings and mappings defined after plugin startup are also
+recognized on buffer entry or when Vim next waits for input (|SafeState|).
+Without SafeState, later mappings are recognized on |CursorHold|.
+
+Other native mark changes, including `:delmarks` and `:normal!`, are displayed
+with |g:SignaturePeriodicRefresh| enabled, using |SafeState| when available or
+|CursorHold| on older versions.
+
 To directly jump to a given marker, the following maps can be used
 >
   nnoremap [1 :call signature#marker#Goto('prev', 1, v:count)
@@ -304,8 +317,10 @@ etc. These are not defined by default
   Boolean, Default: 1
 
   Enable the display to refresh periodically. Generally a good thing to have.
-  This makes use of the CursorHold autocmd event to execute periodically.
-  The frequency of this event can be controlled by changing the value of the
+  Uses |SafeState|, when available, to detect native mark changes (including
+  `:normal!` and `:delmarks`) as soon as Vim waits for input. Also uses |CursorHold|
+  for periodic updates and as a fallback on older Vim versions.
+  The frequency of CursorHold can be controlled by changing the value of the
   updatetime variable in milliseconds
     `set updatetime = 100`
 

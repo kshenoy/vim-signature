@@ -54,11 +54,19 @@ if has('autocmd')
     " This needs to be called upon loading a colorscheme
     " VimEnter is kind of a backup if no colorscheme is explicitly loaded and the default is used
     autocmd VimEnter,ColorScheme * call signature#utils#SetupHighlightGroups()
+    autocmd VimEnter,BufEnter,CmdwinEnter * call signature#utils#RemapMarkAliases()
 
     " This is required to remove signs for global marks that were removed when in another window
     autocmd BufEnter,CmdwinEnter * call signature#sign#Refresh()
 
     autocmd CursorHold * if (g:SignaturePeriodicRefresh) | call signature#sign#Refresh() | endif
+    autocmd CursorHold * call signature#utils#RemapMarkAliases()
+
+    " Non-recursive mappings can set native marks without moving the cursor.
+    if exists('##SafeState')
+      autocmd SafeState * call signature#utils#RemapMarkAliases()
+      autocmd SafeState * if (g:SignaturePeriodicRefresh) | call signature#sign#Refresh() | endif
+    endif
   augroup END
 endif
 

@@ -61,6 +61,33 @@ function! signature#utils#Maps(mode)                                            
   call s:Map(a:mode, 'GotoPrevMarkerAny', "[="                            , 'marker#Goto("prev", "any",  v:count)')
   call s:Map(a:mode, 'ListBufferMarks'  , 'm/'                            , 'mark#List(0, 0)'                     )
   call s:Map(a:mode, 'ListBufferMarkers', 'm?'                            , 'marker#List(v:count, 0)'             )
+  if a:mode ==? 'create'
+    call signature#utils#RemapMarkAliases()
+  endif
+endfunction
+
+
+function! signature#utils#RemapMarkAliases()                                                                       " {{{1
+  if !exists('*maplist') || !exists('*mapset')
+    return
+  endif
+
+  let l:input = maparg('m', 'n', 0, 1)
+  if get(l:input, 'rhs', '') !=# ':<C-U>call signature#utils#Input()<CR>'
+    return
+  endif
+
+  for l:map in maplist()
+    if (  l:map.noremap
+     \ && !l:map.expr
+     \ && l:map.rhs ==# 'm'
+     \ && (l:map.mode ==# ' ' || l:map.mode =~# 'n')
+     \ )
+      " Change only Normal mode, leaving Visual/Operator-pending aliases intact.
+      let l:map.rhs = l:input.rhs
+      call mapset('n', 0, l:map)
+    endif
+  endfor
 endfunction
 
 
